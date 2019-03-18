@@ -1,0 +1,1 @@
+WISHPOST_DB = 'wishpost'

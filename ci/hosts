@@ -1,0 +1,4 @@
+# BEGIN - IU hosts setup
+127.0.0.1       demo.iu.com
+127.0.0.1       mongo-express.iu.com
+# END - IU hosts setup

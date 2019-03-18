@@ -1,0 +1,56 @@
+# Don't track files with the following extentions.
+*~
+*.o
+*.lo
+*.pyc
+*.e4p
+*.cbp
+*.layout
+*.log
+._*
+
+tags
+tags.lock
+tags.temp
+.tags
+*.pyo
+*.swp
+*.swo
+
+# for people who uses eclipse.
+.settings/*
+.project
+.pydevproject
+.metadata
+
+# for vscode
+.vscode
+
+# pip install 'src' folder at this root..
+/src
+# ..and for any subproject under root
+*/src
+# for modelgen
+newmodels
+
+# for sass/css
+.sass-cache
+
+.commit
+
+# for arc
+.arc/
+
+# for Mac users
+.DS_Store
+
+
+# In case you want to configure pylint (or link to .arcpylint_rcfile)
+.pylintrc
+local.properties
+
+# Ignore v0 Dev container build cache
+# See github.com/ContextLogic/dev
+.cache
+.npm
+.config
