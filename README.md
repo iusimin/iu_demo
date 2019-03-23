@@ -1,3 +1,10 @@
+# Docker version required
+```
+docker-compose version 1.23.2, build 1110ad01
+docker-py version: 3.6.0
+CPython version: 3.6.6
+OpenSSL version: OpenSSL 1.1.0h  27 Mar 2018
+```
 # Setup seperate git account
 1. Clone iu project to your local directory
 ```
@@ -42,7 +49,7 @@ Connection to github.com closed.
 $ echo $IU_HOME
 /home/arthur/iu
 ```
-2. Run command iu/ci/setup.sh, this step require root password and may take several minutes to download images and packages.
+2. Run command `python iu/ci/setup.py`, this step require root password and may take several minutes to download images and packages.
 
 # Run demo
 1. Ensure 80 port is released (Stop nginx / apache server if it's running on 80 port)

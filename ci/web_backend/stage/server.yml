@@ -1,0 +1,27 @@
+---
+  env:
+    proj: web_backend
+    config: stage
+  mongo:
+    host: mongodb
+    port: 27017
+    db: iu
+    username: root
+    password: example
+    authentication_source: admin
+  gunicorn:
+    bind: 0.0.0.0:5000
+    workers: 1
+    worker_class: gevent
+    timeout: 300
+    reload: True
+  celery:
+    broker_url: pyamqp://root:example@rabbitmq:5672
+    result_backend: pyamqp://root:example@rabbitmq:5672
+    default_exchange: web-backend
+    default_exchange_type: direct
+    deadletter_prefix: error.
+  rate-limiter:
+    url: http://rate-limiter/r
+    backoff: [2, 4]
+    backoff_max: 600

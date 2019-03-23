@@ -19,9 +19,15 @@ from web_backend.core.url_mapping import API_ROUTER
 import yaml
 import os
 import mongoengine
+from celery import Celery
+import web_backend.tasks.all as async_tasks
+from web_backend.tasks import AbstractAsyncTaskFactory
+from kombu import Exchange, Queue
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
-CONFIG_FILE = '/etc/iu-web-backend.yml'
+CONFIG_FILE = '/etc/server.yml'
+PROJ_NAME = 'web_backend'
+
 
 class IUBackendService(falcon.API):
     options = {}
@@ -39,12 +45,38 @@ class IUBackendService(falcon.API):
 
     def connect(self):
         self.connect_mongo()
+        self.connect_celery()
     
     def connect_mongo(self):
         self.mongo_connections = mongoengine.connect(
             **self.options['mongo'])
         self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
             % self.options['mongo'])
+
+    def connect_celery(self):
+        self.logger.info('Connecting Celery...')
+        self.celery_app = Celery(PROJ_NAME)
+        self.celery_app.conf.update(**self.options['celery'])
+        cfg = self.celery_app.conf
+        # Setup tasks
+        AbstractAsyncTaskFactory.init(self)
+        for t in async_tasks.ALL:
+            t.init(self)
+        # Setup exchange, DLQ will be setup in worker.py
+        default_exchange = Exchange(cfg.default_exchange,
+            type=cfg.default_exchange_type)
+        # Setup router for each task
+        task_routes = {}
+        task_queues = []
+        for t in async_tasks.ALL + async_tasks.CRONS:
+            task_routes.update(t.ROUTES)
+            task_queues.append(Queue(
+                t.queue_name(),
+                exchange=default_exchange,
+                routing_key=t.queue_name(),
+            ))
+        self.celery_app.conf.task_queues = task_queues
+        self.celery_app.conf.task_routes = task_routes
 
     def disconnect(self):
         pass

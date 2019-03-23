@@ -1,9 +1,11 @@
 import json
 import falcon
 from cl.utils import password
-from web_backend.api.base import BaseApiResource
+from web_backend.api import BaseApiResource
 from web_backend.model.user import User
 from mongoengine import errors as dberr
+from web_backend.tasks.sample_light import SampleLightTasks
+from web_backend.tasks.sample_heavy import SampleHeavyTasks
 
 class UserCollectionApi(BaseApiResource):
     def on_get(self, req, resp):
@@ -54,13 +56,24 @@ class UserApi(BaseApiResource):
         }, ensure_ascii=False)
         resp.status = falcon.HTTP_200
 
+class WorkerTestApi(BaseApiResource):
+    def on_get(self, req, resp):
+        light_num = int(req.params.get('light_num', 10))
+        heavy_num = int(req.params.get('heavy_num', 5))
+        for i in range(light_num):
+            SampleLightTasks.sample.delay(2, 3)
+        for i in range(heavy_num):
+            SampleHeavyTasks.sample.delay(2, 3)
+        resp.body = json.dumps({
+            'heavy_task_queued': heavy_num,
+            'light_task_queued': light_num,
+        }, ensure_ascii=False)
+        resp.status = falcon.HTTP_200
+
 class SleepApi(BaseApiResource):
     def on_get(self, req, resp):
         res = str(User.objects(__raw__={
             '$where': 'sleep(10000) || true'
         }))
-        # from mongoengine.connection import get_db
-        # db = get_db()
-        # res = str(db.command('sleep (10)'))
         resp.body = json.dumps(res, ensure_ascii=False)
         resp.status = falcon.HTTP_200
