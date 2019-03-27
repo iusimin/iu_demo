@@ -7,7 +7,7 @@ Options:
     -h --help                   Show this screen.
 """
 from web_backend.server import IUBackendService
-from web_backend.server import parse_config_file
+from web_backend.server import ConfigParser
 from web_backend.server import CONFIG_FILE as SERVER_CONFIG_FILE
 from celery.bin import worker
 from docopt import docopt
@@ -20,7 +20,7 @@ FLOWER_CONFIG_FILE = '/etc/celery-flower.conf'
 
 def main():
     args = docopt(__doc__)
-    app_options = parse_config_file(SERVER_CONFIG_FILE)
+    app_options = ConfigParser.parse_config_file(SERVER_CONFIG_FILE)
     application = IUBackendService(app_options)
     application.connect()
     options.port = 8888

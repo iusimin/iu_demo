@@ -23,28 +23,45 @@ from celery import Celery
 import web_backend.tasks.all as async_tasks
 from web_backend.tasks import AbstractAsyncTaskFactory
 from kombu import Exchange, Queue
+from web_backend.middlewares.require_json import RequireJSON
+from web_backend.middlewares.session import SessionMiddleware
+import walrus
+import web_backend.model.redis_keys as redis_keys
+import web_backend.lib.cache as cache
+import web_backend.lib.unit_convertor as uc
+import redis
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 CONFIG_FILE = '/etc/server.yml'
 PROJ_NAME = 'web_backend'
 
-
 class IUBackendService(falcon.API):
     options = {}
 
     def __init__(self, options):
-        super(IUBackendService, self).__init__(middleware=[
-        ])
         self.options = options
         self.logger = logging.getLogger('iu.web_backend')
         self.logger.setLevel(logging.INFO)
+        super(IUBackendService, self).__init__(middleware=[
+            RequireJSON(),
+            SessionMiddleware(),
+        ])
 
+        falcon_options = options.pop('falcon', {})
+        if 'req_options' in falcon_options:
+            for k, v in falcon_options.pop('req_options').items():
+                setattr(self.req_options, k, v)
+        if 'resp_options' in falcon_options:
+            for k, v in falcon_options.pop('resp_options').items():
+                setattr(self.resp_options, k, v)
+        
         # Build routers
         for (uri, resource) in API_ROUTER:
             self.add_route(uri, resource(self))
 
     def connect(self):
         self.connect_mongo()
+        self.connect_redis()
         self.connect_celery()
     
     def connect_mongo(self):
@@ -52,6 +69,13 @@ class IUBackendService(falcon.API):
             **self.options['mongo'])
         self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
             % self.options['mongo'])
+
+    def connect_redis(self):
+        self.redis_db = walrus.Database(**self.options['redis'])
+        self.redis_conn = redis.Redis(**self.options['redis'])
+        redis_keys.BaseRedisKey.init(self)
+        self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
+            % self.options['redis'])
 
     def connect_celery(self):
         self.logger.info('Connecting Celery...')
@@ -68,7 +92,7 @@ class IUBackendService(falcon.API):
         # Setup router for each task
         task_routes = {}
         task_queues = []
-        for t in async_tasks.ALL + async_tasks.CRONS:
+        for t in async_tasks.ALL:
             task_routes.update(t.ROUTES)
             task_queues.append(Queue(
                 t.queue_name(),
@@ -95,12 +119,31 @@ class GunicornApp(BaseApplication):
         self.application.connect()
         return self.application
 
-def parse_config_file(fpath):
-    f = open(fpath, 'r')
-    return yaml.full_load(f)
+class ConfigParser(object):
+    @classmethod
+    def convert_mapping(cls):
+        return {
+            'max-memory-per-child': uc.memory_to_kb,
+            'login_expire': uc.time_to_second,
+            'guest_expire': uc.time_to_second,
+        }
+
+    @classmethod
+    def parse_config_file(cls, fpath):
+        f = open(fpath, 'r')
+        raw = yaml.full_load(f)
+        convert_mapping = cls.convert_mapping()
+        def __convert_unit(d):
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    __convert_unit(v)
+                elif k in convert_mapping:
+                    d[k] = convert_mapping[k](v)
+        __convert_unit(raw)
+        return raw
 
 def main():
-    options = parse_config_file(CONFIG_FILE)
+    options = ConfigParser.parse_config_file(CONFIG_FILE)
     application = IUBackendService(options)
     gunicorn_app = GunicornApp(application, options['gunicorn'])
     application.logger.info('Server starting...')

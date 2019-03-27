@@ -2,6 +2,12 @@
   env:
     proj: web_backend
     config: stage
+  falcon:
+    resp_options:
+      secure_cookies_by_default: False
+  session:
+    login_expire: 30d
+    guest_expire: 1d
   mongo:
     host: mongodb
     port: 27017
@@ -9,6 +15,10 @@
     username: root
     password: example
     authentication_source: admin
+  redis:
+    host: redis
+    port: 6379
+    db: 0
   gunicorn:
     bind: 0.0.0.0:5000
     workers: 1
@@ -17,7 +27,7 @@
     reload: True
   celery:
     broker_url: pyamqp://root:example@rabbitmq:5672
-    result_backend: pyamqp://root:example@rabbitmq:5672
+    result_backend: redis://redis/1
     default_exchange: web-backend
     default_exchange_type: direct
     deadletter_prefix: error.

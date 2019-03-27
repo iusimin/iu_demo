@@ -25,6 +25,7 @@ Pre-defined Services:
     server                      Backend and frontend web server
     worker                      Worker for all Queue
     worker-shell                Shell to manage workers
+    redis-shell                 Shell to manage redis instance
     heavy-task-worker           Worker for heavy task Queue
     light-task-worker           Worker for light task Queue
 """
@@ -52,18 +53,22 @@ SERVICE_CONFIG = {
     'worker': [
         'run',
         '--use-aliases', '--service-ports', '--rm',
-        'web-backend-worker',
-        'python', 'worker.py', # Need input
+        'web-backend-worker', 'python', 'worker.py', # Need input
     ],
     'worker-shell': [
         'run',
         '--use-aliases', '--service-ports', '--rm',
         'web-backend-worker', '/bin/bash',
     ],
+    'redis-shell': [
+        'run',
+        '--use-aliases', '--service-ports', '--rm',
+        'redis', '/bin/bash',
+    ],
     'infra': [
         'up',
         '--abort-on-container-exit',
-        'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter'
+        'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
     ],
 }
 

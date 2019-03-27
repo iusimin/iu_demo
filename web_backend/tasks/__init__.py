@@ -16,7 +16,7 @@ class AbstractAsyncTaskFactory(object):
         'retry_backoff': (1, 6),
         'retry_backoff_max': 5*60,
         'ignore_result': True,
-        # 'acks_late': True,
+        'acks_late': True,
     }
     ROUTES = {}
     QUEUE_NAME = None
@@ -143,4 +143,3 @@ class AbstractCronTaskFactory(AbstractAsyncTaskFactory):
         'bind': True,
         'ignore_result': False,
     }
-    

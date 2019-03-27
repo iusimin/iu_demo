@@ -2,7 +2,7 @@ import json
 import falcon
 from cl.utils import password
 from web_backend.api import BaseApiResource
-from web_backend.model.user import User
+from web_backend.model.mongo.user import User
 from mongoengine import errors as dberr
 from web_backend.tasks.sample_light import SampleLightTasks
 from web_backend.tasks.sample_heavy import SampleHeavyTasks
@@ -22,12 +22,12 @@ class UserCollectionApi(BaseApiResource):
         resp.status = falcon.HTTP_200
 
     def on_post(self, req, resp):
+        params = req.media
         try:
-            post_body = json.loads(req.stream.read().decode('utf-8'))
-            username = post_body['username']
-            pwd = post_body['password']
-            email = post_body['email']
-            phone = post_body['phone_number']
+            username = params['username']
+            pwd = params['password']
+            email = params['email']
+            phone = params['phone_number']
         except KeyError:
             raise falcon.HTTPBadRequest('Bad input body')
 
@@ -40,9 +40,12 @@ class UserCollectionApi(BaseApiResource):
                 phone_number=phone,
             ).save()
             resp.status = falcon.HTTP_201
-            resp.body = json.dumps({
+            resp.media = {
                 'result': 'Success'
-            }, ensure_ascii=False)
+            }
+            # resp.body = json.dumps({
+            #     'result': 'Success'
+            # }, ensure_ascii=False)
         except dberr.NotUniqueError as e:
             raise falcon.HTTPBadRequest('User already exists')
 

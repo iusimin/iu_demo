@@ -2,14 +2,14 @@ from mongoengine import Document, EmbeddedDocument
 import mongoengine.fields as f
 from cl.utils.py_enum import PyEnumMixin
 from bson import ObjectId
-from web_backend.model.lib import *
+from web_backend.model.mongo import IU_DEMO_DB
 
 class User(Document):
     meta = {
         'indexes': [
         ],
         'allow_inheritance': False,
-        'db_name': WISHPOST_DB,
+        'db_name': IU_DEMO_DB,
         'force_insert': True,
     }
 

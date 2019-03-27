@@ -5,4 +5,6 @@ API_ROUTER = [
     ('/api/user', a.UserCollectionApi),
     ('/api/sleep', a.SleepApi),
     ('/api/worker_test', a.WorkerTestApi),
+    ('/api/login', a.UserLoginApi),
+    ('/api/logout', a.UserLogoutApi),
 ]

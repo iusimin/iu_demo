@@ -1,1 +1,0 @@
-WISHPOST_DB = 'wishpost'

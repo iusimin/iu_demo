@@ -4,24 +4,19 @@ DEFAULT:
   loglevel: INFO
   traceback: True
   time-limit: 3600
-  max-memory-per-child: 1024000
+  max-memory-per-child: 1GB
   concurrency: 1
-
-default-cron-worker:
-  concurrency: 30
-  queues:
-    - As
 
 light-task-worker:
   time-limit: 30
-  max-memory-per-child: 102400
+  max-memory-per-child: 50MB
   concurrency: 30
   queues:
     - SampleLightTasks
 
 heavy-task-worker:
   time-limit: 3600
-  max-memory-per-child: 1024000
+  max-memory-per-child: 1GB
   concurrency: 20
   queues:
     - SampleHeavyTasks

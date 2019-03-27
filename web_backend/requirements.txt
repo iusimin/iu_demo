@@ -11,3 +11,5 @@ celery==4.2.0
 inflection==0.3.1
 flower==0.9.3
 requests==2.21.0
+redis==3.2.1
+walrus==0.7.1
