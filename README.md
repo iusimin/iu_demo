@@ -8,7 +8,7 @@ OpenSSL version: OpenSSL 1.1.0h  27 Mar 2018
 # Setup seperate git account
 1. Clone iu project to your local directory
 ```
-git clone git@github.com:intelligenceunion/iu.git
+git clone git@github.com:intelligenceunion/iu_demo.git
 ```
 2. Modify `~/iu/.git/config`, adding user inforamtion to your IU git account, sample:
 ```
@@ -47,9 +47,9 @@ Connection to github.com closed.
 1. Config environment variable IU_HOME to your project home path(Write in .bashrc)
 ```
 $ echo $IU_HOME
-/home/arthur/iu
+/home/arthur/iu_demo
 ```
-2. Run command `python iu/ci/setup.py`, this step require root password and may take several minutes to download images and packages.
+2. Run command `python iu_demo/ci/setup.py`, this step require root password and may take several minutes to download images and packages.
 
 # Run demo
 1. Ensure 80 port is released (Stop nginx / apache server if it's running on 80 port)

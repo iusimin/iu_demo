@@ -15,7 +15,7 @@ class BaseRedisKey(object):
     def __init__(self, raw_key):
         if self.__namespace__ is None:
             self.__namespace__ = inflection.underscore(self.__class__.__name__)
-        self.key = '%s|%s' % (self.__namespace__, raw_key)
+        self.key = '%s$%s' % (self.__namespace__, raw_key)
         
     def key_exists(self):
         return self.key in self.db

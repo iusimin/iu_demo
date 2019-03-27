@@ -11,7 +11,7 @@ class SessionMiddleware(object):
             resp.set_cookie('session_id', session_id)
         session = Session(session_id)
         if not session.is_valid():
-            # Session expired
             session_id = Session.create_new_session()
             resp.set_cookie('session_id', session_id)
+            session = Session(session_id)
         req.context['session'] = session

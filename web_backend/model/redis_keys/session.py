@@ -24,7 +24,6 @@ class Session(BaseRedisKey):
                 user_id=guest_uid,
             )
             ttl = timedelta(seconds=cls.options()['guest_expire'])
-            print(ttl)
             session_hash.expire(ttl)        
         return key
 
