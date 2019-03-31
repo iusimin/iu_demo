@@ -1,5 +1,7 @@
 from web_backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
+from web_backend.tasks.sample_light import SampleLightTasks
+from web_backend.tasks.sample_heavy import SampleHeavyTasks
 
 class DemoApi(BaseApiResource):
     def on_mongoSleep(self, req, resp):
@@ -12,8 +14,8 @@ class DemoApi(BaseApiResource):
         }
     
     def on_publishAsyncTask(self, req, resp):
-        light_num = req.media['light']
-        heavy_num = req.media['heavy']
+        light_num = req.media.get('light', 0)
+        heavy_num = req.media.get('heavy', 0)
         for i in range(light_num):
             SampleLightTasks.sample.delay(2, 3)
         for i in range(heavy_num):

@@ -136,10 +136,3 @@ class AbstractAsyncTaskFactory(object):
                 cls.check_rate_limiter(f),
             )
         )
-
-class AbstractCronTaskFactory(AbstractAsyncTaskFactory):
-    QUEUE_NAME = 'default_cron_task_queue'
-    DEFAULT_TASK_PARAMS = {
-        'bind': True,
-        'ignore_result': False,
-    }
