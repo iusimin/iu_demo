@@ -5,7 +5,8 @@ from web_backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
 from datetime import datetime
 from web_backend.model.redis_keys.session import Session
-from web_backend.hooks.auth import login_required
+from web_backend.hooks.auth import login_required, permission_required
+from web_backend.hooks.validation import JsonSchema
 
 class UserLoginApi(BaseApiResource):
     @falcon.before(login_required)
@@ -37,13 +38,43 @@ class UserLoginApi(BaseApiResource):
             'user_id': str(u.id),
             'username': str(u.username),
         }
-
-class UserLogoutApi(BaseApiResource):
+    
     @falcon.before(login_required)
-    def on_post(self, req, resp):
+    def on_delete(self, req, resp):
         session = req.context['session']
         session.logout()
         resp.unset_cookie('session_id')
         resp.media = {
             'title': 'Logout Success',
+        }
+
+class SessionCollectionApi(BaseApiResource):
+    @falcon.before(permission_required)
+    def on_get(self, req, resp):
+        session = req.context['session']
+        session_content = session.snapshot
+        permissions = session.permissions
+        resp.media = {
+            'user_id': session_content['user_id'].decode('utf-8'),
+            'user_expire': str(
+                datetime.fromtimestamp(int(session_content['user_expire']))
+            ) if 'user_expire' in session_content else 'N/A',
+            'session_ttl': session.ttl(),
+            'permissions': [
+                p.to_json_dict() for p in permissions
+            ]
+        }
+
+    @falcon.before(login_required)
+    def on_expireUserCache(self, req, resp):
+        session = req.context['session']
+        params = req.media
+        session.expire_user()
+        session_content = session.snapshot
+        resp.media = {
+            'user_id': session_content['user_id'].decode('utf-8'),
+            'user_expire': str(
+                datetime.fromtimestamp(int(session_content['user_expire']))
+            ),
+            'session_ttl': session.ttl(),
         }

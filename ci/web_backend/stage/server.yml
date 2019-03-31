@@ -8,6 +8,7 @@
   session:
     login_expire: 30d
     guest_expire: 1d
+    user_expire: 1m
   mongo:
     host: mongodb
     port: 27017

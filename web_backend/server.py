@@ -23,12 +23,13 @@ from celery import Celery
 import web_backend.tasks.all as async_tasks
 from web_backend.tasks import AbstractAsyncTaskFactory
 from kombu import Exchange, Queue
-from web_backend.middlewares.require_json import RequireJSON
 from web_backend.middlewares.session import SessionMiddleware
+from web_backend.middlewares.validation import RequestValidationMiddleware, RequireJSONMiddleware
 import walrus
-import web_backend.model.redis_keys as redis_keys
+from cl.utils.redis import BaseRedisKey
 import web_backend.lib.cache as cache
 import web_backend.lib.unit_convertor as uc
+from web_backend.api import convert_custom_verb_pattern
 import redis
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -43,7 +44,8 @@ class IUBackendService(falcon.API):
         self.logger = logging.getLogger('iu.web_backend')
         self.logger.setLevel(logging.INFO)
         super(IUBackendService, self).__init__(middleware=[
-            RequireJSON(),
+            RequireJSONMiddleware(),
+            RequestValidationMiddleware(),
             SessionMiddleware(),
         ])
 
@@ -58,6 +60,12 @@ class IUBackendService(falcon.API):
         # Build routers
         for (uri, resource) in API_ROUTER:
             self.add_route(uri, resource(self))
+        # Adding custom verb router
+        for (uri, resource) in API_ROUTER:
+            if not resource.ENABLE_CUSTOM_VERB:
+                continue
+            uri = convert_custom_verb_pattern(uri)
+            self.add_route(uri, resource(self, custom_verb=True))
 
     def connect(self):
         self.connect_mongo()
@@ -73,7 +81,7 @@ class IUBackendService(falcon.API):
     def connect_redis(self):
         self.redis_db = walrus.Database(**self.options['redis'])
         self.redis_conn = redis.Redis(**self.options['redis'])
-        redis_keys.BaseRedisKey.init(self)
+        BaseRedisKey.init(self)
         self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
             % self.options['redis'])
 
@@ -126,6 +134,7 @@ class ConfigParser(object):
             'max-memory-per-child': uc.memory_to_kb,
             'login_expire': uc.time_to_second,
             'guest_expire': uc.time_to_second,
+            'user_expire': uc.time_to_second,
         }
 
     @classmethod

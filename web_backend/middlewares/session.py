@@ -1,6 +1,11 @@
 from web_backend.model.redis_keys.session import Session
 
 class SessionMiddleware(object):
+    def process_resource(self, req, resp, resource, params):
+        ''' Save app options.env to context
+        '''
+        req.context['env'] = resource.application.options['env']
+
     def process_request(self, req, resp):
         ''' Assign a server-side session for each access
         '''
