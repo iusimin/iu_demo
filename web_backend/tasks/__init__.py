@@ -5,6 +5,7 @@ from celery.exceptions import TaskPredicate, MaxRetriesExceededError
 import logging
 import requests
 import random
+from collections import defaultdict
 
 class AbstractAsyncTaskFactory(object):
     DEFAULT_TASK_PARAMS = {
@@ -20,6 +21,7 @@ class AbstractAsyncTaskFactory(object):
     }
     ROUTES = {}
     QUEUE_NAME = None
+    BIND_FUNC_MAPPING = defaultdict(list)
 
     @classmethod
     def queue_prefix(cls):
@@ -44,6 +46,12 @@ class AbstractAsyncTaskFactory(object):
     def init(cls, application):
         cls.application = application
         cls.logger = logging.getLogger(cls.__name__)
+        binds = AbstractAsyncTaskFactory.BIND_FUNC_MAPPING.pop(cls.__name__, [])
+        for b in binds:
+            f = getattr(cls, b['f'])
+            setattr(cls, b['f'], cls.bind_func(
+                f, *b['args'], **b['kwargs']
+            ))
 
     @classmethod
     def on_failure(cls, queue_name, autoretry):
@@ -136,3 +144,14 @@ class AbstractAsyncTaskFactory(object):
                 cls.check_rate_limiter(f),
             )
         )
+
+def async_task(*args, **kwargs):
+    def __wrapper(f):
+        cname, fname = f.__qualname__.split('.')
+        AbstractAsyncTaskFactory.BIND_FUNC_MAPPING[cname].append({
+            'f': fname,
+            'args': args,
+            'kwargs': kwargs,
+        })
+        return f
+    return __wrapper

@@ -15,12 +15,12 @@ class User(Document, MongoMixin):
         'force_insert': True,
     }
 
-    username = f.StringField(db_field="u", index=True, unique=True)
-    password = f.StringField(db_field="p")
-    email = f.StringField(db_field="e", index=True, unique=True)
-    phone_number = f.StringField(db_field="pn")
-    permissions = f.ListField(f.EmbeddedDocumentField('Permission'), db_field='s', default=[])
-    role_names = f.ListField(f.StringField(), db_field="r", default=[])
+    username = f.StringField(index=True, unique=True)
+    password = f.StringField()
+    email = f.StringField( index=True, unique=True)
+    phone_number = f.StringField()
+    permissions = f.ListField(f.EmbeddedDocumentField('Permission'),  default=[])
+    role_names = f.ListField(f.StringField(),  default=[])
 
     def get_permissions(self):
         plist = list(self.permissions)
