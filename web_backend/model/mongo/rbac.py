@@ -20,9 +20,9 @@ class Permission(EmbeddedDocument, MongoMixin):
         PATCH = 3
         DELETE = 4
 
-    allow = f.BooleanField(db_field="e")
-    resource = f.StringField(db_field="r") # Regex for web endpoint
-    actions = f.ListField(f.IntField(choices=Action.get_ids()), db_field="a")
+    allow = f.BooleanField()
+    resource = f.StringField() # Regex for web endpoint
+    actions = f.ListField(f.IntField(choices=Action.get_ids()))
 
     @classmethod
     def check_permissions(cls, resource, action, permissions, default_allow=False):
@@ -56,9 +56,9 @@ class Role(Document, MongoMixin):
     }
 
     name = f.StringField(primary_key=True)
-    description = f.StringField(db_field="d")
-    parents = f.ListField(f.StringField(), db_field="p")
-    permissions = f.ListField(f.EmbeddedDocumentField('Permission'), db_field='s')
+    description = f.StringField()
+    parents = f.ListField(f.StringField())
+    permissions = f.ListField(f.EmbeddedDocumentField('Permission'))
 
     def get_permissions(self):
         plist = list(self.permissions)
