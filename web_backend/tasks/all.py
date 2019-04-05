@@ -5,3 +5,6 @@ ALL = [
     SampleLightTasks,
     SampleHeavyTasks,
 ]
+ALL_NAME = [
+    t.__name__ for t in ALL
+]

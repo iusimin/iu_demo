@@ -125,6 +125,7 @@ class GunicornApp(BaseApplication):
 
     def load(self):
         self.application.connect()
+        self.application.logger.info('Server is now running...')
         return self.application
 
 class ConfigParser(object):
@@ -153,6 +154,8 @@ class ConfigParser(object):
 
 def main():
     options = ConfigParser.parse_config_file(CONFIG_FILE)
+    # Disable rate limiter for web server
+    options['rate-limiter']['enable'] = False
     application = IUBackendService(options)
     gunicorn_app = GunicornApp(application, options['gunicorn'])
     application.logger.info('Server starting...')

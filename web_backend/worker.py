@@ -2,10 +2,11 @@
 
 Usage:
     worker.py from-config [--config=<config-string>] <config-name>
-    worker.py from-queues [--config=<config-string>] <queue-name>...
+    worker.py from-queues [--config=<config-string>] [--process_errors] <queue-name>...
 
 Options:
     -c CFG --config CFG         Override configs, format "cfg1=val1,cfg2=val2"
+    --process_errors            Process error queues
     -h --help                   Show this screen.
 """
 
@@ -16,6 +17,7 @@ from celery.bin import worker
 from celery import bootsteps
 from docopt import docopt
 from web_backend.tasks import AbstractAsyncTaskFactory
+from web_backend.tasks.all import ALL_NAME as ALL_TASK_CLS
 import inflection
 from kombu import Exchange, Queue
 
@@ -51,17 +53,23 @@ def main():
     
     app_options = ConfigParser.parse_config_file(SERVER_CONFIG_FILE)
     worker_options = ConfigParser.parse_config_file(WORKER_CONFIG_FILE)
+    app_options['env']['instance'] = 'worker'
+    if args.get('--process_errors'):
+        app_options['celery']['process_errors'] = True
     application = IUBackendService(app_options)
     application.connect()
     worker_cfg = dict(worker_options['DEFAULT'])
     print(worker_cfg)
 
     # Override default if from-config
+    queue_prefix = AbstractAsyncTaskFactory.queue_prefix()
     if args.get('from-config'):
         cfg_name = args.get('<config-name>')
         # Adding prefix for queues
-        queue_prefix = AbstractAsyncTaskFactory.queue_prefix()
         if 'queues' in worker_options[cfg_name]:
+            for q in worker_options[cfg_name]['queues']:
+                if q not in ALL_TASK_CLS:
+                    exit('%s is not a validate task!' % q)
             queues = ['{queue_prefix}.{queue_name}'.format(
                 queue_prefix=queue_prefix,
                 queue_name=inflection.underscore(queue_name)
@@ -71,7 +79,19 @@ def main():
     # Override queues if from-queues
     elif args.get('from-queues'):
         queues = args.get('<queue-name>')
-        worker_options[cfg_name]['queues'] = ','.join(queues)
+        for q in queues:
+                if q not in ALL_TASK_CLS:
+                    exit('%s is not a validate task!' % q)
+        error_prefix=app_options['celery']['deadletter_prefix']
+        if args.get('--process_errors'):
+            queue_prefix = error_prefix+queue_prefix
+        queues = ['{queue_prefix}.{queue_name}'.format(
+            queue_prefix=queue_prefix,
+            queue_name=inflection.underscore(queue_name)
+        ) for queue_name in queues]
+        worker_cfg.update({
+            'queues': ','.join(queues)
+        })
     # Override others from cmd input
     if cmd_cfg_string:
         cmd_cfg = [r.split('=') for r in cmd_cfg_string.split(',')]
