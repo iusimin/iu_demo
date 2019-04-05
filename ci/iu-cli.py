@@ -3,7 +3,7 @@
 
 Usage:
     iu-cli run <service-name> --env=<ENV> [--shell=<ARGS>] 
-    iu-cli compose <compose-target> --env=<ENV> [--shell=<ARGS>]
+    iu-cli compose <compose-command> <compose-target> --env=<ENV> [--shell=<ARGS>]
     iu-cli rebuild --env=<ENV> 
     iu-cli rm --env=<ENV>
 
@@ -28,6 +28,7 @@ Pre-defined Services:
     redis-shell                 Shell to manage redis instance
     heavy-task-worker           Worker for heavy task Queue
     light-task-worker           Worker for light task Queue
+    rate-limiter-config         Open and edit rate limiter config
 """
 import os
 import sys
@@ -70,6 +71,10 @@ SERVICE_CONFIG = {
         '--abort-on-container-exit',
         'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
     ],
+    'rate-limiter-config': [
+        'exec', 'rate-limiter',
+        'python3', 'cli.py', 'manage',
+    ]
 }
 
 class CommandExecuteFactory(object):
@@ -85,13 +90,6 @@ class CommandExecuteFactory(object):
     
     def run_command(self, args):
         call(args)
-    
-    # def attach_docker_container(self, target):
-    #     if target not in ATTACH_CONFIG:
-    #         print('ERROR: Invalid attach target %s' % target)
-    #         print(__doc__)
-    #         sys.exit(1)
-    #     self.run_docker_compose(ATTACH_CONFIG[target])
 
     def run_service(self, service_name, service_args):
         if service_name not in SERVICE_CONFIG:
@@ -125,11 +123,12 @@ def main():
     # elif options.pop('attach'):
     #     cef.attach_docker_container(options.pop('<attach-target>'))
     elif options.pop('compose'):
-        args = options.pop('--shell').split()
-        cef.run_docker_compose([
+        args = [
+            options.pop('<compose-command>'),
             options.pop('<compose-target>'),
-            args,
-        ])
+        ]
+        args = args + options.pop('--shell').split()
+        cef.run_docker_compose(args)
 
 if __name__ == "__main__":
     main()

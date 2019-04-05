@@ -85,6 +85,6 @@ services:
     volumes:
       - ../rate_limiter/stage/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../../rate_limiter:/iu/rate_limiter:ro
-      - ../../rate_limiter/queue_rate.conf:/etc/rate_limiter/queue_rate.conf:ro
-      - ../../rate_limiter/zones.conf:/etc/rate_limiter/zones.conf:ro
-    command: ['nginx-debug', '-g', 'daemon off;']
+      # - ../../rate_limiter/queue_rate.conf:/etc/rate_limiter/queue_rate.conf:ro
+      # - ../../rate_limiter/zones.conf:/etc/rate_limiter/zones.conf:ro
+    command: ['nginx', '-g', 'daemon off;']

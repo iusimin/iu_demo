@@ -19,6 +19,13 @@ class AbstractAsyncTaskFactory(object):
         'ignore_result': True,
         'acks_late': True,
     }
+    ERROR_TASK_PARAMS = {
+        'bind': True,
+        'ignore_result': True,
+        'acks_late': True,
+        'retry_kwargs': {'max_retries': 0},
+    }
+    TASK_PARAMS = {}
     ROUTES = {}
     QUEUE_NAME = None
     BIND_FUNC_MAPPING = defaultdict(list)
@@ -78,17 +85,22 @@ class AbstractAsyncTaskFactory(object):
                             raise
                 except (TaskPredicate, MaxRetriesExceededError):
                     raise
-                except Exception:
-                    dl_prefix = cls.application.celery_app.conf.deadletter_prefix
-                    dl_queue = dl_prefix + cls.queue_name(queue_name)
-                    cls.logger.error(
-                        'Send {task} to {eq}...'.format(
-                            task = str(task),
-                            eq = dl_queue
+                except Exception as e:
+                    if cls.application.options['celery'].get('process_errors'):
+                        task.max_retries = None
+                        logging.exception(str(e))
+                        raise task.retry(exc=e, countdown=5)
+                    else:
+                        dl_prefix = cls.application.celery_app.conf.deadletter_prefix
+                        dl_queue = dl_prefix + cls.queue_name(queue_name)
+                        cls.logger.error(
+                            'Send {task} to {eq}...'.format(
+                                task = str(task),
+                                eq = dl_queue
+                            )
                         )
-                    )
-                    task.apply_async(args, kwargs, queue=dl_queue)
-                    raise
+                        task.apply_async(args, kwargs, queue=dl_queue)
+                        raise
             return __wrapper
         return __decorator
     
@@ -96,6 +108,9 @@ class AbstractAsyncTaskFactory(object):
     def check_rate_limiter(cls, f):
         @wraps(f)
         def __wrapper(task, *args, **kwargs):
+            # Skip rate limit check if task is not running under worker
+            if cls.application.options['rate-limiter'].get('enable') == False:
+                return f(task, *args, **kwargs)
             backoff = cls.application.options['rate-limiter']['backoff']
             backoff_max = cls.application.options['rate-limiter']['backoff_max']
             url = cls.application.options['rate-limiter']['url']
@@ -121,9 +136,13 @@ class AbstractAsyncTaskFactory(object):
             queue_name=cls.queue_name(queue_name),
             func_name=f.__name__,
         )
-        default_kwargs = dict(cls.DEFAULT_TASK_PARAMS)
+        if cls.application.options['celery'].get('process_errors'):
+            default_kwargs = dict(cls.ERROR_TASK_PARAMS)
+        else:
+            default_kwargs = dict(cls.DEFAULT_TASK_PARAMS)
+            default_kwargs.update(cls.TASK_PARAMS)
+            default_kwargs.update(kwargs)
         default_kwargs['name'] = task_name
-        default_kwargs.update(kwargs)
         # Hack autoretry decorator to exclude TaskPredicate exceptions
         autoretry = {
             'autoretry_for': default_kwargs.pop('autoretry_for', []),
