@@ -1,6 +1,6 @@
 version: '3'
 services:
-   # The web backend API server created upon Gunicorn+Gevent+Falcon
+  # The web backend API server created upon Gunicorn+Gevent+Falcon
   web-backend:
     build: ../../web_backend
     ports:
@@ -12,6 +12,16 @@ services:
     environment:
       PYTHONPATH: /iu
     command: ['python', 'server.py']
+    stdin_open: true
+    tty: true
+  # wms-frontend
+  vue-frontend:
+    build: ../../vue_frontend
+    ports:
+      - 5080:5080
+    volumes:
+      - ../../vue_frontend:/iu/vue_frontend:ro
+    command: ["http-server", "dist", "-p 5080"]
     stdin_open: true
     tty: true
   # Celery workers entrypoint
