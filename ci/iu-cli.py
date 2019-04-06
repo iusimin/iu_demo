@@ -51,6 +51,11 @@ SERVICE_CONFIG = {
         '--use-aliases', '--service-ports', '--rm',
         'web-backend',
     ],
+    'vue-frontend-server': [
+        'run',
+        '--use-aliases', '--service-ports', '--rm',
+        'vue-frontend',
+    ],
     'worker': [
         'run',
         '--use-aliases', '--service-ports', '--rm',
