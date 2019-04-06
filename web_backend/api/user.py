@@ -63,7 +63,7 @@ class UserCollectionApi(BaseApiResource):
                 'username': str(u.username),
             }
         except dberr.NotUniqueError as e:
-            raise falcon.HTTPBadRequest('User already exists')
+            raise falcon.HTTPBadRequest('User already exists1111')
 
 class UserApi(BaseApiResource):
     URL_PARAMS_SCHEMA = UrlParamsSchema('''
