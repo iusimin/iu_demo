@@ -35,12 +35,24 @@ Host github-iu
   User git
   IdentityFile ~/.ssh/id_rsa_iu
 ```
+```
+# aliyun-code
+Host code.aliyun.com
+  HostName code.aliyun.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_iu
+```
 6. Test and verify
 ```
 $ ssh git@github-iu
 PTY allocation request failed on channel 0
 Hi iumao! You've successfully authenticated, but GitHub does not provide shell access.
 Connection to github.com closed.
+```
+```
+$ ssh git@code.aliyun.com
+Welcome to GIT, iuqian!
+Connection to code.aliyun.com closed.
 ```
 
 # Setup
