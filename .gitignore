@@ -29,7 +29,7 @@ tags.temp
 # pip install 'src' folder at this root..
 /src
 # ..and for any subproject under root
-*/src
+# */src
 # for modelgen
 newmodels
 
