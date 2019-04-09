@@ -73,10 +73,11 @@ class IUBackendService(falcon.API):
         self.connect_celery()
     
     def connect_mongo(self):
-        self.mongo_connections = mongoengine.connect(
-            **self.options['mongo'])
-        self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
-            % self.options['mongo'])
+        for opts in self.options['mongo']:
+            self.mongo_connections = mongoengine.connect(
+                **opts)
+            self.logger.info('Connecting mongo %(alias)s: %(host)s:%(port)s/%(db)s' \
+                % opts)
 
     def connect_redis(self):
         self.redis_db = walrus.Database(**self.options['redis'])

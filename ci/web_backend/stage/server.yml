@@ -10,12 +10,21 @@
     guest_expire: 1d
     user_expire: 1m
   mongo:
-    host: mongodb
-    port: 27017
-    db: iu
-    username: root
-    password: example
-    authentication_source: admin
+    # Support multiple database
+    - host: mongodb
+      port: 27017
+      db: iu-demo
+      alias: iu-demo
+      username: root
+      password: example
+      authentication_source: admin
+    - host: mongodb
+      port: 27017
+      db: iu-demo2
+      alias: iu-demo2
+      username: root
+      password: example
+      authentication_source: admin
   redis:
     host: redis
     port: 6379

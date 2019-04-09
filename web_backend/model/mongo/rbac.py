@@ -4,7 +4,6 @@ from mongoengine import Document, EmbeddedDocument
 import mongoengine.fields as f
 from cl.utils.py_enum import PyEnumMixin
 from bson import ObjectId
-from web_backend.model.mongo import IU_DEMO_DB
 from cl.utils.mongo import MongoMixin
 import re
 
@@ -51,7 +50,7 @@ class Role(Document, MongoMixin):
         'indexes': [
         ],
         'allow_inheritance': False,
-        'db_name': IU_DEMO_DB,
+        'db_alias': 'iu-demo',
         'force_insert': True,
     }
 

@@ -4,8 +4,8 @@
 Usage:
     iu-cli run <service-name> --env=<ENV> [--shell=<ARGS>] 
     iu-cli compose <compose-command> <compose-target> --env=<ENV> [--shell=<ARGS>]
-    iu-cli rebuild --env=<ENV> 
-    iu-cli rm --env=<ENV>
+    iu-cli rebuild --env=<ENV> <rebuild-targets>...
+    iu-cli rm --env=<ENV> <remove-targets>...
 
 Options:
     -e ENV --env ENV            Running environment
@@ -115,7 +115,9 @@ def main():
         print('ERROR: $IU_HOME variable not set!')
         sys.exit(1)
     if options.pop('rebuild'):
-        cef.run_docker_compose(['build'])
+        targets = options.pop('<rebuild-targets>')
+        cef.run_docker_compose(['rm']+targets)
+        cef.run_docker_compose(['build']+targets)
     elif options.pop('run'):
         args = options.pop('--shell')
         args = args.split() if args else []
@@ -124,7 +126,8 @@ def main():
             args
         )
     elif options.pop('rm'):
-        cef.run_docker_compose(['rm'])
+        targets = options.pop('<remove-targets>')
+        cef.run_docker_compose(['rm']+targets)
     # elif options.pop('attach'):
     #     cef.attach_docker_container(options.pop('<attach-target>'))
     elif options.pop('compose'):
