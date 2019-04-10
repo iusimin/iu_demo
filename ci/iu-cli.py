@@ -23,6 +23,7 @@ Pre-defined Services:
     all                         Run all service available
     infra                       Infra components like Nginx/DB...
     server                      Backend and frontend web server
+    wms-backend                 WMS server
     worker                      Worker for all Queue
     worker-shell                Shell to manage workers
     redis-shell                 Shell to manage redis instance
@@ -55,6 +56,11 @@ SERVICE_CONFIG = {
         'run',
         '--use-aliases', '--service-ports', '--rm',
         'vue-frontend',
+    ],
+    'wms-backend': [
+        'run',
+        '--use-aliases', '--service-ports', '--rm',
+        'wms-backend',
     ],
     'worker': [
         'run',
@@ -98,6 +104,7 @@ class CommandExecuteFactory(object):
 
     def run_service(self, service_name, service_args):
         if service_name not in SERVICE_CONFIG:
+            print(SERVICE_CONFIG)
             print('ERROR: Invalid service %s' % service_name)
             print(__doc__)
             sys.exit(1)

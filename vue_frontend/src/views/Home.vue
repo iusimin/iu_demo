@@ -44,12 +44,12 @@
 <script>
 import axios from "axios";
 export default {
-  data: {
+  data: () => ({
     userName: null,
     userEmail: null,
     userPassword: null,
     userPhoneNumber: null
-  },
+  }),
   components: {},
   methods: {
     registerUser: function() {
@@ -64,8 +64,8 @@ export default {
             phone_number: vm.userPhoneNumber
           }
         )
-        .then(response => (alert("Register Success!")))
-        .catch(error => console.log(error));
+        .then(alert("Register Success!"))
+        .catch(error => alert(error));
     }
   }
 };

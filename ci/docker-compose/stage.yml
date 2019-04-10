@@ -24,6 +24,20 @@ services:
     command: ["http-server", "dist", "-p 5080"]
     stdin_open: true
     tty: true
+  # wms-backend
+  wms-backend:
+    build: ../../wms_backend
+    ports:
+      - 5090:5090
+    volumes:
+      - ../../wms_backend:/iu/wms_backend:ro
+      - ../../cl:/iu/cl:ro
+      - ../wms_backend/stage/server.yml:/etc/server.yml:ro
+    environment:
+      PYTHONPATH: /iu
+    command: ['python', 'server.py']
+    stdin_open: true
+    tty: true
   # Celery workers entrypoint
   web-backend-worker:
     build: ../../web_backend
