@@ -17,6 +17,7 @@ from cl.backend.tasks import get_all_tasks
 from web_backend.middlewares.session import SessionMiddleware
 from cl.backend.middlewares.validation import RequestValidationMiddleware, RequireJSONMiddleware
 import cl.utils.unit_convertor as uc
+import web_backend.tasks as t
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 CONFIG_FILE = '/etc/server.yml'
@@ -48,7 +49,7 @@ class ConfigParser(s.ConfigParser):
         }
 
 def main():
-    options = IuConfigParser.parse_config_file(CONFIG_FILE)
+    options = ConfigParser.parse_config_file(CONFIG_FILE)
     # Disable rate limiter for web server
     options['rate-limiter']['enable'] = False
     application = IUBackendService(

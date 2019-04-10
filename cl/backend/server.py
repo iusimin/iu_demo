@@ -2,6 +2,7 @@ from gevent import monkey
 monkey.patch_all()
 import falcon
 from gunicorn.app.base import BaseApplication
+import logging
 
 import yaml
 import mongoengine
