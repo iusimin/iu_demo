@@ -2,7 +2,7 @@ from web_backend.model.mongo.user import User
 import uuid
 import walrus as w
 from datetime import timedelta, datetime
-from web_backend.lib.cache import instance_cache
+from cl.utils.cache import instance_cache
 from web_backend.model.mongo.user import User
 from cl.utils.redis import BaseRedisKey, redis_pipeline
 import pickle

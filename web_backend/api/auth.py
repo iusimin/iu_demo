@@ -1,12 +1,12 @@
 import json
 import falcon
 from cl.utils import password
-from web_backend.api import BaseApiResource
+from cl.backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
 from datetime import datetime
 from web_backend.model.redis_keys.session import Session
 from web_backend.hooks.auth import login_required, permission_required
-from web_backend.hooks.validation import JsonSchema
+from cl.backend.hooks.validation import JsonSchema
 
 class UserLoginApi(BaseApiResource):
     @falcon.before(login_required)

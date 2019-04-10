@@ -1,4 +1,4 @@
-from web_backend.api import BaseApiResource
+from cl.backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
 from web_backend.tasks.sample_light import SampleLightTasks
 from web_backend.tasks.sample_heavy import SampleHeavyTasks

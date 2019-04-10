@@ -1,4 +1,4 @@
-from web_backend.api import all as a
+import web_backend.api as a
 
 API_ROUTER = [
     ('/api/users/', a.UserCollectionApi),

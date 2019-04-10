@@ -1,8 +1,8 @@
 from web_backend.model.mongo.rbac import Role, Permission
-from web_backend.api import BaseApiResource
-from web_backend.hooks.validation import JsonSchema
+from cl.backend.api import BaseApiResource
+from cl.backend.hooks.validation import JsonSchema
 from web_backend.hooks.auth import permission_required
-from web_backend.hooks.transform import add_list_index
+from cl.backend.hooks.transform import add_list_index
 from mongoengine import errors as dberr
 import falcon
 import json

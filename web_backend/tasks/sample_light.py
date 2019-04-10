@@ -1,4 +1,4 @@
-from web_backend.tasks import AbstractAsyncTaskFactory, async_task
+from cl.backend.tasks import AbstractAsyncTaskFactory, async_task
 import time
 
 class SampleLightTasks(AbstractAsyncTaskFactory):

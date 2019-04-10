@@ -9,10 +9,7 @@ Options:
 from web_backend.server import IUBackendService
 from web_backend.server import ConfigParser
 from web_backend.server import CONFIG_FILE as SERVER_CONFIG_FILE
-from celery.bin import worker
 from docopt import docopt
-from web_backend.tasks import AbstractAsyncTaskFactory
-import inflection
 from flower.command import FlowerCommand
 import flower.options as options
 

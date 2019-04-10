@@ -1,15 +1,15 @@
 import json
 import falcon
 from cl.utils import password
-from web_backend.api import BaseApiResource
+from cl.backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
 from web_backend.model.mongo.rbac import Role
 from mongoengine import errors as dberr
 from web_backend.tasks.sample_light import SampleLightTasks
 from web_backend.tasks.sample_heavy import SampleHeavyTasks
 from web_backend.hooks.auth import login_required, permission_required
-from web_backend.hooks.validation import JsonSchema, UrlParamsSchema
-from web_backend.hooks.transform import add_list_index
+from cl.backend.hooks.validation import JsonSchema, UrlParamsSchema
+from cl.backend.hooks.transform import add_list_index
 from web_backend.model.mongo.rbac import Permission
 
 def extract_params_object(req, resp, resource, params):
