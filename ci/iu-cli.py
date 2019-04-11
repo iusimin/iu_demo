@@ -2,10 +2,14 @@
 """IU Developer CLI Tool
 
 Usage:
-    iu-cli run <service-name> --env=<ENV> [--shell=<ARGS>] 
-    iu-cli compose <compose-command> <compose-target> --env=<ENV> [--shell=<ARGS>]
-    iu-cli rebuild --env=<ENV> <rebuild-targets>...
-    iu-cli rm --env=<ENV> <remove-targets>...
+    iu-cli <proj> run <service-name> --env=<ENV> [--shell=<ARGS>] 
+    iu-cli <proj> compose <compose-command> <compose-target> --env=<ENV> [--shell=<ARGS>]
+    iu-cli <proj> rebuild --env=<ENV> [<rebuild-targets>...]
+    iu-cli <proj> rm --env=<ENV> [<remove-targets>...]
+
+Projects:
+    demo                        IU Demo Project
+    wms                         WMS Project
 
 Options:
     -e ENV --env ENV            Running environment
@@ -20,7 +24,6 @@ Sub Commands:
     attach                      Attach to a running service
 
 Pre-defined Services:
-    all                         Run all service available
     infra                       Infra components like Nginx/DB...
     server                      Backend and frontend web server
     wms                 WMS server
@@ -37,65 +40,73 @@ from docopt import docopt
 from subprocess import call
 
 IU_HOME = os.environ['IU_HOME']
+CFG_FILE = os.path.join(IU_HOME, '.iu_cli')
 
 ENV_ALLOWED = {
     'stage': 'stage.yml'
 }
 
 SERVICE_CONFIG = {
-    'all': [
-        'up',
-        '--no-recreate', '--abort-on-container-exit',
-    ],
-    'server': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'web-backend',
-    ],
-    'vue-frontend-server': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'vue-frontend',
-    ],
-    'wms': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'wms',
-    ],
-    'worker': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'web-backend-worker', 'python', 'worker.py', # Need input
-    ],
-    'worker-shell': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'web-backend-worker', '/bin/bash',
-    ],
-    'redis-shell': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'redis', '/bin/bash',
-    ],
-    'infra': [
-        'up',
-        '--abort-on-container-exit',
-        'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
-    ],
-    'rate-limiter-config': [
-        'exec', 'rate-limiter',
-        'python3', 'cli.py', 'manage',
-    ]
+    'demo': {
+        'server': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'demo',
+        ],
+        'worker': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'demo-worker', 'python', 'worker.py', # Need input
+        ],
+        'worker-shell': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'demo-worker', '/bin/bash',
+        ],
+        'redis-shell': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'redis', '/bin/bash',
+        ],
+        'infra': [
+            'up',
+            '--abort-on-container-exit',
+            'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
+        ],
+        'rate-limiter-config': [
+            'exec', 'rate-limiter',
+            'python3', 'cli.py', 'manage',
+        ],
+    },
+    'wms': {
+        'vue-frontend-server': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'vue-frontend',
+        ],
+        'server': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'wms',
+        ],
+        'nginx': [
+            'run',
+            '--use-aliases', '--service-ports', '--rm',
+            'nginx'
+        ]
+    }
 }
 
 class CommandExecuteFactory(object):
-    def __init__(self, env_file):
+    def __init__(self, proj, env_file):
+        self.proj = proj
         self.env_file = env_file
+        self.service_cfg = SERVICE_CONFIG[self.proj]
     
     def run_docker_compose(self, args):
         origin_args = ['docker-compose', '-f', os.path.join(
             IU_HOME,
-            'ci/docker-compose/%s' % self.env_file
+            'ci/docker-compose/%s/%s' % (self.proj, self.env_file)
         )]
         call(origin_args + args)
     
@@ -103,21 +114,22 @@ class CommandExecuteFactory(object):
         call(args)
 
     def run_service(self, service_name, service_args):
-        if service_name not in SERVICE_CONFIG:
-            print(SERVICE_CONFIG)
+        if service_name not in self.service_cfg:
+            print(self.service_cfg)
             print('ERROR: Invalid service %s' % service_name)
             print(__doc__)
             sys.exit(1)
         
-        self.run_docker_compose(SERVICE_CONFIG[service_name] + service_args)
+        self.run_docker_compose(self.service_cfg[service_name] + service_args)
 
 def main():
     options = docopt(__doc__)
+    proj = options.pop('<proj>')
     env = options.pop('--env')
     if env not in ENV_ALLOWED:
         exit('Invalid --env vaule')
     env_file = ENV_ALLOWED[env]
-    cef = CommandExecuteFactory(env_file)
+    cef = CommandExecuteFactory(proj, env_file)
     if not IU_HOME:
         print('ERROR: $IU_HOME variable not set!')
         sys.exit(1)
@@ -135,8 +147,6 @@ def main():
     elif options.pop('rm'):
         targets = options.pop('<remove-targets>')
         cef.run_docker_compose(['rm']+targets)
-    # elif options.pop('attach'):
-    #     cef.attach_docker_container(options.pop('<attach-target>'))
     elif options.pop('compose'):
         args = [
             options.pop('<compose-command>'),

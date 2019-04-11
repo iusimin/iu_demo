@@ -1,0 +1,90 @@
+version: '3'
+services:
+  # wms-frontend
+  vue-frontend:
+    build: $IU_HOME/vue_frontend
+    ports:
+      - 5080:5080
+    volumes:
+      - $IU_HOME/vue_frontend:/iu/vue_frontend:ro
+    command: ["http-server", "dist", "-p 5080"]
+    stdin_open: true
+    tty: true
+  # wms
+  wms:
+    build: $IU_HOME/wms
+    ports:
+      - 5090:5090
+    volumes:
+      - $IU_HOME/wms:/iu/wms:ro
+      #- /iu/wms/web/node_modules/:rw
+      #- /iu/wms/web/dist/:rw
+      - $IU_HOME/cl:/iu/cl:ro
+      - $IU_HOME/ci/wms/stage/server.yml:/etc/server.yml:ro
+    environment:
+      PYTHONPATH: /iu
+    command: ['python', 'server.py']
+    stdin_open: true
+    tty: true
+  # UI to monitor / manage celery workers
+  celery-flower:
+    build: $IU_HOME/demo
+    ports:
+      - 8888:8888
+    volumes:
+      - $IU_HOME/demo:/iu/demo:ro
+      - $IU_HOME/cl:/iu/cl:ro
+      - $IU_HOME/ci/demo/stage/server.yml:/etc/server.yml:ro
+    environment:
+      PYTHONPATH: /iu
+      FLOWER_PORT: 8888
+      FLOWER_ADDRESS: 0.0.0.0
+    command: ['python', 'celery-flower.py']
+    stdin_open: true
+    tty: true
+  # Mongo DB
+  mongodb:
+    image: mongo:4.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  # A simple GUI tool for Mongo DB
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongodb
+  # Celery Broker with management UI
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: example
+  # Redis for caching and celery backend
+  redis:
+    image: redis:5.0
+    volumes:
+      - $IU_HOME/ci/redis/stage/redis.conf:/usr/local/etc/redis/redis.conf:ro
+  # Proxy and load balancer
+  nginx:
+    image: nginx:1.15.9
+    volumes:
+      - $IU_HOME/ci/nginx/stage/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $IU_HOME/ci/nginx/stage/includes/demo.conf:/etc/nginx/includes/demo.conf:ro
+    command: ['nginx-debug', '-g', 'daemon off;']
+    ports:
+      - 80:80
+  # Nginx for rate limiter
+  rate-limiter:
+    build: $IU_HOME/rate_limiter
+    volumes:
+      - $IU_HOME/ci/rate_limiter/stage/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $IU_HOME/rate_limiter:/iu/rate_limiter:ro
+      # - $IU_HOME/rate_limiter/queue_rate.conf:/etc/rate_limiter/queue_rate.conf:ro
+      # - $IU_HOME/rate_limiter/zones.conf:/etc/rate_limiter/zones.conf:ro
+    command: ['nginx', '-g', 'daemon off;']
