@@ -1,0 +1,1 @@
+IU_DEMO_DB = 'iu'

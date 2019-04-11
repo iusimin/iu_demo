@@ -23,7 +23,7 @@ Pre-defined Services:
     all                         Run all service available
     infra                       Infra components like Nginx/DB...
     server                      Backend and frontend web server
-    wms-backend                 WMS server
+    wms                 WMS server
     worker                      Worker for all Queue
     worker-shell                Shell to manage workers
     redis-shell                 Shell to manage redis instance
@@ -57,10 +57,10 @@ SERVICE_CONFIG = {
         '--use-aliases', '--service-ports', '--rm',
         'vue-frontend',
     ],
-    'wms-backend': [
+    'wms': [
         'run',
         '--use-aliases', '--service-ports', '--rm',
-        'wms-backend',
+        'wms',
     ],
     'worker': [
         'run',

@@ -24,15 +24,15 @@ services:
     command: ["http-server", "dist", "-p 5080"]
     stdin_open: true
     tty: true
-  # wms-backend
-  wms-backend:
-    build: ../../wms_backend
+  # wms
+  wms:
+    build: ../../wms
     ports:
       - 5090:5090
     volumes:
-      - ../../wms_backend:/iu/wms_backend:ro
+      - ../../wms:/iu/wms:ro
       - ../../cl:/iu/cl:ro
-      - ../wms_backend/stage/server.yml:/etc/server.yml:ro
+      - ../wms/stage/server.yml:/etc/server.yml:ro
     environment:
       PYTHONPATH: /iu
     command: ['python', 'server.py']
