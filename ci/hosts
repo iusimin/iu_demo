@@ -1,5 +1,6 @@
 # BEGIN - IU hosts setup
 127.0.0.1       demo.iu.com
+127.0.0.1       wms.iu.com
 127.0.0.1       mongo-express.iu.com
 127.0.0.1       rabbitmq.iu.com
 127.0.0.1       celery-flower.iu.com

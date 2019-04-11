@@ -1,29 +1,27 @@
 # -*- coding: utf-8 -*-
 
-import mongoengine.fields as f
-from mongoengine import Document, OperationError
-
-from cl.utils.mongo import MongoMixin
-from cl.utils.py_enum import PyEnumMixin
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
 from wms_backend.model.mongo import IU_DEMO_DB
 
 
-class SequenceIdGenerator(MongoMixin, Document):
+class SequenceIdGenerator(Document):
     '''
         Generate sequence id with format: {prefix}-{current_number}.
         current_number will increase by one automatically.
     '''
-    meta = MongoMixin.NO_INHERIT()
-    meta['shard_key'] = False
-    meta['index'] = [
-        {'keys': "prefix:1", "unique": True}
-    ]
+    meta = {
+        'indexes': [
+            IndexDefinition.parse_from_keys_str("prefix:1", unique=True)
+        ],
+        'allow_inheritance': False,
+        'db_name': IU_DEMO_DB,
+        'force_insert': True,
+    }
 
-    meta['db_name'] = IU_DEMO_DB
-    meta['force_insert'] = True
-
-    prefix = f.StringField(db_field="p", required=True)
-    current_number = f.IntField(db_field="c", required=True)
+    prefix = StringField(required=True)
+    current_number = IntField(required=True)
 
     @classmethod
     def get_sequence_id(cls, prefix, number_digits=5):

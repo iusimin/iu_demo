@@ -1,14 +1,13 @@
-import mongoengine.fields as f
-from bson import ObjectId
-from mongoengine import Document, EmbeddedDocument
 
-from cl.utils.mongo import MongoMixin
-from cl.utils.py_enum import PyEnumMixin
+# -*- coding: utf-8 -*-
+
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
 from wms_backend.model.mongo import IU_DEMO_DB
 from wms_backend.model.mongo.rbac import Role
 
 
-class User(Document, MongoMixin):
+class User(Document):
     meta = {
         'indexes': [
         ],
@@ -17,12 +16,12 @@ class User(Document, MongoMixin):
         'force_insert': True,
     }
 
-    username = f.StringField(index=True, unique=True)
-    password = f.StringField()
-    email = f.StringField( index=True, unique=True)
-    phone_number = f.StringField()
-    permissions = f.ListField(f.EmbeddedDocumentField('Permission'),  default=[])
-    role_names = f.ListField(f.StringField(),  default=[])
+    username = StringField(index=True, unique=True)
+    password = StringField()
+    email = StringField( index=True, unique=True)
+    phone_number = StringField()
+    permissions = ListField(EmbeddedDocumentField('Permission'),  default=[])
+    role_names = ListField(StringField(),  default=[])
 
     def get_permissions(self):
         plist = list(self.permissions)

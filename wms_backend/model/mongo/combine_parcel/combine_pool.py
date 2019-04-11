@@ -1,45 +1,44 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import mongoengine.fields as f
-from bson import ObjectId
-from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
-from mongoengine import Document, EmbeddedDocument
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
 from wms_backend.model.mongo import IU_DEMO_DB
 
 
-class CPSortGroupId(EmbeddedDocument, MongoMixin):
-    seq_id = f.IntField(db_field="g", required=True)
+class CPSortGroupId(EmbeddedDocument):
+    seq_id = IntField(required=True)
 
 
-class CPSortPool(Document, MongoMixin):
+class CPSortPool(Document):
     class SortType(PyEnumMixin):
         Combined = 0
         DirectShip = 1
 
     meta = {
         'indexes': [
-            #{'keys': 'job_id:1,tracking_id:1', "unique": True},
-            #{'keys': 'group_ids.seq_id:1'}
+            IndexDefinition.parse_from_keys_str("job_id:1,tracking_id:1", unique=True),
+            IndexDefinition.parse_from_keys_str("group_ids.seq_id:1")
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
         'force_insert': True,
     }
 
-    job_id = f.StringField()
-    tracking_id = f.StringField()
-    sort_type = f.IntField()
-    group_ids = f.ListField(f.EmbeddedDocumentField("CPSortGroupId"))
+    job_id = StringField()
+    tracking_id = StringField()
+    sort_type = IntField()
+    group_ids = ListField(EmbeddedDocumentField("CPSortGroupId"))
 
     # parcels in he same cabinet have the same cabinet_id
-    cabinet_id = f.StringField()
-    lattice_id = f.IntField()
-    actual_combine_id = f.StringField()
+    cabinet_id = StringField()
+    lattice_id = IntField()
+    actual_combine_id = StringField()
 
-    created_datetime = f.DateTimeField()
-    updated_datetime = f.DateTimeField()
+    created_datetime = DateTimeField()
+    updated_datetime = DateTimeField()
 
     @classmethod
     def create(cls, job_id, tracking_id, sort_type, group_ids, cabinet_id, lattice_id):

@@ -2,18 +2,15 @@
 """
 import re
 
-import mongoengine.fields as f
 from bson import ObjectId
-from mongoengine import Document, EmbeddedDocument
-
-from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
 from wms_backend.model.mongo import IU_DEMO_DB
 
 
-class Permission(EmbeddedDocument, MongoMixin):
+class Permission(EmbeddedDocument):
     meta = {
-        'allow_inheritance': False,
     }
     
     class Action(PyEnumMixin):
@@ -23,9 +20,9 @@ class Permission(EmbeddedDocument, MongoMixin):
         PATCH = 3
         DELETE = 4
 
-    allow = f.BooleanField()
-    resource = f.StringField() # Regex for web endpoint
-    actions = f.ListField(f.IntField(choices=Action.get_ids()))
+    allow = BooleanField()
+    resource = StringField() # Regex for web endpoint
+    actions = ListField(IntField(choices=Action.get_ids()))
 
     @classmethod
     def check_permissions(cls, resource, action, permissions, default_allow=False):
@@ -49,7 +46,7 @@ class Permission(EmbeddedDocument, MongoMixin):
             ]
         }
 
-class Role(Document, MongoMixin):
+class Role(Document):
     meta = {
         'indexes': [
         ],
@@ -58,10 +55,10 @@ class Role(Document, MongoMixin):
         'force_insert': True,
     }
 
-    name = f.StringField(primary_key=True)
-    description = f.StringField()
-    parents = f.ListField(f.StringField())
-    permissions = f.ListField(f.EmbeddedDocumentField('Permission'))
+    name = StringField(primary_key=True)
+    description = StringField()
+    parents = ListField(StringField())
+    permissions = ListField(EmbeddedDocumentField('Permission'))
 
     def get_permissions(self):
         plist = list(self.permissions)

@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import mongoengine.fields as f
-from bson import ObjectId
-from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
-from mongoengine import Document, EmbeddedDocument
-from wms_backend.model.mongo.combine_parcel.operation_record import CPOperationRecord
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
 from wms_backend.model.mongo import IU_DEMO_DB
+from wms_backend.model.mongo.combine_parcel.operation_record import \
+    CPOperationRecord
 
 
-class CPInboundParcelTimeline(EmbeddedDocument, MongoMixin):
-    created = f.DateTimeField(db_field="c")
-    inbound = f.DateTimeField(db_field="i")
-    seeded = f.DateTimeField(db_field="s")
+class CPInboundParcelTimeline(EmbeddedDocument):
+    created = DateTimeField()
+    inbound = DateTimeField()
+    seeded = DateTimeField()
 
 
-class CPInboundParcel(Document, MongoMixin):
+class CPInboundParcel(Document):
     class Status(PyEnumMixin):
         Pending = 0
         Inbound = 10
@@ -32,41 +32,41 @@ class CPInboundParcel(Document, MongoMixin):
 
     meta = {
         'indexes': [
-            #{'keys': 'tracking_id:1', "unique": True},
-            #{'keys': 'warehouse_id:1,status:1,ready_to_ship:1,combine_id:1'},
-            #{'keys': 'timeline.created:1'},
-            #{'keys': 'timeline.inbound:1'},
-            #{'keys': 'created_datetime:1'},
+            IndexDefinition.parse_from_keys_str("tracking_id:1", unique=True),
+            IndexDefinition.parse_from_keys_str("warehouse_id:1,status:1,ready_to_ship:1,combine_id:1"),
+            IndexDefinition.parse_from_keys_str("timeline.created:1"),
+            IndexDefinition.parse_from_keys_str("timeline.inbound:1"),
+            IndexDefinition.parse_from_keys_str("created_datetime:1"),
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
         'force_insert': True,
     }
 
-    tracking_id = f.StringField()
-    combine_id = f.StringField()
-    warehouse_id = f.StringField()
-    inbound_carrier = f.IntField()
-    latest_ship_datetime = f.DateTimeField()
-    status = f.IntField()
-    parcel_type = f.IntField()
+    tracking_id = StringField(required=True)
+    combine_id = StringField()
+    warehouse_id = StringField(required=True)
+    inbound_carrier = IntField()
+    latest_ship_datetime = DateTimeField(required=True)
+    status = IntField(required=True)
+    parcel_type = IntField()
 
-    outbound_tracking_id = f.StringField()
+    outbound_tracking_id = StringField()
 
-    ready_to_ship = f.BooleanField()
+    ready_to_ship = BooleanField()
 
-    timeline = f.EmbeddedDocumentField("CPInboundParcelTimeline")
-    operation_records = f.ListField(f.EmbeddedDocumentField("CPOperationRecord"), default=[])
+    timeline = EmbeddedDocumentField("CPInboundParcelTimeline")
+    operation_records = ListField(EmbeddedDocumentField("CPOperationRecord"), default=[])
 
-    weight = f.FloatField()
-    has_battery = f.BooleanField()
-    has_liquid = f.BooleanField()
-    has_sensitive = f.BooleanField()
+    weight = FloatField()
+    has_battery = BooleanField()
+    has_liquid = BooleanField()
+    has_sensitive = BooleanField()
 
     # outbound info
 
-    created_datetime = f.DateTimeField()
-    updated_datetime = f.DateTimeField()
+    created_datetime = DateTimeField(required=True)
+    updated_datetime = DateTimeField()
 
     @classmethod
     def create_if_not_exist(cls, tracking_id, combine_id, warehouse_id, inbound_carrier, latest_ship_datetime):

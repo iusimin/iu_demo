@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import mongoengine.fields as f
-from bson import ObjectId
-from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
-from mongoengine import Document, EmbeddedDocument
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
 from wms_backend.model.mongo import IU_DEMO_DB
 
 
-class CPOperationRecord(EmbeddedDocument, MongoMixin):
+class CPOperationRecord(EmbeddedDocument):
     class CPOperationType(PyEnumMixin):
         InboundScan = 0
 
-    operator = f.StringField()
-    operation = f.IntField()
-    operation_description = f.StringField()
-    operation_info = f.DictField()
-    operation_datetime = f.DateTimeField()
-    
+    operator = StringField()
+    operation = IntField()
+    operation_description = StringField()
+    operation_info = DictField()
+    operation_datetime = DateTimeField()

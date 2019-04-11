@@ -9,22 +9,22 @@ Options:
 import logging
 import os
 
-import falcon
-import mongoengine
-import redis
-import walrus
 import yaml
-from celery import Celery
 from docopt import docopt
-from gevent import monkey
-from gunicorn.app.base import BaseApplication
-from kombu import Exchange, Queue
 
 import cl.utils.password as p
+import falcon
+import redis
+import walrus
 import wms_backend.lib.cache as cache
 import wms_backend.lib.unit_convertor as uc
 import wms_backend.tasks.all as async_tasks
+from celery import Celery
 from cl.utils.redis import BaseRedisKey
+from gevent import monkey
+from gunicorn.app.base import BaseApplication
+from iu_mongo import connect as mongo_connect
+from kombu import Exchange, Queue
 from wms_backend.api import convert_custom_verb_pattern
 from wms_backend.core.url_mapping import API_ROUTER
 from wms_backend.middlewares.session import SessionMiddleware
@@ -77,9 +77,9 @@ class IUWMSBackendService(falcon.API):
         self.connect_celery()
     
     def connect_mongo(self):
-        self.mongo_connections = mongoengine.connect(
+        self.mongo_connections = mongo_connect(
             **self.options['mongo'])
-        self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db)s' \
+        self.logger.info('Connecting mongo: %(host)s:%(port)s/%(db_names)s' \
             % self.options['mongo'])
 
     def connect_redis(self):

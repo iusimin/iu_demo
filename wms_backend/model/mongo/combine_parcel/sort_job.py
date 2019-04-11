@@ -1,44 +1,42 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-import mongoengine.fields as f
-from bson import ObjectId
-from mongoengine import Document, EmbeddedDocument
-
-from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
+from iu_mongo.document import Document, EmbeddedDocument
+from iu_mongo.fields import *
+from iu_mongo.index import IndexDefinition
 from wms_backend.model.mongo import IU_DEMO_DB
 from wms_backend.model.mongo.warehouse_info import CPCabinetSize, CPWarehouse
 
 
-class CPSortJob(Document, MongoMixin):
+class CPSortJob(Document):
     class Type(PyEnumMixin):
         CheckInboundParcelReadyToShip = 0
         AllocateCabinetLattice = 1
 
     meta = {
         'indexes': [
-            #{'keys': 'job_id:1', "unique": True},
-            #{'keys': 'job_id:1,warehouse_id:1'},
-            #{'keys': 'job_finish_datetime:1'},
-            #{'keys': 'created_datetime:1,updated_datetime:1'},
+            IndexDefinition.parse_from_keys_str("job_id:1", unique=True),
+            IndexDefinition.parse_from_keys_str("job_id:1,warehouse_id:1"),
+            IndexDefinition.parse_from_keys_str("job_finish_datetime:1"),
+            IndexDefinition.parse_from_keys_str("created_datetime:1,updated_datetime:1")
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
         'force_insert': True,
     }
 
-    job_id = f.StringField()
-    job_type = f.IntField()
-    warehouse_id = f.StringField()
+    job_id = StringField(required=True)
+    job_type = IntField(required=True)
+    warehouse_id = StringField(required=True)
 
-    warehouse_seed_cabinet_size = f.EmbeddedDocumentField("CPCabinetSize")
-    sort_batch_size = f.ListField(f.IntField())
+    warehouse_seed_cabinet_size = EmbeddedDocumentField("CPCabinetSize")
+    sort_batch_size = ListField(IntField())
     
-    job_finish_datetime = f.DateTimeField()
+    job_finish_datetime = DateTimeField()
 
-    created_datetime = f.DateTimeField()
-    updated_datetime = f.DateTimeField()
+    created_datetime = DateTimeField(required=True)
+    updated_datetime = DateTimeField()
 
     @classmethod
     def create(cls, job_id, job_type, warehouse_id):

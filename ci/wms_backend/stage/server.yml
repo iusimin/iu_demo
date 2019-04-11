@@ -12,10 +12,11 @@
   mongo:
     host: mongodb
     port: 27017
-    db: iu
+    db_names:
+      - iu
     username: root
     password: example
-    authentication_source: admin
+    auth_db: admin
   redis:
     host: redis
     port: 6379
