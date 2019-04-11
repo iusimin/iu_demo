@@ -25,7 +25,9 @@ class UserLoginApi(BaseApiResource):
             password_attempt = params['password']
         except KeyError:
             raise falcon.HTTPInvalidParam('HTTP param not valid')
-        u = User.objects.filter(username=username_attempt).first()
+        u = User.find_one({
+            'username': username_attempt
+        })
         if not u:
             raise falcon.HTTPUnauthorized('User %(username)s not exists' % params)
         if not password.verify_password(u.password, password_attempt):

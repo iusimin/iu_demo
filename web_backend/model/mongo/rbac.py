@@ -1,17 +1,13 @@
 """ RBAC defination
 """
-from mongoengine import Document, EmbeddedDocument
-import mongoengine.fields as f
+from iu_mongo import Document, EmbeddedDocument
+import iu_mongo.fields as f
 from cl.utils.py_enum import PyEnumMixin
 from bson import ObjectId
 from cl.utils.mongo import MongoMixin
 import re
 
 class Permission(EmbeddedDocument, MongoMixin):
-    meta = {
-        'allow_inheritance': False,
-    }
-    
     class Action(PyEnumMixin):
         GET = 0
         POST = 1
@@ -49,19 +45,21 @@ class Role(Document, MongoMixin):
     meta = {
         'indexes': [
         ],
-        'allow_inheritance': False,
-        'db_alias': 'iu-demo',
-        'force_insert': True,
+        'db_name': 'iu-demo',
     }
 
-    name = f.StringField(primary_key=True)
+    name = f.StringField()
     description = f.StringField()
     parents = f.ListField(f.StringField())
     permissions = f.ListField(f.EmbeddedDocumentField('Permission'))
 
     def get_permissions(self):
         plist = list(self.permissions)
-        parents = Role.objects.filter(name__in = self.parents)
+        parents = Role.find({
+            'name': {
+                '$in': self.parents,
+            }
+        })
         for r in parents:
             permissions = r.get_permissions()
             for p in permissions:

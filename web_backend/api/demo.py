@@ -6,9 +6,9 @@ from web_backend.tasks.sample_heavy import SampleHeavyTasks
 class DemoApi(BaseApiResource):
     def on_mongoSleep(self, req, resp):
         sleep_seconds = req.media['seconds']
-        res = str(User.objects(__raw__={
+        res = User.find({
             '$where': 'sleep(%s) || true' % (sleep_seconds*1000)
-        }))
+        })
         resp.media = {
             'title': '%s seconds sleep.' % sleep_seconds
         }

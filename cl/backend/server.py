@@ -5,7 +5,7 @@ from gunicorn.app.base import BaseApplication
 import logging
 
 import yaml
-import mongoengine
+import iu_mongo
 from celery import Celery
 from cl.backend.tasks import AbstractAsyncTaskFactory
 from cl.backend.api import convert_custom_verb_pattern
@@ -59,10 +59,9 @@ class BaseBackendService(falcon.API):
     
     def connect_mongo(self):
         for opts in self.options['mongo']:
-            self.mongo_connections = mongoengine.connect(
+            self.mongo_connections = iu_mongo.connect(
                 **opts)
-            self.logger.info('Connecting mongo %(alias)s: %(host)s:%(port)s/%(db)s' \
-                % opts)
+            self.logger.info('Connecting mongo %(host)s...' % opts)
 
     def connect_redis(self):
         self.redis_db = walrus.Database(**self.options['redis'])

@@ -1,5 +1,5 @@
-from mongoengine import Document, EmbeddedDocument
-import mongoengine.fields as f
+from iu_mongo import Document, EmbeddedDocument
+import iu_mongo.fields as f
 from cl.utils.py_enum import PyEnumMixin
 from bson import ObjectId
 from web_backend.model.mongo.rbac import Role
@@ -9,9 +9,7 @@ class User(Document, MongoMixin):
     meta = {
         'indexes': [
         ],
-        'allow_inheritance': False,
-        'db_alias': 'iu-demo',
-        'force_insert': True,
+        'db_name': 'iu-demo',
     }
 
     username = f.StringField(index=True, unique=True)
@@ -32,8 +30,11 @@ class User(Document, MongoMixin):
         return plist
     
     def get_roles(self):
-        roles_dict = {r.name: r 
-            for r in Role.objects.filter(name__in = self.role_names)}
+        roles_dict = {
+            r.name: r for r in Role.find({
+                'name': {'$in': self.role_names}
+            })
+        }
         return [roles_dict[rn] for rn in self.role_names]
 
     def to_json_dict(self):

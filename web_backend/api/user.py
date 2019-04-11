@@ -4,7 +4,7 @@ from cl.utils import password
 from cl.backend.api import BaseApiResource
 from web_backend.model.mongo.user import User
 from web_backend.model.mongo.rbac import Role
-from mongoengine import errors as dberr
+from iu_mongo import errors as dberr
 from web_backend.tasks.sample_light import SampleLightTasks
 from web_backend.tasks.sample_heavy import SampleHeavyTasks
 from web_backend.hooks.auth import login_required, permission_required
@@ -14,7 +14,9 @@ from web_backend.model.mongo.rbac import Permission
 
 def extract_params_object(req, resp, resource, params):
     if 'user_id' in params:
-        user = User.objects.filter(id=params['user_id']).first()
+        user = User.find_one({
+            'user_id': params['user_id']
+        })
         if not user:
             raise falcon.HTTPNotFound(
                     title='User not found',
@@ -24,7 +26,7 @@ def extract_params_object(req, resp, resource, params):
 class UserCollectionApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp):
-        all_users = User.objects
+        all_users = User.find({})
         resp.media = [u.to_json_dict() for u in all_users]
 
     @falcon.before(JsonSchema('''

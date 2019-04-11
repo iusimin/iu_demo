@@ -3,14 +3,16 @@ from cl.backend.api import BaseApiResource
 from cl.backend.hooks.validation import JsonSchema
 from web_backend.hooks.auth import permission_required
 from cl.backend.hooks.transform import add_list_index
-from mongoengine import errors as dberr
+from iu_mongo import errors as dberr
 import falcon
 import json
 from bson import ObjectId
 
 def extract_params_object(req, resp, resource, params):
     if 'role_name' in params:
-        role = Role.objects.filter(name=params['role_name']).first()
+        role = Role.find_one({
+            'name': params['role_name']
+        })
     else:
         return
     if 'permission_id' in params:
@@ -34,7 +36,7 @@ def extract_params_object(req, resp, resource, params):
 class RoleCollectionApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp):
-        roles = Role.objects
+        roles = Role.find({})
         resp.media = [{
             'id': str(r.id),
             'name': r.name,
@@ -100,7 +102,9 @@ class RoleCollectionApi(BaseApiResource):
                 permissions=permissions,
             ))
         try:
-            Role.objects.insert(roles)
+            with Role.bulk() as bulk_context:
+                for r in roles:
+                    r.bulk_save(bulk_context)
         except dberr.NotUniqueError as e:
             raise falcon.HTTPBadRequest(
                 'Role name already exists.'
@@ -292,7 +296,11 @@ class RoleParentCollectionApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp, role_name):
         role = req.context['role']
-        parents = Role.objects.filter(name__in=role.parents)
+        parents = Role.find({
+            'name': {
+                '$in': role.parents,
+            }
+        })
         resp.media = [ p.to_json_dict() for p in parents ]
 
     @falcon.before(extract_params_object)
@@ -349,7 +357,9 @@ class RoleParentApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp, role_name, parent_name):
         role = req.context['role']
-        parent = Role.objects.get(name=parent_name)
+        parent = Role.find_one({
+            'name': parent_name
+        })
         resp.media = parent.to_json_dict()
 
     @falcon.before(extract_params_object)

@@ -12,19 +12,12 @@
   mongo:
     # Support multiple database
     - host: mongodb
-      port: 27017
-      db: iu-demo
-      alias: iu-demo
+      db_names:
+        - iu-demo
+        - iu-demo2
       username: root
       password: example
-      authentication_source: admin
-    - host: mongodb
-      port: 27017
-      db: iu-demo2
-      alias: iu-demo2
-      username: root
-      password: example
-      authentication_source: admin
+      auth_db: admin
   redis:
     host: redis
     port: 6379

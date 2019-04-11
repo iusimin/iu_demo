@@ -42,9 +42,9 @@ class Session(BaseRedisKey):
                 int(session_content['user_expire']) < int(datetime.utcnow().strftime('%s')):
             user_expire = datetime.utcnow() + timedelta(seconds=self.options()['user_expire'])
             user_expire = user_expire.strftime('%s')
-            user = User.objects.filter(
-                id=session_content['user_id'].decode('utf-8')
-            )[0]
+            user = User.find_one({
+                'id': session_content['user_id'].decode('utf-8')
+            })
             self.container().update(
                 user_cache=pickle.dumps(user),
                 user_expire=user_expire,
