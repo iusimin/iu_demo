@@ -31,6 +31,8 @@ services:
       - 5090:5090
     volumes:
       - ../../wms:/iu/wms:ro
+      #- /iu/wms/web/node_modules/:rw
+      #- /iu/wms/web/dist/:rw
       - ../../cl:/iu/cl:ro
       - ../wms/stage/server.yml:/etc/server.yml:ro
     environment:

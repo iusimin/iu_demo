@@ -117,7 +117,7 @@ class IUWMSBackendService(falcon.API):
 
     def build_web_resource(self):
         cwd = os.path.join(CUR_DIR, "web")
-        command = "npm run build"
+        command = "npm install && npm run build"
         return subprocess.Popen(command, cwd=cwd, shell=True, stderr=subprocess.STDOUT)
 
     def disconnect(self):
@@ -134,7 +134,7 @@ class GunicornApp(BaseApplication):
             self.cfg.set(key.lower(), value)
 
     def load(self):
-        #build_web_process = self.application.build_web_resource()
+        build_web_process = self.application.build_web_resource()
 
         self.application.connect()
 
