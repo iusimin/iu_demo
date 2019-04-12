@@ -10,7 +10,7 @@ var _axios_call = function (config, callback, errorCallback, loader) {
         })
         .catch(function (error) {
             if (loader) loader.hide();
-            if (error.response && _.isObject(error.response.data)) {
+            if (error.response) {
                 if (errorCallback) {
                     errorCallback(error.response.data);
                 } else {
@@ -27,17 +27,17 @@ var _axios_call = function (config, callback, errorCallback, loader) {
 };
 
 export default {
-    call_json: function (method, url, params, callback, errorCallback, loader) {
-        var data = _.pickBy(params, e => {
+    call_json: function (method, url, query_string, params, callback, errorCallback, loader) {
+        var data = params; /* _.pickBy(params, e => {
             return !_.isNil(e)
-        });
-        var xsrf_token = $("#xsrf-container").find("input").val();
+        }); */
+        //var xsrf_token = $("#xsrf-container").find("input").val();
         var config = {
             data: data,
             method: method,
             url: 'api/' + url,
             headers: {
-                'X-XSRFToken': xsrf_token
+                //'X-XSRFToken': xsrf_token
             }
         };
         _axios_call(config, callback, errorCallback, loader);
@@ -45,13 +45,14 @@ export default {
     login: function (username, password, remember_me, callback, errorCallback) {
         this.call_json(
             "post",
-            "login", {
+            "login",
+            null,
+            {
                 username: username,
-                password: password,
-                remember_me: remember_me
+                password: password
             },
             callback,
             errorCallback
         );
     }
-}
+};

@@ -15,13 +15,15 @@ import Meta from 'vue-meta'
 // Routes
 import paths from './paths'
 
-function route (path, view, name) {
+function route (path, name, page, component) {
   return {
-    name: name || view,
+    name: name,
     path,
-    component: (resovle) => import(
-      `@/views/${view}.vue`
-    ).then(resovle)
+    component: page,
+    children: [{
+      path: "/login",
+      component: component
+    }]
   }
 }
 
@@ -30,8 +32,9 @@ Vue.use(Router)
 // Create a new router
 const router = new Router({
   //mode: 'history',
-  routes: paths.map(path => route(path.path, path.view, path.name)).concat([
-    { path: '*', redirect: '/dashboard' }
+  //paths.map(path => route(path.path, path.name, path.page, path.component))
+  routes: paths.concat([
+    { path: '*', redirect: '/login' }
   ]),
   scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {

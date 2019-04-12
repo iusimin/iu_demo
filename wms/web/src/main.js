@@ -17,10 +17,21 @@ import i18n from '@/i18n'
 import router from '@/router'
 import store from '@/store'
 
+import api from './utils/api'
+
 // Sync store with router
 sync(store, router)
 
 Vue.config.productionTip = false
+
+Vue.mixin({
+  data: function() {
+    return {
+      api: api,
+      rrr: 111
+    };
+  }
+})
 
 /* eslint-disable no-new */
 new Vue({

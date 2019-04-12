@@ -75,7 +75,7 @@ services:
     image: nginx:1.15.9
     volumes:
       - $IU_HOME/ci/nginx/stage/nginx.conf:/etc/nginx/nginx.conf:ro
-      - $IU_HOME/ci/nginx/stage/includes/demo.conf:/etc/nginx/includes/demo.conf:ro
+      - $IU_HOME/ci/nginx/stage/includes/wms.conf:/etc/nginx/includes/wms.conf:ro
     command: ['nginx-debug', '-g', 'daemon off;']
     ports:
       - 80:80

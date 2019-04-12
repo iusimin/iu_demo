@@ -89,10 +89,10 @@ SERVICE_CONFIG = {
             '--use-aliases', '--service-ports', '--rm',
             'wms',
         ],
-        'nginx': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'nginx'
+        'infra': [
+            'up',
+            '--abort-on-container-exit',
+            'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
         ]
     }
 }

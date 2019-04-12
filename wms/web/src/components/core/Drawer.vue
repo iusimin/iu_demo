@@ -87,41 +87,6 @@ export default {
     logo: './img/vuetifylogo.png',
     links: [
       {
-        to: '/dashboard',
-        icon: 'mdi-view-dashboard',
-        text: 'Dashboard'
-      },
-      {
-        to: '/user-profile',
-        icon: 'mdi-account',
-        text: 'User Profile'
-      },
-      {
-        to: '/table-list',
-        icon: 'mdi-clipboard-outline',
-        text: 'Table List'
-      },
-      {
-        to: '/typography',
-        icon: 'mdi-format-font',
-        text: 'Typography'
-      },
-      {
-        to: '/icons',
-        icon: 'mdi-chart-bubble',
-        text: 'Icons'
-      },
-      {
-        to: '/maps',
-        icon: 'mdi-map-marker',
-        text: 'Maps'
-      },
-      {
-        to: '/notifications',
-        icon: 'mdi-bell',
-        text: 'Notifications'
-      },
-      {
         to: '/inbound-scan',
         icon: 'mdi-audiobook',
         text: '扫描入库'
