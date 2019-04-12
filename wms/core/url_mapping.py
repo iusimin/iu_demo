@@ -4,3 +4,7 @@ API_ROUTER = [
     ('/api/inbound-parcel/inbound', a.InboundParcelResource),
     ('/api/seed-pool', a.CPSeedPool)
 ]
+
+STATIC_ROUTE = [
+    ('/', 'web/dist')
+]

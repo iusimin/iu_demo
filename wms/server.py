@@ -10,24 +10,24 @@ import logging
 import os
 import subprocess
 
+import yaml
+from docopt import docopt
+
+import cl.utils.password as p
 import falcon
 import redis
 import walrus
-import yaml
-from celery import Celery
-from docopt import docopt
-from gevent import monkey
-from gunicorn.app.base import BaseApplication
-from kombu import Exchange, Queue
-
-import cl.utils.password as p
 import wms.lib.cache as cache
 import wms.lib.unit_convertor as uc
 import wms.tasks.all as async_tasks
+from celery import Celery
 from cl.utils.redis import BaseRedisKey
+from gevent import monkey
+from gunicorn.app.base import BaseApplication
 from iu_mongo import connect as mongo_connect
+from kombu import Exchange, Queue
 from wms.api import convert_custom_verb_pattern
-from wms.core.url_mapping import API_ROUTER
+from wms.core.url_mapping import API_ROUTER, STATIC_ROUTE
 from wms.middlewares.session import SessionMiddleware
 from wms.middlewares.validation import (RequestValidationMiddleware,
                                         RequireJSONMiddleware)
@@ -71,6 +71,11 @@ class IUWMSBackendService(falcon.API):
                 continue
             uri = convert_custom_verb_pattern(uri)
             self.add_route(uri, resource(self, custom_verb=True))
+
+        # Build static route
+        for (uri, path) in STATIC_ROUTE:
+            abs_path = os.path.join(CUR_DIR, path)
+            self.add_static_route(uri, abs_path)
 
     def connect(self):
         self.connect_mongo()
@@ -117,7 +122,7 @@ class IUWMSBackendService(falcon.API):
 
     def build_web_resource(self):
         cwd = os.path.join(CUR_DIR, "web")
-        command = "npm install && npm run build"
+        command = "echo '------' && whoami"#"npm install && npm run build"
         return subprocess.Popen(command, cwd=cwd, shell=True, stderr=subprocess.STDOUT)
 
     def disconnect(self):
@@ -134,7 +139,7 @@ class GunicornApp(BaseApplication):
             self.cfg.set(key.lower(), value)
 
     def load(self):
-        build_web_process = self.application.build_web_resource()
+        #build_web_process = self.application.build_web_resource()
 
         self.application.connect()
 
