@@ -18,10 +18,11 @@ var _axios_call = function (config, callback, errorCallback, loader) {
                         text: error.response.data.msg,
                         type: "error"
                     }).show();
-                    log.error(error.response.data)
+                    //log.error(error.response.data)
                 }
             } else {
-                log.error(error)
+                console.log(error);
+                //log.error(error)
             }
         });
 };
@@ -51,6 +52,16 @@ export default {
                 username: username,
                 password: password
             },
+            callback,
+            errorCallback
+        );
+    },
+    checkLogin: function(callback, errorCallback) {
+        this.call_json(
+            "get",
+            "login",
+            null,
+            null,
             callback,
             errorCallback
         );

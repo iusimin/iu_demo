@@ -11,11 +11,12 @@ import Vue from 'vue'
 import VueAnalytics from 'vue-analytics'
 import Router from 'vue-router'
 import Meta from 'vue-meta'
+import api from '../utils/api'
 
 // Routes
 import paths from './paths'
 
-function route (path, name, page, component) {
+function route(path, name, page, component) {
   return {
     name: name,
     path,
@@ -33,19 +34,45 @@ Vue.use(Router)
 const router = new Router({
   //mode: 'history',
   //paths.map(path => route(path.path, path.name, path.page, path.component))
-  routes: paths.concat([
-    { path: '*', redirect: '/login' }
-  ]),
-  scrollBehavior (to, from, savedPosition) {
+  routes: paths.concat([{
+    path: '*',
+    redirect: '/login'
+  }]),
+  scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     }
     if (to.hash) {
-      return { selector: to.hash }
+      return {
+        selector: to.hash
+      }
     }
-    return { x: 0, y: 0 }
+    return {
+      x: 0,
+      y: 0
+    }
   }
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    api.checkLogin(
+      resp => {
+        next();
+      },
+      resp => {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        });
+      }
+    );
+  } else {
+    next() // make sure to always call next()!
+  }
+});
 
 Vue.use(Meta)
 

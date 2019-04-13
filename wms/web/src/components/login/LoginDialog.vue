@@ -49,13 +49,13 @@ export default {
   methods: {
     login: function() {
       var vm = this;
-      console.log(vm.$data);
       vm.api.login(
         vm.username,
         vm.password,
         false,
         resp => {
-          alert("success");
+          var redirect = vm.$route.query.redirect || '/home';
+          vm.$router.push(redirect);
         },
         resp => {
           alert("failed");

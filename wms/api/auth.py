@@ -12,6 +12,14 @@ from wms.model.redis_keys.session import Session
 
 
 class UserLoginApi(BaseApiResource):
+    @falcon.before(login_required)
+    def on_get(self, req, resp):
+        session = req.context['session']
+        session_dict = session.snapshot
+        resp.media = {
+            'user_id': session_dict.get('user_id').decode('utf-8'),
+            'is_guest': session.is_guest(),
+        }
 
     def on_post(self, req, resp):
         params = req.media

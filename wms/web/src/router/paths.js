@@ -8,6 +8,7 @@ import EmptyPage from "../page/EmptyPage";
 import UserHome from "../page/UserHome";
 
 import LoginDialog from "../components/login/LoginDialog";
+import HomeContent from "../components/home/HomeContent";
 import InboundScan from "../components/inboundScan/InboundScan";
 import Sorter from "../components/sorter/Sorter";
 import Outbound from "../components/outbound/Outbound";
@@ -15,7 +16,7 @@ import Outbound from "../components/outbound/Outbound";
 export default [
   {
     path: '/login',
-    name: '',
+    name: 'login',
     component: EmptyPage,
     children: [{
       path: '/',
@@ -23,13 +24,26 @@ export default [
     }]
   },
   {
+    path: '/home',
+    name: 'home',
+    component: UserHome,
+    children: [{
+      path: '/',
+      component: HomeContent,
+      meta: { requiresAuth: true }
+    }],
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/inbound-scan',
     name: '扫描入库',
     component: UserHome,
     children: [{
       path: '/',
-      component: InboundScan
-    }]
+      component: InboundScan,
+      meta: { requiresAuth: true }
+    }],
+    meta: { requiresAuth: true }
   },
   {
     path: '/sorter',
@@ -38,7 +52,8 @@ export default [
     children: [{
       path: '/',
       component: Sorter
-    }]
+    }],
+    meta: { requiresAuth: true }
   },
   {
     path: '/outbound',
@@ -47,6 +62,7 @@ export default [
     children: [{
       path: '/',
       component: Outbound
-    }]
+    }],
+    meta: { requiresAuth: true }
   }
 ]
