@@ -55,3 +55,7 @@ local.properties
 .npm
 .config
 .idea/
+
+# For npm dist
+dist/
+node_modules/

@@ -129,6 +129,7 @@ class RoleApi(BaseApiResource):
     properties:
       name: { type: string }
       description: { type: string }
+    required: [name, description]
     '''))
     @falcon.before(permission_required)
     def on_patch(self, req, resp, role_name):

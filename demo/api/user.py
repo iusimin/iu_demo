@@ -11,11 +11,13 @@ from demo.hooks.auth import login_required, permission_required
 from cl.backend.hooks.validation import JsonSchema, UrlParamsSchema
 from cl.backend.hooks.transform import add_list_index
 from demo.model.mongo.rbac import Permission
+from bson import ObjectId
+import time
 
 def extract_params_object(req, resp, resource, params):
     if 'user_id' in params:
         user = User.find_one({
-            'user_id': params['user_id']
+            'id': ObjectId(params['user_id'])
         })
         if not user:
             raise falcon.HTTPNotFound(
@@ -41,6 +43,7 @@ class UserCollectionApi(BaseApiResource):
     required: [username, password, email, phone_number]
     '''))
     def on_post(self, req, resp):
+        time.sleep(1) # simulate server delay
         params = req.media
         try:
             username = params['username']
@@ -65,7 +68,7 @@ class UserCollectionApi(BaseApiResource):
                 'username': str(u.username),
             }
         except dberr.NotUniqueError as e:
-            raise falcon.HTTPBadRequest('User already exists1111')
+            raise falcon.HTTPBadRequest('User already exists')
 
 class UserApi(BaseApiResource):
     URL_PARAMS_SCHEMA = UrlParamsSchema('''
@@ -132,10 +135,13 @@ class UserRoleCollectionApi(BaseApiResource):
         role_names = req.media
         if isinstance(role_names, str):
             role_names = [role_names]
-        for r in role_names:
-            if r not in u.role_names:
-                u.role_names.append(r)
-        u.save()
+        u.update_one({
+            '$addToSet': {
+                'role_names': {
+                    '$each': role_names,
+                }
+            }
+        })
         resp.media = role_names
         resp.status = falcon.HTTP_201
     

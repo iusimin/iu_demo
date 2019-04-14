@@ -12,12 +12,23 @@ class UserLoginApi(BaseApiResource):
     @falcon.before(login_required)
     def on_get(self, req, resp):
         session = req.context['session']
-        session_dict = session.snapshot
+        permissions = session.user.get_permissions()
         resp.media = {
-            'user_id': session_dict.get('user_id').decode('utf-8'),
+            'user_id': str(session.user.id),
+            'username': str(session.user.username),
+            'permissions': [
+                p.to_json_dict() for p in permissions
+            ],
             'is_guest': session.is_guest(),
         }
 
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      username: { type: string }
+      password: { type: string }
+    required: [username, password]
+    '''))
     def on_post(self, req, resp):
         params = req.media
         try:
@@ -35,10 +46,14 @@ class UserLoginApi(BaseApiResource):
         
         session = req.context['session']
         session.login(u)
+        permissions = u.get_permissions()
         resp.media = {
             'title': 'Login Success',
             'user_id': str(u.id),
             'username': str(u.username),
+            'permissions': [
+                p.to_json_dict() for p in permissions
+            ],
         }
     
     @falcon.before(login_required)

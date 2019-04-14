@@ -38,6 +38,8 @@ import os
 import sys
 from docopt import docopt
 from subprocess import call
+import demo.cli_settings as demo_settings
+import wms.cli_settings as wms_settings
 
 IU_HOME = os.environ['IU_HOME']
 CFG_FILE = os.path.join(IU_HOME, '.iu_cli')
@@ -47,54 +49,8 @@ ENV_ALLOWED = {
 }
 
 SERVICE_CONFIG = {
-    'demo': {
-        'server': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'demo',
-        ],
-        'worker': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'demo-worker', 'python', 'worker.py', # Need input
-        ],
-        'worker-shell': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'demo-worker', '/bin/bash',
-        ],
-        'redis-shell': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'redis', '/bin/bash',
-        ],
-        'infra': [
-            'up',
-            '--abort-on-container-exit',
-            'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
-        ],
-        'rate-limiter-config': [
-            'exec', 'rate-limiter',
-            'python3', 'cli.py', 'manage',
-        ],
-    },
-    'wms': {
-        'vue-frontend-server': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'vue-frontend',
-        ],
-        'server': [
-            'run',
-            '--use-aliases', '--service-ports', '--rm',
-            'wms',
-        ],
-        'infra': [
-            'up',
-            '--abort-on-container-exit',
-            'nginx', 'mongodb', 'mongo-express', 'rabbitmq', 'celery-flower', 'rate-limiter', 'redis'
-        ]
-    }
+    'demo': demo_settings.SERVICE_CONFIG,
+    'wms': wms_settings.SERVICE_CONFIG,
 }
 
 class CommandExecuteFactory(object):

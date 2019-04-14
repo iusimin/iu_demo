@@ -6,6 +6,7 @@ from cl.utils.cache import instance_cache
 from demo.model.mongo.user import User
 from cl.utils.redis import BaseRedisKey, redis_pipeline
 import pickle
+from bson import ObjectId
 
 GUEST_PREFIX = 'G_'
 
@@ -43,7 +44,7 @@ class Session(BaseRedisKey):
             user_expire = datetime.utcnow() + timedelta(seconds=self.options()['user_expire'])
             user_expire = user_expire.strftime('%s')
             user = User.find_one({
-                'id': session_content['user_id'].decode('utf-8')
+                'id': ObjectId(session_content['user_id'].decode('utf-8'))
             })
             self.container().update(
                 user_cache=pickle.dumps(user),
