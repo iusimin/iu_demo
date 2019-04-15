@@ -20,13 +20,12 @@
 </template>
 
 <script>
+import ParcelScanType from "@/mixins/ParcelScanType.vue";
 export default {
   data: () => ({
-    tracking_id: null,
-    weight: null,
-    sensitive_reason: null,
     error_msg: null
-  })
+  }),
+  mixins: [ParcelScanType]
 }
 </script>
 

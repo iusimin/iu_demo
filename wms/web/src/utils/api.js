@@ -28,7 +28,7 @@ var _axios_call = function (config, callback, errorCallback, loader) {
 };
 
 export default {
-    call_json: function (method, url, query_string, params, callback, errorCallback, loader) {
+    call: function (method, url, query_string, params, callback, errorCallback, loader) {
         var data = params; /* _.pickBy(params, e => {
             return !_.isNil(e)
         }); */
@@ -44,7 +44,7 @@ export default {
         _axios_call(config, callback, errorCallback, loader);
     },
     login: function (username, password, remember_me, callback, errorCallback) {
-        this.call_json(
+        this.call(
             "post",
             "login",
             null,
@@ -57,11 +57,21 @@ export default {
         );
     },
     checkLogin: function(callback, errorCallback) {
-        this.call_json(
+        this.call(
             "get",
             "login",
             null,
             null,
+            callback,
+            errorCallback
+        );
+    },
+    inboundParcel: function(parcel, callback, errorCallback) {
+        this.call(
+            "put",
+            "inbound-parcel/inbound",
+            null,
+            parcel,
             callback,
             errorCallback
         );

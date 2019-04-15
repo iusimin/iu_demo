@@ -42,9 +42,8 @@ export default [
     children: [{
       path: '/',
       component: InboundScan,
-      meta: { requiresAuth: true }
     }],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/sorter',

@@ -89,7 +89,7 @@ export default {
       {
         to: '/dashboard',
         icon: 'mdi-view-dashboard',
-        text: 'Dashboard'
+        text: '控制台'
       },
       {
         to: '/inbound-scan',

@@ -16,24 +16,36 @@ from wms.model.redis_keys.session import Session
 
 
 class InboundParcelResource(BaseApiResource):
-
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      tracking_id: { type: string }
+      parcel_type: { type: number }
+      weight: { type: number }
+      has_battery: { type: boolean }
+      has_liquid: { type: boolean }
+      has_sensitive: { type: boolean }
+    required: [tracking_id, parcel_type, weight]
+    '''))
     def on_put(self, req, resp):
-        tracking_id = req.get_param("tracking_id", required=True)
-        parcel_type = req.get_param_as_int("parcel_type", required=True)
-        weight = req.get_param_as_int("weight", required=True)
+        params = req.media
+        tracking_id = params['tracking_id']
+        parcel_type = params['parcel_type']
+        weight = params['weight']
 
-        has_battery = req.get_param_as_bool("has_battery", default=False)
-        has_liquid = req.get_param_as_bool("has_liquid", default=False)
-        has_sensitive = req.get_param_as_bool("has_sensitive", default=False)
+        has_battery = params.get("has_battery", False)
+        has_liquid = params.get("has_liquid", False)
+        has_sensitive = params.get("has_sensitive", False)
+        sensitive_reason = params.get("sensitive_reason")
 
         try:
             InboundParcelUtil.inbound_parcel(
                 tracking_id=tracking_id,
                 parcel_type=parcel_type,
                 weight=weight,
-                has_battery=has_battery,
-                has_liquid=has_liquid,
-                has_sensitive=has_sensitive
+                has_battery=False,#has_battery,
+                has_liquid=False,#has_liquid,
+                has_sensitive=False,#has_sensitive
             )
         except (ValueError, InvalidOperationException):
-            raise falcon.HTTP_BAD_REQUEST()
+            raise falcon.HTTPBadRequest("", "")
