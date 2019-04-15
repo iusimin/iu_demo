@@ -28,7 +28,12 @@
           <!-- <v-card-title primary-title>{{ current_tracking_id }}</v-card-title> -->
           <v-card-text>
             <div class="font-weight-medium headline">{{ current_tracking_id }}</div>
-            <v-data-table :items="current_parcel_info" class="elevation-1" hide-actions hide-headers>
+            <v-data-table
+              :items="current_parcel_info"
+              class="elevation-1"
+              hide-actions
+              hide-headers
+            >
               <template v-slot:items="props">
                 <td>{{ props.item.name }}</td>
                 <td class="text-xs-right">{{ props.item.value }}</td>
@@ -37,9 +42,10 @@
           </v-card-text>
         </v-card>
         <v-card>
-          <v-layout>
-            <v-flex md6>
-              <!-- <v-card>
+          <v-card-text>
+            <v-layout>
+              <v-flex md6>
+                <!-- <v-card>
                 <div>
                   <span>未上架</span>
                   <span>({{ pending_table.data.length }})</span>
@@ -47,21 +53,21 @@
                     {{ pending_table.data.length }}
                   </v-chip>
                 </div>
-              </v-card> -->
-              <v-data-table
-                :headers="pending_table.headers"
-                :items="pending_table.data"
-                hide-actions
-                class="elevation-1"
-                no-data-text
-              >
-                <template v-slot:items="props">
-                  <td>{{ props.item.tracking_id }}</td>
-                </template>
-              </v-data-table>
-            </v-flex>
-            <v-flex md6>
-              <!-- <v-card>
+                </v-card>-->
+                <v-data-table
+                  :headers="pending_table.headers"
+                  :items="pending_table.data"
+                  hide-actions
+                  class="elevation-1"
+                  no-data-text
+                >
+                  <template v-slot:items="props">
+                    <td>{{ props.item.tracking_id }}</td>
+                  </template>
+                </v-data-table>
+              </v-flex>
+              <v-flex md6>
+                <!-- <v-card>
                 <div>
                   <span>已上架</span>
                   <span>({{ seeded_table.data.length }})</span>
@@ -69,22 +75,21 @@
                     {{ seeded_table.data.length }}
                   </v-chip>
                 </div>
-              </v-card> -->
-              <v-data-table
-                :headers="seeded_table.headers"
-                :items="seeded_table.data"
-                hide-actions
-                
-                class="elevation-1"
-                no-data-text
-              >
-                <template v-slot:items="props">
-                  <td class="text-xs-right"
-                  >{{ props.item.tracking_id }}</td>
-                </template>
-              </v-data-table>
-            </v-flex>
-          </v-layout>
+                </v-card>-->
+                <v-data-table
+                  :headers="seeded_table.headers"
+                  :items="seeded_table.data"
+                  hide-actions
+                  class="elevation-1"
+                  no-data-text
+                >
+                  <template v-slot:items="props">
+                    <td class="text-xs-right">{{ props.item.tracking_id }}</td>
+                  </template>
+                </v-data-table>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
         </v-card>
       </v-flex>
       <v-flex md9>
@@ -171,9 +176,18 @@ export default {
     current_parcel_info: function() {
       var vm = this;
       return [
-        {name: '分拣结果', value: vm.current_parcel ? vm.current_parcel.lattice_id : null},
-        {name: '入库重量', value: vm.current_parcel ? vm.current_parcel.inbound_weight : null},
-        {name: '入库时间', value: vm.current_parcel ? vm.current_parcel.inbound_datetime : null}
+        {
+          name: "分拣结果",
+          value: vm.current_parcel ? vm.current_parcel.lattice_id : null
+        },
+        {
+          name: "入库重量",
+          value: vm.current_parcel ? vm.current_parcel.inbound_weight : null
+        },
+        {
+          name: "入库时间",
+          value: vm.current_parcel ? vm.current_parcel.inbound_datetime : null
+        }
       ];
     },
     current_lattice: function() {
