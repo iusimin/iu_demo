@@ -10,7 +10,7 @@
       <v-stepper-items>
         <v-stepper-content step="1">
           <seed></seed>
-          <v-btn color="primary" @click="e1 = 2">Continue</v-btn>
+          <v-btn color="primary" @click="e1 = 2">全部上架完成</v-btn>
         </v-stepper-content>
         <v-stepper-content step="2">
           <combine></combine>

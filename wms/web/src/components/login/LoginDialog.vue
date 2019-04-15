@@ -27,7 +27,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" @click="login">Login</v-btn>
+              <v-btn color="primary" @click="login">登录</v-btn>
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -54,7 +54,7 @@ export default {
         vm.password,
         false,
         resp => {
-          var redirect = vm.$route.query.redirect || '/home';
+          var redirect = vm.$route.query.redirect || '/dashboard';
           vm.$router.push(redirect);
         },
         resp => {

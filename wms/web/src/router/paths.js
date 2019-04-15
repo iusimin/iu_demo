@@ -4,14 +4,15 @@
  * official documentation https://router.vuejs.org/en/
  */
 
-import EmptyPage from "../page/EmptyPage";
-import UserHome from "../page/UserHome";
+import EmptyPage from "@/page/EmptyPage";
+import UserHome from "@/page/UserHome";
 
-import LoginDialog from "../components/login/LoginDialog";
-import HomeContent from "../components/home/HomeContent";
-import InboundScan from "../components/inboundScan/InboundScan";
-import Sorter from "../components/sorter/Sorter";
-import Outbound from "../components/outbound/Outbound";
+import LoginDialog from "@/components/login/LoginDialog";
+import HomeContent from "@/components/home/HomeContent";
+import InboundScan from "@/components/inboundScan/InboundScan";
+import Sorter from "@/components/sorter/Sorter";
+import Outbound from "@/components/outbound/Outbound";
+import Dashboard from "@/views/Dashboard.vue";
 
 export default [
   {
@@ -24,8 +25,8 @@ export default [
     }]
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/dashboard',
+    name: 'dashboard',
     component: UserHome,
     children: [{
       path: '/',

@@ -23,6 +23,7 @@ import api from './utils/api'
 sync(store, router)
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
 
 Vue.mixin({
   data: function() {

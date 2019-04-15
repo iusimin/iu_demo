@@ -4,7 +4,7 @@
     absolute
     height="82"
   >
-    <div class="footer-items">
+    <!-- <div class="footer-items">
       <span
         v-for="link in links"
         :key="link.name"
@@ -13,18 +13,18 @@
           :href="link.Link"
           class="tertiary--text footer-links">{{ link.name }}</a>
       </span>
-    </div>
+    </div> -->
     <v-spacer/>
     <span class="font-weight-light copyright">
       &copy;
       {{ (new Date()).getFullYear() }}
-      <a
+      Intelligence Union &amp; China Post
+      <!-- <a
         href="https://www.creative-tim.com/"
-        target="_blank">Creative Tim</a>, made with
-      <v-icon
+        target="_blank">Creative Tim</a>, made with -->
+      <!-- <v-icon
         color="tertiary"
-        size="17">mdi-heart</v-icon>
-      for a better web
+        size="17">mdi-heart</v-icon> -->
     </span>
   </v-footer>
 </template>
