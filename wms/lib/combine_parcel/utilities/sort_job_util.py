@@ -20,8 +20,20 @@ class SortJobUtil(object):
         return SortJobAccessor.get_latest_complete_job_id()
 
     @classmethod
+    def get_parcel_sort_info(cls, job_id, tracking_id, round_id):
+        parcel = CPSortPool.by_tracking_id(job_id, tracking_id)
+
+        if not parcel:
+            raise ValueError("Parcel with tracking id {0} didn't exist in job {1}.".format(tracking_id, job_id))
+
+        info_dict = parcel.to_dict()
+        info_dict["group_ids_string"] = parcel.group_ids_string
+        info_dict["round_group_id"] = parcel.get_group_id_by_round(round_id)
+        return info_dict
+
+    @classmethod
     def get_combine_cabinet_from_first_tracking_id(cls, job_id, tracking_id):
-        job_accessor = SortJobAccessor(job_id)
+        #job_accessor = SortJobAccessor(job_id)
         parcel = CPSortPool.by_tracking_id(job_id, tracking_id)
 
         if not parcel:
@@ -50,6 +62,7 @@ class SortJobUtil(object):
                 inbound_parcel = inbound_parcel_dict[tracking_id]
                 parcel["inbound_weight"] = inbound_parcel.weight
                 parcel["inbound_datetime"] = inbound_parcel.timeline.inbound.strftime("%Y-%m-%d %H:%M:%S")
+                parcel["lattice_id"] = lattice_id
 
             res.append(parcels_in_lattice)
 

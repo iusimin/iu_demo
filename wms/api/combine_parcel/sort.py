@@ -16,14 +16,15 @@ from wms.model.mongo.user import User
 from wms.model.redis_keys.session import Session
 
 
-class CPSeedPool(BaseApiResource):
+class SortParcel(BaseApiResource):
     @falcon.before(login_required)
     def on_get(self, req, resp):
         tracking_id = req.get_param("tracking_id", required=True)
         job_id = req.get_param("job_id", required=True)
+        round_id = req.get_param_as_int("round_id", required=True)
 
-        parcels = SortJobUtil.get_combine_cabinet_from_first_tracking_id(job_id, tracking_id)
+        sort_info = SortJobUtil.get_parcel_sort_info(job_id, tracking_id, round_id)
 
         resp.media = {
-            "parcels": parcels
+            "sort_info": sort_info
         }

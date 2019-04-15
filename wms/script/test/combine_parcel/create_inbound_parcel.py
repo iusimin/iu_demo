@@ -64,5 +64,5 @@ def inbound_parcel():
 
 if __name__ == "__main__":
     _setup()
-    #create_inbound_parcels()
-    inbound_parcel()
+    create_inbound_parcels()
+    #inbound_parcel()

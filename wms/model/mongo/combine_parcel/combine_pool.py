@@ -40,6 +40,12 @@ class CPSortPool(Document):
     created_datetime = DateTimeField()
     updated_datetime = DateTimeField()
 
+    SORT_GROUP_NAMES = [
+        ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"],
+        ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q"],
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+    ]
+
     @classmethod
     def create(cls, job_id, tracking_id, sort_type, group_ids, cabinet_id, lattice_id):
         obj = cls(
@@ -60,6 +66,13 @@ class CPSortPool(Document):
             "job_id": job_id,
             "tracking_id": tracking_id
         })
+
+    @property
+    def group_ids_string(self):
+        return "".join([CPSortPool.SORT_GROUP_NAMES[index][group.seq_id] for index, group in self.group_ids] if self.group_ids else [])
+
+    def get_group_id_by_round(self, round_id):
+        return CPSortPool.SORT_GROUP_NAMES[round_id][self.group_ids[round_id]]
 
     def to_dict(self):
         return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

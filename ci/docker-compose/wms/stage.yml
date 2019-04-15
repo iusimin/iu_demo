@@ -1,15 +1,5 @@
 version: '3'
 services:
-  # wms-frontend
-  vue-frontend:
-    build: $IU_HOME/vue_frontend
-    ports:
-      - 5080:5080
-    volumes:
-      - $IU_HOME/vue_frontend:/iu/vue_frontend:ro
-    command: ["http-server", "dist", "-p 5080"]
-    stdin_open: true
-    tty: true
   # wms
   wms:
     build: $IU_HOME/wms

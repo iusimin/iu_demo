@@ -35,5 +35,5 @@ class InboundParcelResource(BaseApiResource):
                 has_liquid=has_liquid,
                 has_sensitive=has_sensitive
             )
-        except (ValueError, InvalidOperationException) as ex:
+        except (ValueError, InvalidOperationException):
             raise falcon.HTTP_BAD_REQUEST()
