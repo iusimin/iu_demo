@@ -5,10 +5,10 @@
       <v-container>
         <v-layout row wrap>
           <v-flex md12>
-            <v-text-field v-model="tracking_id" label="物流单号" required></v-text-field>
+            <v-text-field id="SpecialTrackingIdInput" v-model="tracking_id" label="物流单号" required></v-text-field>
           </v-flex>
           <v-flex md12>
-            <v-text-field v-model="weight" label="重量" required></v-text-field>
+            <v-text-field id="SpecialWeightInput" v-model="weight" label="重量" required></v-text-field>
           </v-flex>
           <v-flex md12>
             <v-checkbox v-model="has_battery" label="是否带电"></v-checkbox>
@@ -29,6 +29,29 @@ export default {
     error_msg: null
   }),
   mixins: [ParcelScanType],
+  mounted: function() {
+    var vm = this;
+    document
+      .getElementById("SpecialTrackingIdInput")
+      .addEventListener("keyup", vm.stopInputPropagation);
+    document
+      .getElementById("SpecialWeightInput")
+      .addEventListener("keyup", vm.stopInputPropagation);
+  },
+  methods: {
+    stopInputPropagation: function(e) {
+      e.stopPropagation();
+    }
+  },
+  destroyed: function() {
+    var vm = this;
+    document
+      .getElementById("SpecialTrackingIdInput")
+      .removeEventListener("keyup", vm.stopInputPropagation);
+    document
+      .getElementById("SpecialWeightInput")
+      .removeEventListener("keyup", vm.stopInputPropagation);
+  }
 }
 </script>
 

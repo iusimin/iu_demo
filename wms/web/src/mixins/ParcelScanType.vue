@@ -10,8 +10,10 @@ export default {
   }),
   mounted: function() {
     var vm = this;
-    vm.tracking_id = vm.value.tracking_id || null;
-    vm.weight = vm.value.weight || null;
+    if (vm.value) {
+      vm.tracking_id = vm.value.tracking_id || null;
+      vm.weight = vm.value.weight || null;
+    }
   },
   methods: {
     updateParcelInfo: function() {
@@ -38,13 +40,13 @@ export default {
       handler: function(newValue, oldValue) {
         var vm = this;
         vm.updateParcelInfo();
-      },
+      }
     },
     weight: {
       handler: function(newValue, oldValue) {
         var vm = this;
         vm.updateParcelInfo();
-      },
+      }
     }
   }
 };

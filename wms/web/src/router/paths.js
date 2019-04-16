@@ -53,7 +53,7 @@ export default [
       path: '/',
       component: Sorter
     }],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/outbound',
