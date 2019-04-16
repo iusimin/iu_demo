@@ -50,6 +50,7 @@ class CPSortJob(Document):
             job_type=job_type,
             warehouse_id=warehouse_id,
             warehouse_seed_cabinet_size=warehouse.cabinet_size,
+            sort_batch_size=warehouse.sort_batch_size,
             created_datetime=datetime.utcnow()
         )
 

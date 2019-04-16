@@ -17,7 +17,7 @@ from wms.model.redis_keys.session import Session
 
 
 class SortParcel(BaseApiResource):
-    @falcon.before(login_required)
+    #@falcon.before(login_required)
     def on_get(self, req, resp):
         tracking_id = req.get_param("tracking_id", required=True)
         job_id = req.get_param("job_id", required=True)
