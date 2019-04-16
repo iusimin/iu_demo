@@ -1,32 +1,26 @@
 # -*- coding: UTF-8 -*-
 
-import logging
-import math
 import random
 from datetime import datetime, timedelta
-from itertools import groupby
 
 from bson import ObjectId
-from tornado.options import options
-from wishwms.core.options import define_for_server
-from wishwms.lib.combine_parcel.data_accessor.inbound_parcel_accessor import \
-    CPInboundParcelAccessor
-from wishwms.lib.combine_parcel.data_accessor.sort_job_accessor import \
-    SortJobAccessor
-from wishwms.lib.combine_parcel.utilities.inbound_parcel_util import \
-    InboundParcelUtil
-from wishwms.model.combine_parcel.combine_pool import CPSortGroupId, CPSortPool
-from wishwms.model.combine_parcel.inbound_parcel import CPInboundParcel
-from wishwms.model.combine_parcel.sort_job import CPSortJob
-from wishwms.model.sequence_id_generator import SequenceIdGenerator
-from wishwms.server import WishWmsApplication, configure
 
-LOGGER = logging.getLogger("wishwms.test")
+from wms.lib.combine_parcel.data_accessor.inbound_parcel_accessor import \
+    CPInboundParcelAccessor
+from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
+    InboundParcelUtil
+from wms.model.mongo.combine_parcel.inbound_parcel import \
+    CPInboundParcel
+from wms.model.mongo.warehouse_info import CPWarehouse
+from wms.server import ConfigParser, IUWMSBackendService
+
+CONFIG_FILE = '/etc/server.yml'
+
 
 def _setup():
-    define_for_server()
-    configure()
-    application = WishWmsApplication(options, LOGGER)
+    options = ConfigParser.parse_config_file(CONFIG_FILE)
+    options['rate-limiter']['enable'] = False
+    application = IUWMSBackendService(options)
     application.connect()
 
 def create_combine_pool():

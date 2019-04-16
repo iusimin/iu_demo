@@ -22,19 +22,20 @@ class CPWarehouse(Document):
         'force_insert': True,
     }
 
-    warehouse_id = StringField()
-    cabinet_size = EmbeddedDocumentField("CPCabinetSize")
+    warehouse_id = StringField(required=True)
+    cabinet_size = EmbeddedDocumentField("CPCabinetSize", required=True)
 
-    sort_batch_size = ListField(IntField())
+    sort_batch_size = IntField(required=True)
 
-    created_datetime = DateTimeField()
+    created_datetime = DateTimeField(required=True)
     updated_datetime = DateTimeField()
 
     @classmethod
-    def create(cls, warehouse_id, cabinet_width, cabinet_height):
+    def create(cls, warehouse_id, cabinet_width, cabinet_height, sort_batch_size):
         obj = cls(
             warehouse_id=warehouse_id,
             cabinet_size=CPCabinetSize(width=cabinet_width, height=cabinet_height),
+            sort_batch_size=sort_batch_size,
             created_datetime=datetime.utcnow()
         )
 

@@ -31,7 +31,7 @@ class CPSortJob(Document):
     warehouse_id = StringField(required=True)
 
     warehouse_seed_cabinet_size = EmbeddedDocumentField("CPCabinetSize")
-    sort_batch_size = ListField(IntField())
+    sort_batch_size = IntField(required=True)
     
     job_finish_datetime = DateTimeField()
 
