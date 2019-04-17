@@ -24,6 +24,7 @@ export default {
   }),
   mixins: [ParcelScanType],
   mounted: function() {
+    //TODO: Refactor later
     var vm = this;
     document
       .getElementById("TrackingIdInput")

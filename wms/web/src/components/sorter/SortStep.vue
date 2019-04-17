@@ -11,8 +11,17 @@
       </v-container>
     </v-form>
     <div>
-      <v-text-field v-model="sort_info.weight" label="weight" :readonly="true"></v-text-field>
-      <v-text-field v-model="sort_info.inbound_datetime" label="inbound datetime" :readonly="true"></v-text-field>
+      <v-card>
+        <v-card-text>
+          <p class="display-4 font-weight-black text-md-center">{{ sort_info.sort_group_id }}</p>
+          <v-text-field v-model="sort_info.weight" label="weight" :readonly="true"></v-text-field>
+          <v-text-field
+            v-model="sort_info.inbound_datetime"
+            label="inbound datetime"
+            :readonly="true"
+          ></v-text-field>
+        </v-card-text>
+      </v-card>
     </div>
   </v-container>
 </template>

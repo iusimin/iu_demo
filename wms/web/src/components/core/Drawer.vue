@@ -92,6 +92,11 @@ export default {
         text: '控制台'
       },
       {
+        to: '/warehouse-setting',
+        icon: 'mdi-view-dashboard',
+        text: '仓库设置'
+      },
+      {
         to: '/inbound-scan',
         icon: 'mdi-audiobook',
         text: '扫描入库'
@@ -105,6 +110,16 @@ export default {
         to: '/outbound',
         icon: 'mdi-adobe',
         text: '播种合并'
+      },
+      {
+        to: '/directship',
+        icon: 'mdi-adobe',
+        text: '直发打单'
+      },
+      {
+        to: '/outboundscan',
+        icon: 'mdi-adobe',
+        text: '出库扫描'
       }
     ],
     responsive: false

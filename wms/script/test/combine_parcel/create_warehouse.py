@@ -14,6 +14,8 @@ def _setup():
 def create_warehouse():
     CPWarehouse.create(
         warehouse_id="CHINAPOST-SH001",
+        warehouse_name="CHINAPOST-DONGGUAN",
+        cabinet_count=8,
         cabinet_width=8,
         cabinet_height=5,
         sort_batch_size=8

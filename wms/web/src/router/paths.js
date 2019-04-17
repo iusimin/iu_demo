@@ -13,6 +13,9 @@ import InboundScan from "@/components/inboundScan/InboundScan";
 import Sorter from "@/components/sorter/Sorter";
 import Outbound from "@/components/outbound/Outbound";
 import Dashboard from "@/views/Dashboard.vue";
+import WarehouseSetting from "@/components/admin/WarehouseSetting.vue";
+import DirectShip from "@/components/operation/DirectShip.vue";
+import OutboundScan from "@/components/operation/OutboundScan.vue";
 
 export default [
   {
@@ -34,6 +37,16 @@ export default [
       meta: { requiresAuth: true }
     }],
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/warehouse-setting',
+    name: 'warehousesetting',
+    component: UserHome,
+    children: [{
+      path: '/',
+      component: WarehouseSetting
+    }],
+    meta: { requiresAuth: false }
   },
   {
     path: '/inbound-scan',
@@ -64,5 +77,25 @@ export default [
       component: Outbound
     }],
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/directship',
+    name: '直发打单',
+    component: UserHome,
+    children: [{
+      path: '/',
+      component: DirectShip
+    }],
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/outboundscan',
+    name: '出库扫描',
+    component: UserHome,
+    children: [{
+      path: '/',
+      component: OutboundScan
+    }],
+    meta: { requiresAuth: false }
   }
 ]
