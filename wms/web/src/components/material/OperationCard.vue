@@ -1,11 +1,11 @@
 <template>
-  <material-card v-bind="$attrs" class="v-card--material-stats" v-on="$listeners">
+  <material-card v-bind="$attrs" class="v-card--material-stats" v-on="$listeners" @click="jumpTarget">
     <v-card slot="offset" :class="`elevation-${elevation}`" :color="color" class="pa-4" dark>
       <v-icon size="40">{{ icon }}</v-icon>
     </v-card>
     <div class="text-xs-right">
-      <p class="category grey--text font-weight-light" v-text="title"/>
-      <h3 class="title display-1 font-weight-light">
+      <p class="category title font-weight-bold" v-text="title"/>
+      <h3 class="body-2 font-weight-light">
         {{ value }}
         <small>{{ smallValue }}</small>
       </h3>
@@ -57,6 +57,18 @@ export default {
     smallValue: {
       type: String,
       default: undefined
+    },
+    clickLink: {
+      type: String,
+      default: null
+    }
+  },
+  methods: {
+    jumpTarget: function() {
+      var vm = this;
+      if (vm.clickLink) {
+        vm.$router.push(vm.clickLink);
+      }
     }
   }
 };

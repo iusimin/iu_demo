@@ -1,15 +1,6 @@
 <template>
-  <v-card
-    v-bind="$attrs"
-    :style="styles"
-    v-on="$listeners"
-  >
-    <helper-offset
-      v-if="hasOffset"
-      :inline="inline"
-      :full-width="fullWidth"
-      :offset="offset"
-    >
+  <v-card v-bind="$attrs" :style="styles" v-on="$listeners">
+    <helper-offset v-if="hasOffset" :inline="inline" :full-width="fullWidth" :offset="offset">
       <v-card
         v-if="!$slots.offset"
         :color="color"
@@ -17,38 +8,23 @@
         class="v-card--material__header"
         dark
       >
-        <slot
-          v-if="!title && !text"
-          name="header"
-        />
+        <slot v-if="!title && !text" name="header"/>
         <span v-else>
-          <h4
-            class="title font-weight-light mb-2"
-            v-text="title"
-          />
-          <p
-            class="category font-weight-thin"
-            v-text="text"
-          />
+          <h4 class="title font-weight-light mb-2" v-text="title"/>
+          <p class="category font-weight-thin" v-text="text"/>
         </span>
       </v-card>
-      <slot
-        v-else
-        name="offset"
-      />
+      <slot v-else name="offset"/>
     </helper-offset>
 
     <v-card-text>
-      <slot />
+      <slot/>
     </v-card-text>
 
-    <v-divider
-      v-if="$slots.actions"
-      class="mx-3"
-    />
+    <v-divider v-if="$slots.actions" class="mx-3"/>
 
     <v-card-actions v-if="$slots.actions">
-      <slot name="actions" />
+      <slot name="actions"/>
     </v-card-actions>
   </v-card>
 </template>
@@ -60,7 +36,7 @@ export default {
   props: {
     color: {
       type: String,
-      default: 'secondary'
+      default: "secondary"
     },
     elevation: {
       type: [Number, String],
@@ -89,30 +65,29 @@ export default {
   },
 
   computed: {
-    hasOffset () {
-      return this.$slots.header ||
-        this.$slots.offset ||
-        this.title ||
-        this.text
+    hasOffset() {
+      return (
+        this.$slots.header || this.$slots.offset || this.title || this.text
+      );
     },
-    styles () {
-      if (!this.hasOffset) return null
+    styles() {
+      if (!this.hasOffset) return null;
 
       return {
         marginBottom: `${this.offset}px`,
         marginTop: `${this.offset * 2}px`
-      }
+      };
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
-  .v-card--material {
-    &__header {
-      &.v-card {
-        border-radius: 4px;
-      }
+.v-card--material {
+  &__header {
+    &.v-card {
+      border-radius: 4px;
     }
   }
+}
 </style>

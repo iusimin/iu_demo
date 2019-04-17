@@ -107,7 +107,7 @@ export default {
         text: '分拣'
       },
       {
-        to: '/outbound',
+        to: '/seed',
         icon: 'mdi-adobe',
         text: '播种合并'
       },

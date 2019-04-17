@@ -33,10 +33,9 @@ export default [
     component: UserHome,
     children: [{
       path: '/',
-      component: HomeContent,
-      meta: { requiresAuth: true }
+      component: HomeContent
     }],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/warehouse-setting',
@@ -69,14 +68,14 @@ export default [
     meta: { requiresAuth: false }
   },
   {
-    path: '/outbound',
+    path: '/seed',
     name: '播种合并',
     component: UserHome,
     children: [{
       path: '/',
       component: Outbound
     }],
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/directship',
