@@ -18,6 +18,9 @@ import paths from './paths'
 // Stores
 import store from '@/store'
 
+import axios from 'axios'
+import login from '../utils/login'
+
 function route (path, view, name, meta) {
   return {
     name: name || view,
@@ -50,19 +53,45 @@ const router = new Router({
 
 // Add login guard
 router.beforeEach((to, from, next) => {
-  if (to.meta.loginRequired) {
-    if (!store.state.login.user_id) {
+  // If login expired, check api and update
+  if (login.loginExpired()) {
+    axios.get(
+      '/api/login',
+      {}
+    ).then(
+      response => {
+        var data = response.data
+        login.updateLoginStatus(data)
+        login.setLoginExpire()
+        next()
+      }
+    ).catch(error => {
+      // Also cache logged failed status
+      login.setLoginExpire()
+      if (to.meta.loginRequired) {
+        // Redirect to sign in if require log in
+        next({
+          path: '/signin',
+          query: {
+            redirect: to.fullPath
+          }
+        })
+      } else {
+        next()
+      }
+    })
+  } else {
+    // Check cached result
+    if (!to.meta.loginExpired || login.hasLoggedIn()) {
+      next()
+    } else {
       next({
         path: '/signin',
         query: {
           redirect: to.fullPath
         }
       })
-    } else {
-      next()
     }
-  } else {
-    next()
   }
 })
 

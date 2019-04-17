@@ -148,7 +148,6 @@ export default {
   mounted () {
     this.onResponsiveInverted()
     window.addEventListener('resize', this.onResponsiveInverted)
-    this.updateLoginStatus()
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.onResponsiveInverted)
