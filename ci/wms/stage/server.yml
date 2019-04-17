@@ -10,13 +10,13 @@
     guest_expire: 1d
     user_expire: 1m
   mongo:
-    host: mongodb
-    port: 27017
-    db_names:
-      - iu
-    username: root
-    password: example
-    auth_db: admin
+    - host: 10.86.19.163
+      port: 27017
+      db_names:
+        - iu
+      username: 
+      password: 
+      auth_db: admin
   redis:
     host: redis
     port: 6379

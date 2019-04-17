@@ -9,20 +9,9 @@ from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
-class CPOutboundParcelTimeline(EmbeddedDocument):
-    created = DateTimeField()
-    inbound = DateTimeField()
-    seeded = DateTimeField()
-
-
-class CPOutboundParcel(Document):
+class LogisticsOrder(Document):
     class Status(PyEnumMixin):
         Pending = 0
-
-    class ParcelType(PyEnumMixin):
-        Ordinary = 0
-        Special = 1
-        Sensitive = 2
 
     meta = {
         'indexes': [
@@ -34,6 +23,7 @@ class CPOutboundParcel(Document):
     }
 
     tracking_id = StringField(required=True)
+    platform_id = StringField(required=True)
     combine_id = StringField()
     warehouse_id = StringField(required=True)
     outbound_carrier = IntField()

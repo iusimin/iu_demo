@@ -111,21 +111,20 @@ class CPSortGroupIdGenerator(object):
 
 class CPSortAllocateGroupId(object):
     @staticmethod
-    def allocate(items, scale):
+    def allocate(number, scale):
         if not scale:
             raise ValueError("scale")
-        if not items:
-            raise ValueError("items")
+        if number <= 0:
+            raise ValueError("number")
 
-        digits = math.ceil(math.log(len(items), scale))
+        digits = math.ceil(math.log(number, scale))
         id_generator = CPSortGroupIdGenerator(scale, digits)
 
         seq_ids = []
 
-        length = len(items)
-        for index, _ in enumerate(items):
+        for index in range(number):
             seq_ids.append(id_generator.current_copy)
-            if index < length - 1:
+            if index < number - 1:
                 id_generator.next()
 
         return seq_ids

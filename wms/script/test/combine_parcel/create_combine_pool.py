@@ -55,7 +55,7 @@ def create_combine_pool():
     for parcel in inbound_parcels:
         parcel_groups[parcel.combine_id].append(parcel)
 
-    group_ids = CPSortAllocateGroupId.allocate(combine_ids, warehouse.sort_batch_size)
+    group_ids = CPSortAllocateGroupId.allocate(len(combine_ids), warehouse.sort_batch_size)
     group_dict = dict(zip(combine_ids, group_ids))
 
     lattice_id = 1

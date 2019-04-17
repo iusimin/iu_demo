@@ -1,9 +1,4 @@
 SERVICE_CONFIG = {
-    'vue-frontend-server': [
-        'run',
-        '--use-aliases', '--service-ports', '--rm',
-        'vue-frontend',
-    ],
     'server': [
         'run',
         '--use-aliases', '--service-ports', '--rm',

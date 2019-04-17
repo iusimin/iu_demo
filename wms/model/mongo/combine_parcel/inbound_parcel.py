@@ -32,11 +32,11 @@ class CPInboundParcel(Document):
 
     meta = {
         'indexes': [
-            IndexDefinition.parse_from_keys_str("tracking_id:1", unique=True),
-            IndexDefinition.parse_from_keys_str("warehouse_id:1,status:1,ready_to_ship:1,combine_id:1"),
-            IndexDefinition.parse_from_keys_str("timeline.created:1"),
-            IndexDefinition.parse_from_keys_str("timeline.inbound:1"),
-            IndexDefinition.parse_from_keys_str("created_datetime:1"),
+            {'keys': 'tracking_id:1', 'unique': True},
+            {'keys': 'warehouse_id:1,status:1,ready_to_ship:1,combine_id:1'},
+            {'keys': 'timeline.created:1'},
+            {'keys': 'timeline.inbound:1'},
+            {'keys': 'created_datetime:1'}
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
@@ -85,13 +85,7 @@ class CPInboundParcel(Document):
             created_datetime=utcnow
         )
 
-        try:
-            obj.save()
-        except OperationError as ex:
-            if 'duplicate unique keys' in ex.message:
-                return False, None
-            else:
-                raise
+        obj.save()
 
         return True, obj
 
