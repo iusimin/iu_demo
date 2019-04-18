@@ -12,7 +12,7 @@
           ></v-text-field>
         </div>
         <v-card>
-          <v-card-title class="primary" v-if="parcel_valid">
+          <v-card-title class="primary" v-if="tracking_id_valid">
             <v-layout>
               <v-flex md6>当前格子：{{ current_parcel ? current_parcel.lattice_id : null }}</v-flex>
               <!-- <v-flex md6>进度 {{  }} / {{  }}</v-flex> -->
@@ -134,11 +134,11 @@ export default {
       data: []
     },
     current_tracking_id: null,
-    parcel_valid: true,
+    tracking_id_valid: true,
     manual_input: false,
     manual_tracking_id: null,
     cabinet_size: [8, 6],
-    target_parcels: test_parcels
+    target_parcels: []
   }),
   mounted: function() {
     var vm = this;
@@ -193,7 +193,7 @@ export default {
     current_lattice: function() {
       var vm = this;
       var lattice = null;
-      if (vm.current_tracking_id) {
+      if (vm.current_tracking_id && vm.current_parcel) {
         var lattice_id = vm.current_parcel.lattice_id;
         lattice = vm.target_parcels[lattice_id - 1];
       }
@@ -223,23 +223,49 @@ export default {
     },
     tracking_id_updated: function() {
       var vm = this;
-      if (vm.current_tracking_id && !vm.current_parcel) {
-        vm.parcel_valid = false;
-      } else {
-        vm.parcel_valid = true;
+      if (vm.target_parcels.length == 0) {
+        vm.init_target_parcels(vm.seed_tracking_id);
       }
-      if (vm.current_parcel) {
-        vm.$refs.Cabinet.seed_parcel(vm.current_parcel);
-        vm.current_parcel.seeded = true;
+      else {
+        vm.seed_tracking_id();
+      }
+    },
+    seed_tracking_id: function() {
+      var vm = this;
+      console.log(vm.parcels_by_tracking_id);
+      var current_parcel = vm.parcels_by_tracking_id[vm.current_tracking_id];
+      if (vm.current_tracking_id && !current_parcel) {
+        vm.tracking_id_valid = false;
+      } else {
+        vm.tracking_id_valid = true;
+      }
+      if (current_parcel) {
+        vm.$refs.Cabinet.seed_parcel(current_parcel);
+        current_parcel.seeded = true;
       }
       vm.adjust_table();
+    },
+    init_target_parcels: function(cb) {
+      var vm = this;
+      if (vm.target_parcels.length == 0) {
+        vm.api.getSeedCabinet(
+          vm.current_tracking_id,
+          "20190418-00001",
+          resp => {
+            vm.target_parcels = resp.parcels;
+            vm.$nextTick(cb);
+          },
+          resp => {
+            alert("error");
+          }
+        );
+      }
     },
     adjust_table: function() {
       var vm = this;
       vm.pending_table.data = [];
       vm.seeded_table.data = [];
       if (vm.current_lattice) {
-        console.log("11");
         vm.pending_table.data = vm.current_lattice.filter(function(ele) {
           return !ele.seeded;
         });

@@ -28,8 +28,7 @@ Vue.config.devtools = true
 Vue.mixin({
   data: function() {
     return {
-      api: api,
-      rrr: 111
+      api: api
     };
   }
 })

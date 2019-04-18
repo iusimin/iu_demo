@@ -40,10 +40,14 @@ export default {
                    return !_.isNil(e)
                }); */
         //var xsrf_token = $("#xsrf-container").find("input").val();
+        url = 'api/' + url;
+        if (query_string) {
+            url = url + "?" + query_string
+        }
         var config = {
             data: data,
             method: method,
-            url: 'api/' + url,
+            url: url,
             headers: {
                 //'X-XSRFToken': xsrf_token
             }
@@ -95,6 +99,18 @@ export default {
             callback,
             errorCallback
         );
+    },
+    getSeedCabinet: function (tracking_id, job_id, callback, errorCallback) {
+        this.call(
+            "get",
+            "seed-pool",
+            this.buildQueryString({
+                tracking_id: tracking_id,
+                job_id: job_id
+            }),
+            null,
+            callback,
+            errorCallback
+        );
     }
-
 };

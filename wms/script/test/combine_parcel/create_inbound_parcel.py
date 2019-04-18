@@ -45,8 +45,8 @@ def inbound_parcel():
     inbound_parcels = CPInboundParcel.find(
         {
             "created_datetime": {
-                "$gte": datetime(2019, 4, 15, 0, 0, 0),
-                "$lte": datetime(2019, 4, 17, 0, 0, 0)
+                "$gte": datetime(2019, 4, 18, 0, 0, 0),
+                "$lte": datetime(2019, 4, 19, 0, 0, 0)
             }
         }
     )
