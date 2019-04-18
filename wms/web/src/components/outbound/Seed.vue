@@ -232,7 +232,6 @@ export default {
     },
     seed_tracking_id: function() {
       var vm = this;
-      console.log(vm.parcels_by_tracking_id);
       var current_parcel = vm.parcels_by_tracking_id[vm.current_tracking_id];
       if (vm.current_tracking_id && !current_parcel) {
         vm.tracking_id_valid = false;

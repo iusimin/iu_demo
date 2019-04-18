@@ -76,6 +76,6 @@ def set_ready_to_ship():
 
 if __name__ == "__main__":
     _setup()
-    #create_inbound_parcels()
+    create_inbound_parcels()
     #inbound_parcel()
-    set_ready_to_ship()
+    #set_ready_to_ship()

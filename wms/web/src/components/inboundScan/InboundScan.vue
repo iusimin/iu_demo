@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-container fluid>
+      <v-alert :value="alert_msg != null" :type="alert_type">{{ alert_msg }}</v-alert>
       <v-tabs centered color="cyan" dark grow icons-and-text @change="tabChanged">
         <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -45,6 +46,8 @@ import Vue from "vue";
 
 export default {
   data: () => ({
+    alert_msg: null,
+    alert_type: "success",
     current_tab: "tab-1",
     parcel_map: {
       "tab-1": {
@@ -64,13 +67,12 @@ export default {
     SpecialParcel,
     SensitiveParcel
   },
-  mounted: function() {
-  },
+  mounted: function() {},
   computed: {
     current_parcel: function() {
       var vm = this;
       return vm.parcel_map[vm.current_tab];
-    },
+    }
   },
   methods: {
     tabChanged: function(tab_id) {
@@ -88,10 +90,14 @@ export default {
       vm.api.inboundParcel(
         parcel,
         resp => {
-          alert("1");
+          vm.tracking_id = null;
+          vm.weight = null;
+          vm.alert_msg = "已成功入库！";
+          vm.alert_type = "success";
         },
         resp => {
-          alert("0");
+          vm.alert_msg = "入库失败！";
+          vm.alert_type = "error";
         }
       );
     }
