@@ -66,6 +66,5 @@ $ echo $IU_HOME
 # Run demo
 1. Ensure 80 port is released (Stop nginx / apache server if it's running on 80 port)
 2. Run command `iu-cli run server`
-3. Run command `iu-cli run vue-frontend-server` to build frontend image and run container
-4. Run command `iu-cli run infra` (Nginx may crash if your server is not running)
-5. Then you can access http://demo.iu.com to check results
+3. Run command `iu-cli run infra` (Nginx may crash if your server is not running)
+4. Then you can access http://demo.iu.com to check results

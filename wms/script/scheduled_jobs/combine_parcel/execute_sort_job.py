@@ -1,7 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-from wms.model.mongo.warehouse import CPWarehouse
 from wms.server import ConfigParser, IUWMSBackendService
+from wms.model.mongo.combine_parcel.sort_job import CPSortJob
+from wms.model.mongo.warehouse import CPWarehouse
+
+from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks
 
 CONFIG_FILE = '/etc/server.yml'
 
@@ -11,17 +14,14 @@ def _setup():
     application = IUWMSBackendService(options)
     application.connect()
 
-def create_warehouse():
-    CPWarehouse.create(
-        warehouse_id="CHINAPOST-SH001",
-        warehouse_name="CHINAPOST-DONGGUAN",
-        cabinet_count=8,
-        cabinet_width=8,
-        cabinet_height=5,
-        sort_batch_size=8
-    )
+def run():
+    jobs = CPSortJob.find_iter({
+        "status": CPSortJob.Status.Pending
+    })
+    for job in jobs:
+        CPSortJobTasks.run_job(job.job_id)
 
 
 if __name__ == "__main__":
     _setup()
-    create_warehouse()
+    run()

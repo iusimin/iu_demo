@@ -4,6 +4,11 @@ SERVICE_CONFIG = {
         '--use-aliases', '--service-ports', '--rm',
         'wms',
     ],
+    'worker': [
+        'run',
+        '--use-aliases', '--service-ports', '--rm',
+        'wms-worker', 'python', 'worker.py', # Need input
+    ],
     'infra': [
         'up',
         '--abort-on-container-exit',

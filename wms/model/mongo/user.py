@@ -18,10 +18,12 @@ class User(Document):
 
     username = StringField(index=True, unique=True)
     password = StringField()
-    email = StringField( index=True, unique=True)
+    email = StringField(index=True, unique=True)
     phone_number = StringField()
     permissions = ListField(EmbeddedDocumentField('Permission'),  default=[])
     role_names = ListField(StringField(),  default=[])
+
+    warehouse_id = StringField(required=True)
 
     def get_permissions(self):
         plist = list(self.permissions)
@@ -34,11 +36,14 @@ class User(Document):
         return plist
     
     def get_roles(self):
-        roles_dict = {r.name: r 
-            for r in Role.objects.filter(name__in = self.role_names)}
+        roles_dict = {
+            r.name: r for r in Role.find({
+                'name': {'$in': self.role_names}
+            })
+        }
         return [roles_dict[rn] for rn in self.role_names]
 
-    def to_json_dict(self):
+    def to_dict(self):
         return {
             'id': str(self.id),
             'username': str(self.username),
@@ -46,6 +51,7 @@ class User(Document):
             'phone_number': str(self.phone_number),
             'role_names': [str(r) for r in self.role_names],
             'permissions_all': [
-                p.to_json_dict() for p in self.get_permissions()
-            ]
+                p.to_dict() for p in self.get_permissions()
+            ],
+            'warehouse_id': self.warehouse_id
         }

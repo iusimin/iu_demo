@@ -2,10 +2,12 @@
 import math
 from datetime import datetime
 
-from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
 from iu_mongo.index import IndexDefinition
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 
 
@@ -13,7 +15,7 @@ class CPSortGroupId(EmbeddedDocument):
     seq_id = IntField(required=True)
 
 
-class CPSortPool(Document):
+class CPSortPool(Document, MongoMixin):
     class SortType(PyEnumMixin):
         Combined = 0
         DirectShip = 1
@@ -76,14 +78,7 @@ class CPSortPool(Document):
         return CPSortPool.SORT_GROUP_NAMES[round_id][self.group_ids[round_id]]
 
     def to_dict(self):
-        return {
-            "tracking_id": self.tracking_id,
-            "job_id": self.job_id,
-            "cabinet_id": self.cabinet_id,
-            "lattice_id": self.lattice_id,
-            "sort_type": self.sort_type,
-            "group_ids": self.group_ids
-        }
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
 
 
 class CPSortGroupIdGenerator(object):

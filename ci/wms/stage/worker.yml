@@ -7,16 +7,9 @@ DEFAULT:
   max-memory-per-child: 1GB
   concurrency: 1
 
-light-task-worker:
+cpsort-job-task-worker:
   time-limit: 30
   max-memory-per-child: 50MB
   concurrency: 30
   queues:
-    - SampleLightTasks
-
-heavy-task-worker:
-  time-limit: 3600
-  max-memory-per-child: 1GB
-  concurrency: 20
-  queues:
-    - SampleHeavyTasks
+    - CPSortJobTasks

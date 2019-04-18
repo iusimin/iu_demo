@@ -38,7 +38,8 @@ class UserCollectionApi(BaseApiResource):
         type: string
         format: email
       phone_number: { type: string }
-    required: [username, password, email, phone_number]
+      warehouse_id: { type: string }
+    required: [username, password, email, phone_number, warehouse_id]
     '''))
     def on_post(self, req, resp):
         params = req.media
@@ -47,6 +48,7 @@ class UserCollectionApi(BaseApiResource):
             pwd = params['password']
             email = params['email']
             phone = params['phone_number']
+            warehouse_id = params['warehouse_id']
         except KeyError:
             raise falcon.HTTPBadRequest('Bad input body')
 
@@ -57,6 +59,7 @@ class UserCollectionApi(BaseApiResource):
                 password=e_password,
                 email=email,
                 phone_number=phone,
+                warehouse_id=warehouse_id
             )
             u.save()
             resp.status = falcon.HTTP_201

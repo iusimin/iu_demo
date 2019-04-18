@@ -89,7 +89,7 @@ export default {
     getParcelSortInfo: function (tracking_id, job_id, round_id, callback, errorCallback) {
         this.call(
             "get",
-            "sort_info",
+            "sort-info",
             this.buildQueryString({
                 tracking_id: tracking_id,
                 job_id: job_id,

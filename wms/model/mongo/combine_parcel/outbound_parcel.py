@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
 from iu_mongo.index import IndexDefinition
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
@@ -15,7 +17,7 @@ class CPOutboundParcelTimeline(EmbeddedDocument):
     seeded = DateTimeField()
 
 
-class CPOutboundParcel(Document):
+class CPOutboundParcel(Document, MongoMixin):
     class Status(PyEnumMixin):
         Pending = 0
 
@@ -79,4 +81,4 @@ class CPOutboundParcel(Document):
         return cls.find({"tracking_id": {"$in": tracking_ids}})
 
     def to_dict(self):
-        pass
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

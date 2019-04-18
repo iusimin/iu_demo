@@ -16,6 +16,19 @@ services:
     command: ['python', 'server.py']
     stdin_open: true
     tty: true
+  # Celery workers entrypoint
+  wms-worker:
+    build: $IU_HOME/wms
+    volumes:
+      - $IU_HOME/wms:/iu/wms:ro
+      - $IU_HOME/cl:/iu/cl:ro
+      - $IU_HOME/ci/wms/stage/server.yml:/etc/server.yml:ro
+      - $IU_HOME/ci/wms/stage/worker.yml:/etc/worker.yml:ro
+    environment:
+      PYTHONPATH: /iu
+    command: ['python', 'worker.py']
+    stdin_open: true
+    tty: true
   # UI to monitor / manage celery workers
   celery-flower:
     build: $IU_HOME/demo

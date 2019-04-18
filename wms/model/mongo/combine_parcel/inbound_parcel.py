@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
 from iu_mongo.index import IndexDefinition
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
-from wms.model.mongo.combine_parcel.operation_record import \
-    CPOperationRecord
+from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
 class CPInboundParcelTimeline(EmbeddedDocument):
@@ -16,7 +17,7 @@ class CPInboundParcelTimeline(EmbeddedDocument):
     seeded = DateTimeField()
 
 
-class CPInboundParcel(Document):
+class CPInboundParcel(Document, MongoMixin):
     class Status(PyEnumMixin):
         Pending = 0
         Inbound = 10

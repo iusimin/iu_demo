@@ -1,0 +1,1 @@
+from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks

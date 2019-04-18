@@ -3,16 +3,15 @@
 import re
 
 from bson import ObjectId
-from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 
 
-class Permission(EmbeddedDocument):
-    meta = {
-    }
-    
+class Permission(EmbeddedDocument, MongoMixin):
     class Action(PyEnumMixin):
         GET = 0
         POST = 1
@@ -22,7 +21,7 @@ class Permission(EmbeddedDocument):
 
     allow = BooleanField()
     resource = StringField() # Regex for web endpoint
-    actions = ListField(IntField(choices=Action.get_ids()))
+    actions = ListField(IntField())
 
     @classmethod
     def check_permissions(cls, resource, action, permissions, default_allow=False):
@@ -36,7 +35,7 @@ class Permission(EmbeddedDocument):
         else:
             return default_allow
     
-    def to_json_dict(self):
+    def to_dict(self):
         return {
             'allow': self.allow,
             'resource': self.resource,
@@ -46,23 +45,25 @@ class Permission(EmbeddedDocument):
             ]
         }
 
-class Role(Document):
+class Role(Document, MongoMixin):
     meta = {
         'indexes': [
         ],
-        'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
-        'force_insert': True,
     }
 
-    name = StringField(primary_key=True)
+    name = StringField()
     description = StringField()
     parents = ListField(StringField())
     permissions = ListField(EmbeddedDocumentField('Permission'))
 
     def get_permissions(self):
         plist = list(self.permissions)
-        parents = Role.objects.filter(name__in = self.parents)
+        parents = Role.find({
+            'name': {
+                '$in': self.parents,
+            }
+        })
         for r in parents:
             permissions = r.get_permissions()
             for p in permissions:
@@ -70,18 +71,5 @@ class Role(Document):
                     plist.append(p)
         return plist
     
-    def to_json_dict(self, fields=None):
-        ret = {
-            'name': self.name,
-            'description': self.description,
-            'parents': [str(p) for p in self.parents],
-            'permissions': [
-                p.to_json_dict() for p in self.permissions
-            ],
-            'permissions_all': [
-                p.to_json_dict() for p in self.get_permissions()
-            ]
-        }
-        if fields is not None:
-            ret = {k:v for k, v in ret.items() if k in fields}
-        return ret
+    def to_dict(self, fields=None):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

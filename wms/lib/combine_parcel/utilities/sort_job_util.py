@@ -11,7 +11,7 @@ from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
 from wms.model.mongo.combine_parcel.combine_pool import (CPSortAllocateGroupId,
                                                          CPSortPool)
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
-from wms.model.mongo.warehouse_info import CPWarehouse
+from wms.model.mongo.warehouse import CPWarehouse
 
 
 class SortJobUtil(object):
@@ -23,41 +23,52 @@ class SortJobUtil(object):
     @classmethod
     def allocate_cabinet_for_parcels(cls, job_id):
         job_accessor = SortJobAccessor(job_id)
+        job_accessor.start()
+        job_accessor.flush()
+
         job = job_accessor.sort_job
 
-        warehouse = CPWarehouse.by_warehouse_id(job.warehouse_id)
-        inbound_parcels = CPInboundParcel.find({
-            "warehouse_id": job.warehouse_id,
-            "status": CPInboundParcel.Status.Inbound,
-            "ready_to_ship": True
-        })
+        try:
+            warehouse = CPWarehouse.by_warehouse_id(job.warehouse_id)
+            inbound_parcels = CPInboundParcel.find({
+                "warehouse_id": job.warehouse_id,
+                "status": CPInboundParcel.Status.Inbound,
+                "ready_to_ship": True
+            })
 
-        combine_ids = list(
-            set(parcel.combine_id for parcel in inbound_parcels))
-        parcel_groups = defaultdict(list)
-        for parcel in inbound_parcels:
-            parcel_groups[parcel.combine_id].append(parcel)
+            combine_ids = list(
+                set(parcel.combine_id for parcel in inbound_parcels))
+            parcel_groups = defaultdict(list)
+            for parcel in inbound_parcels:
+                parcel_groups[parcel.combine_id].append(parcel)
 
-        group_ids = CPSortAllocateGroupId.allocate(
-            len(combine_ids), warehouse.sort_batch_size)
-        group_dict = dict(zip(combine_ids, group_ids))
+            if combine_ids:
+                group_ids = CPSortAllocateGroupId.allocate(
+                    len(combine_ids), warehouse.sort_batch_size)
+                group_dict = dict(zip(combine_ids, group_ids))
 
-        lattice_id = 1
-        cabinet_id = str(ObjectId())
-        for combine_id, parcels in parcel_groups.items():
-            group_length = len(parcels)
-            sort_type = CPSortPool.SortType.DirectShip if group_length == 1 else CPSortPool.SortType.Combined
-            for parcel in parcels:
-                group_id = group_dict[combine_id]
-                CPSortPool.create(
-                    job_id=job_id,
-                    tracking_id=parcel.tracking_id,
-                    sort_type=sort_type,
-                    group_ids=group_id,
-                    cabinet_id=cabinet_id,
-                    lattice_id=lattice_id
-                )
-            lattice_id += 1
+                lattice_id = 1
+                cabinet_id = str(ObjectId())
+                for combine_id, parcels in parcel_groups.items():
+                    group_length = len(parcels)
+                    sort_type = CPSortPool.SortType.DirectShip if group_length == 1 else CPSortPool.SortType.Combined
+                    for parcel in parcels:
+                        group_id = group_dict[combine_id]
+                        CPSortPool.create(
+                            job_id=job_id,
+                            tracking_id=parcel.tracking_id,
+                            sort_type=sort_type,
+                            group_ids=group_id,
+                            cabinet_id=cabinet_id,
+                            lattice_id=lattice_id
+                        )
+                    lattice_id += 1
+
+            job_accessor.success()
+        except Exception as ex:
+            job_accessor.fail(str(ex))
+        finally:
+            job_accessor.flush()
 
     @classmethod
     def get_latest_complete_job_id(cls):

@@ -11,7 +11,7 @@ from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
     InboundParcelUtil
 from wms.model.mongo.combine_parcel.inbound_parcel import \
     CPInboundParcel
-from wms.model.mongo.warehouse_info import CPWarehouse
+from wms.model.mongo.warehouse import CPWarehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'
@@ -61,8 +61,21 @@ def inbound_parcel():
             has_sensitive=False
         )
 
+def set_ready_to_ship():
+    inbound_parcels = CPInboundParcel.find(
+        {
+            "created_datetime": {
+                "$gte": datetime(2019, 4, 18, 0, 0, 0),
+                "$lte": datetime(2019, 4, 19, 0, 0, 0)
+            }
+        }
+    )
+
+    for parcel in inbound_parcels:
+        parcel.set(ready_to_ship=True)
 
 if __name__ == "__main__":
     _setup()
     #create_inbound_parcels()
-    inbound_parcel()
+    #inbound_parcel()
+    set_ready_to_ship()

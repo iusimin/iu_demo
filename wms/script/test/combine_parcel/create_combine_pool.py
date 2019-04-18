@@ -19,7 +19,7 @@ from wms.model.mongo.combine_parcel.combine_pool import (CPSortAllocateGroupId,
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
 from wms.model.mongo.sequence_id_generator import SequenceIdGenerator
-from wms.model.mongo.warehouse_info import CPWarehouse
+from wms.model.mongo.warehouse import CPWarehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'

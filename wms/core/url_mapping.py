@@ -5,8 +5,9 @@ API_ROUTER = [
     ('/api/login/', a.UserLoginApi),
 
     ('/api/inbound-parcel/inbound', a.InboundParcelResource),
-    ('/api/sort_info', a.SortParcel),
-    ('/api/seed-pool', a.CPSeedPool)
+    ('/api/sort-info', a.SortParcel),
+    ('/api/seed-pool', a.CPSeedPool),
+    ('/api/sort-job', a.SortJob)
 ]
 
 STATIC_ROUTE = [
