@@ -4,8 +4,8 @@ from datetime import datetime
 
 import falcon
 
+from cl.backend.api import BaseApiResource
 from cl.utils import password
-from wms.api import BaseApiResource
 from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
 from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
@@ -21,7 +21,7 @@ from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks
 
 
 class SortParcel(BaseApiResource):
-    #@falcon.before(login_required)
+    @falcon.before(login_required)
     def on_get(self, req, resp):
         tracking_id = req.get_param("tracking_id", required=True)
         job_id = req.get_param("job_id", required=True)

@@ -1,12 +1,15 @@
-from demo.model.mongo.rbac import Role, Permission
+import json
+
+import falcon
+from bson import ObjectId
+from iu_mongo import errors as dberr
+
 from cl.backend.api import BaseApiResource
+from cl.backend.hooks.transform import add_list_index
 from cl.backend.hooks.validation import JsonSchema
 from demo.hooks.auth import permission_required
-from cl.backend.hooks.transform import add_list_index
-from iu_mongo import errors as dberr
-import falcon
-import json
-from bson import ObjectId
+from demo.model.mongo.rbac import Permission, Role
+
 
 def extract_params_object(req, resp, resource, params):
     if 'role_name' in params:

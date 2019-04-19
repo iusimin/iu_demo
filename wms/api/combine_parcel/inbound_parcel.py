@@ -4,8 +4,8 @@ from datetime import datetime
 
 import falcon
 
+from cl.backend.api import BaseApiResource
 from cl.utils import password
-from wms.api import BaseApiResource
 from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
 from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
