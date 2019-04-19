@@ -19,9 +19,9 @@ class InboundParcelUtil(object):
         )
 
     @classmethod
-    def inbound_parcel(cls, tracking_id, parcel_type, weight, has_battery, has_liquid, has_sensitive):
+    def inbound_parcel(cls, tracking_id, parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason):
         accessor = CPInboundParcelAccessor(tracking_id)
-        accessor.inbound(parcel_type, weight, has_battery, has_liquid, has_sensitive)
+        accessor.inbound(parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason)
         accessor.flush()
 
     @classmethod

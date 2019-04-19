@@ -56,22 +56,25 @@ class CPInboundParcelAccessor(AccessorBase):
         })
 
     @StatusChecker([CPInboundParcel.Status.Pending, CPInboundParcel.Status.Inbound, CPInboundParcel.Status.Sorted, CPInboundParcel.Status.Combined])
-    def inbound(self, parcel_type, weight, has_battery, has_liquid, has_sensitive):
+    def inbound(self, parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason):
         self.inbound_parcel.parcel_type = parcel_type
         self.inbound_parcel.weight = weight
         self.inbound_parcel.has_battery = has_battery
         self.inbound_parcel.has_liquid = has_liquid
         self.inbound_parcel.has_sensitive = has_sensitive
+        self.inbound_parcel.sensitive_reason = sensitive_reason
         self.inbound_parcel.status = CPInboundParcel.Status.Inbound
         self.inbound_parcel.timeline.inbound = datetime.utcnow()
 
     def flush(self):
         po_props = {
+            "parcel_type": self.inbound_parcel.parcel_type,
             "status": self.inbound_parcel.status,
             "weight": self.inbound_parcel.weight,
             "has_battery": self.inbound_parcel.has_battery,
             "has_liquid": self.inbound_parcel.has_liquid,
             "has_sensitive": self.inbound_parcel.has_sensitive,
+            "sensitive_reason": self.inbound_parcel.sensitive_reason,
             "timeline": self.inbound_parcel.timeline.to_mongo(),
             "updated_datetime": datetime.utcnow()
         }

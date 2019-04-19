@@ -35,7 +35,6 @@ class InboundParcelResource(BaseApiResource):
 
         has_battery = params.get("has_battery", False)
         has_liquid = params.get("has_liquid", False)
-        has_sensitive = params.get("has_sensitive", False)
         sensitive_reason = params.get("sensitive_reason")
 
         try:
@@ -43,9 +42,10 @@ class InboundParcelResource(BaseApiResource):
                 tracking_id=tracking_id,
                 parcel_type=parcel_type,
                 weight=weight,
-                has_battery=False,#has_battery,
-                has_liquid=False,#has_liquid,
-                has_sensitive=False,#has_sensitive
+                has_battery=has_battery,
+                has_liquid=has_liquid,
+                has_sensitive=bool(sensitive_reason),
+                sensitive_reason=sensitive_reason
             )
         except (ValueError, InvalidOperationException):
             raise falcon.HTTPBadRequest("", "")

@@ -2,51 +2,54 @@
 export default {
   props: ["value"],
   data: () => ({
-    tracking_id: null,
-    weight: null,
-    sensitive_reason: null,
-    has_battery: false,
-    has_liquid: false
+    parcel_scan_info: {
+      tracking_id: null,
+      weight: null,
+      sensitive_reason: null,
+      has_battery: false,
+      has_liquid: false
+    }
   }),
   mounted: function() {
     var vm = this;
     if (vm.value) {
-      vm.tracking_id = vm.value.tracking_id || null;
-      vm.weight = vm.value.weight || null;
+      Object.assign(vm.parcel_scan_info, vm.value);
+    }
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].addEventListener("keyup", vm.stopInputPropagation);
     }
   },
   methods: {
     updateParcelInfo: function() {
       var vm = this;
-      vm.$emit("input", {
-        tracking_id: vm.tracking_id,
-        weight: vm.weight,
-        sensitive_reason: vm.sensitive_reason,
-        has_battery: vm.has_battery,
-        has_liquid: vm.has_liquid
-      });
+      vm.$emit("input", vm.parcel_scan_info);
+    },
+    stopInputPropagation: function(e) {
+      e.stopPropagation();
     }
   },
   watch: {
     value: {
       handler: function(newValue, oldValue) {
         var vm = this;
-        vm.tracking_id = newValue.tracking_id;
-        vm.weight = newValue.weight;
+        Object.assign(vm.parcel_scan_info, vm.value);
       },
       deep: true
     },
-    tracking_id: {
+    parcel_scan_info: {
       handler: function(newValue, oldValue) {
         var vm = this;
         vm.updateParcelInfo();
-      }
-    },
-    weight: {
-      handler: function(newValue, oldValue) {
-        var vm = this;
-        vm.updateParcelInfo();
-      }
+      },
+      deep: true
+    }
+  },
+  destroyed: function() {
+    var vm = this;
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].removeEventListener("keyup", vm.stopInputPropagation);
     }
   }
 };

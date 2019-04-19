@@ -63,6 +63,7 @@ class CPInboundParcel(Document, MongoMixin):
     has_battery = BooleanField()
     has_liquid = BooleanField()
     has_sensitive = BooleanField()
+    sensitive_reason = StringField()
 
     # outbound info
 

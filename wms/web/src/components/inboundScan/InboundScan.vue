@@ -50,15 +50,14 @@ export default {
     alert_type: "success",
     current_tab: "tab-1",
     parcel_map: {
-      "tab-1": {
-        parcel_type: 0
-      },
-      "tab-2": {
-        parcel_type: 1
-      },
-      "tab-3": {
-        parcel_type: 2
-      }
+      "tab-1": {},
+      "tab-2": {},
+      "tab-3": {}
+    },
+    parcel_type_map: {
+      "tab-1": 0, //TODO: use constant
+      "tab-2": 1,
+      "tab-3": 2
     }
   }),
   mixins: [ParcelScanListener],
@@ -82,7 +81,7 @@ export default {
     submitParcel: function() {
       var vm = this;
       var parcel = vm.parcel_map[vm.current_tab];
-      parcel.parcel_type = 0;
+      parcel.parcel_type = vm.parcel_type_map[vm.current_tab];
       var weight = parseFloat(parcel.weight);
       if (weight) {
         parcel.weight = weight;

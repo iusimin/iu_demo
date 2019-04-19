@@ -5,7 +5,7 @@
       <v-container>
         <v-layout row wrap>
           <v-flex md12>
-            <v-text-field id="TrackingIdInput" v-model="tracking_id" label="物流单号" required></v-text-field>
+            <v-text-field class="stop-propagation" v-model="tracking_id" label="物流单号" required></v-text-field>
           </v-flex>
         </v-layout>
       </v-container>
@@ -35,9 +35,10 @@ export default {
   }),
   mounted: function() {
     var vm = this;
-    document
-      .getElementById("TrackingIdInput")
-      .addEventListener("keyup", vm.stopInputPropagation);
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].addEventListener("keyup", vm.stopInputPropagation);
+    }
   },
   mixins: [ParcelScanType],
   methods: {
@@ -55,9 +56,10 @@ export default {
   },
   destroyed: function() {
     var vm = this;
-    document
-      .getElementById("TrackingIdInput")
-      .removeEventListener("keyup", vm.stopInputPropagation);
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].removeEventListener("keyup", vm.stopInputPropagation);
+    }
   }
 };
 </script>
