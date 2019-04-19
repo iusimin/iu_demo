@@ -112,5 +112,16 @@ export default {
             callback,
             errorCallback
         );
+    },
+    getSortJobs: function (pagination, callback, errorCallback) {
+        this.call(
+            "post", // post as get
+            "sort-jobs",
+            null, {
+                pagination: pagination
+            },
+            callback,
+            errorCallback
+        );
     }
 };

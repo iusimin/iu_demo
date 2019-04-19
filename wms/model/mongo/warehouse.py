@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from cl.utils.mongo import MongoMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
 from iu_mongo.index import IndexDefinition
 from wms.model.mongo import IU_DEMO_DB
 
 
-class CPCabinetSize(EmbeddedDocument):
+class CPCabinetSize(EmbeddedDocument, MongoMixin):
     width = IntField(required=True)
     height = IntField(required=True)
+
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
 
 class CPWarehouse(Document):
     meta = {

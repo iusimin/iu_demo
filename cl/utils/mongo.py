@@ -4,6 +4,16 @@ from bson import ObjectId
 
 
 class MongoMixin(object):
+    @classmethod
+    def all_fields(cls):
+        return cls._fields.keys()
+
+    def dict_include(self):
+        return self.all_fields()
+
+    def dict_exclude(self):
+        return []
+
     def to_dict_default(self, date_format="%Y-%m-%d"):
        def transform_field(value):
            if type(value) is ObjectId:

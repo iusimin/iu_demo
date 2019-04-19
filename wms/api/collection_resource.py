@@ -17,7 +17,7 @@ class CollectionResource(BaseApiResource):
       pagination: { type: object }
     required: [pagination]
     '''))
-    def on_get(self, req, resp):
+    def on_post(self, req, resp):
         pagination = req.media["pagination"]
 
         skip, limit = self.get_range(pagination)

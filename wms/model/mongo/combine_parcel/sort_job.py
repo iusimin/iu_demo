@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
@@ -9,12 +10,15 @@ from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.warehouse import CPCabinetSize, CPWarehouse
 
 
-class CPSortJobTimeline(EmbeddedDocument):
+class CPSortJobTimeline(EmbeddedDocument, MongoMixin):
     created = DateTimeField()
     job_started = DateTimeField()
     job_complete = DateTimeField()
 
-class CPSortJob(Document):
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+
+class CPSortJob(Document, MongoMixin):
     class Type(PyEnumMixin):
         CheckInboundParcelReadyToShip = 0
         AllocateCabinetLattice = 1
@@ -24,6 +28,21 @@ class CPSortJob(Document):
         Started = 10
         Failed = 99
         Succeeded = 100
+
+        _text_dict = {
+            Pending: "待运行",
+            Started: "分拣任务正在生成",
+            Failed: "分拣任务生成失败",
+            Succeeded: "分拣任务生成完成"
+        }
+
+        @classmethod
+        def text_dict(cls):
+            return cls._text_dict
+
+        @classmethod
+        def get_text(cls, status):
+            return cls._text_dict[status]
 
     meta = {
         'indexes': [
@@ -78,3 +97,6 @@ class CPSortJob(Document):
     @classmethod
     def by_job_id(cls, job_id):
         return cls.find_one({"job_id": job_id})
+
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

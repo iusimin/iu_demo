@@ -13,10 +13,18 @@ class CPSortJobCollectionResource(CollectionResource):
         return CPSortJob
 
     def get_field_mapping(self):
-        return {}
+        return {
+            "job_finish_datetime": "job_finish_datetime"
+        }
 
     def get_query(self):
         return {}
     
     def transform_date(self, data):
-        return data
+        return [self._build_item(item) for item in data]
+
+    def _build_item(self, item):
+        item_dict = item.to_dict()
+        status_text = CPSortJob.Status.get_text(item.status)
+        item_dict["status_text"] = status_text
+        return item_dict
