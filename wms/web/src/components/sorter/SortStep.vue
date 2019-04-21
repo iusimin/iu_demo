@@ -5,7 +5,12 @@
       <v-container>
         <v-layout row wrap>
           <v-flex md12>
-            <v-text-field class="stop-propagation" v-model="tracking_id" label="物流单号" required></v-text-field>
+            <v-text-field
+              class="stop-propagation"
+              v-model="parcel_scan_info.tracking_id"
+              label="物流单号"
+              required
+            ></v-text-field>
           </v-flex>
         </v-layout>
       </v-container>
@@ -13,7 +18,7 @@
     <div>
       <v-card>
         <v-card-text>
-          <p class="display-4 font-weight-black text-md-center">{{ sort_info.sort_group_id }}</p>
+          <p class="display-4 font-weight-black text-md-center">{{ sort_info.round_group_id }}</p>
           <v-text-field v-model="sort_info.weight" label="weight" :readonly="true"></v-text-field>
           <v-text-field
             v-model="sort_info.inbound_datetime"
@@ -29,36 +34,38 @@
 <script>
 import ParcelScanType from "@/mixins/ParcelScanType.vue";
 export default {
-  props: ["sort_info"],
+  props: ["round_id"],
   data: () => ({
-    error_msg: null
-  }),
-  mounted: function() {
-    var vm = this;
-    var eles = document.getElementsByClassName("stop-propagation");
-    for (let i = 0; i < eles.length; i++) {
-      eles[i].addEventListener("keyup", vm.stopInputPropagation);
+    error_msg: null,
+    sort_info: {
+      round_group_id: null,
+      weight: null,
+      inbound_datetime: null
     }
-  },
+  }),
+  mounted: function() {},
   mixins: [ParcelScanType],
   methods: {
-    stopInputPropagation: function(e) {
-      e.stopPropagation();
+    getSortInfo: function() {
+      var vm = this;
+      vm.api.getParcelSortInfo(
+        vm.parcel_scan_info.tracking_id,
+        "20190418-00001",
+        vm.round_id,
+        resp => {
+          vm.sort_info = resp.sort_info;
+        },
+        resp => {}
+      );
     }
   },
   watch: {
-    sort_info: {
+    "parcel_scan_info.tracking_id": {
       handler: function(newValue, oldValue) {
         var vm = this;
+        vm.getSortInfo();
       },
       deep: true
-    }
-  },
-  destroyed: function() {
-    var vm = this;
-    var eles = document.getElementsByClassName("stop-propagation");
-    for (let i = 0; i < eles.length; i++) {
-      eles[i].removeEventListener("keyup", vm.stopInputPropagation);
     }
   }
 };

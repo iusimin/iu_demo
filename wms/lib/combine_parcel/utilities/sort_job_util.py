@@ -84,7 +84,7 @@ class SortJobUtil(object):
 
         info_dict = parcel.to_dict()
         info_dict["group_ids_string"] = parcel.group_ids_string
-        info_dict["round_group_id"] = parcel.get_group_id_by_round(round_id)
+        info_dict["round_group_id"] = parcel.get_group_id_by_round(round_id - 1)
         return info_dict
 
     @classmethod

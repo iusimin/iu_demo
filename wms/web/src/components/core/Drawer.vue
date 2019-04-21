@@ -113,13 +113,18 @@ export default {
       },
       {
         to: '/directship',
-        icon: 'mdi-adobe',
+        icon: 'mdi-airport',
         text: '直发打单'
       },
       {
         to: '/outboundscan',
-        icon: 'mdi-adobe',
+        icon: 'mdi-airplane-off',
         text: '出库扫描'
+      },
+      {
+        to: '/sort-job',
+        icon: 'mdi-alpha',
+        text: '分拣任务'
       }
     ],
     responsive: false

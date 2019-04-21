@@ -16,6 +16,7 @@ import Dashboard from "@/views/Dashboard.vue";
 import WarehouseSetting from "@/components/admin/WarehouseSetting.vue";
 import DirectShip from "@/components/operation/DirectShip.vue";
 import OutboundScan from "@/components/operation/OutboundScan.vue";
+import SortJob from "@/components/sorter/SortJob.vue";
 
 export default [
   {
@@ -94,6 +95,17 @@ export default [
     children: [{
       path: '/',
       component: OutboundScan
+    }],
+    meta: { requiresAuth: false }
+  }
+  ,
+  {
+    path: '/sort-job',
+    name: '分拣任务',
+    component: UserHome,
+    children: [{
+      path: '/',
+      component: SortJob
     }],
     meta: { requiresAuth: false }
   }
