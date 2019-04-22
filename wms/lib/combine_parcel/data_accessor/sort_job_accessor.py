@@ -1,7 +1,9 @@
 
+from collections import defaultdict
 from datetime import datetime
 
 from wms.lib.accessor_base import AccessorBase
+from wms.model.mongo.combine_parcel.combine_pool import CPSortPool
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
 
 
@@ -48,6 +50,23 @@ class SortJobAccessor(AccessorBase):
             {},
             sort=[("job_finish_datetime", -1), ("_id", -1)]
         )
+
+    @classmethod
+    def get_job_parcel_count(cls, job_ids):
+        #TODO antony: use aggregation
+        parcel_count = defaultdict(int)
+        for parcel in CPSortPool.find_iter({
+            "job_id": {
+                "$in": job_ids
+            }
+        },
+        {
+            "job_id": True
+        }):
+            parcel_count[parcel.job_id] += 1
+
+        return parcel_count
+
 
     def start(self):
         self.sort_job.status = CPSortJob.Status.Started

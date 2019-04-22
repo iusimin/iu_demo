@@ -8,6 +8,10 @@ from wms.hooks.validation import JsonSchema
 
 class CollectionResource(BaseApiResource):
     DEFAULT_PAGE_SIZE = 30
+
+    def __init__(self, *args, **kwargs):
+        self.query_dict = {}
+        super(CollectionResource, self).__init__(*args, **kwargs)
     
     #TODO antony: refactor, put validation in derived class
     @falcon.before(login_required)
@@ -19,6 +23,7 @@ class CollectionResource(BaseApiResource):
     '''))
     def on_post(self, req, resp):
         pagination = req.media["pagination"]
+        self.query_dict = req.media.get("query")
 
         skip, limit = self.get_range(pagination)
 

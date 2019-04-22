@@ -123,5 +123,27 @@ export default {
             callback,
             errorCallback
         );
+    },
+    createSortJob: function (callback, errorCallback) {
+        this.call(
+            "post",
+            "sort-job",
+            null,
+            null,
+            callback,
+            errorCallback
+        );
+    },
+    getSortJobDetail: function (job_id, callback, errorCallback) {
+        this.call(
+            "get",
+            "sort-job",
+            this.buildQueryString({
+                job_id: job_id
+            }),
+            null,
+            callback,
+            errorCallback
+        );
     }
 };

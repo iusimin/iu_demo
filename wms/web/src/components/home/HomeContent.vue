@@ -129,7 +129,10 @@ export default {
       ],
       jobs: [],
       loading: true,
-      pagination: {},
+      pagination: {
+        sortBy: "job_finish_datetime",
+        descending: true
+      },
       total_count: 10
     }
   }),

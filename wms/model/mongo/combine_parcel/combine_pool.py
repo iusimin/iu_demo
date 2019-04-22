@@ -20,10 +20,23 @@ class CPSortPool(Document, MongoMixin):
         Combined = 0
         DirectShip = 1
 
+        _text_dict = {
+            Combined: "合并",
+            DirectShip: "直发"
+        }
+
+        @classmethod
+        def text_dict(cls):
+            return cls._text_dict
+
+        @classmethod
+        def get_text(cls, status):
+            return cls._text_dict[status]
+
     meta = {
         'indexes': [
-            IndexDefinition.parse_from_keys_str("job_id:1,tracking_id:1", unique=True),
-            IndexDefinition.parse_from_keys_str("group_ids:1")
+            {'keys': "job_id:1,tracking_id:1", "unique": True},
+            {'keys': "group_ids:1"}
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
@@ -62,6 +75,12 @@ class CPSortPool(Document, MongoMixin):
         )
 
         obj.save()
+
+    @classmethod
+    def by_job_id(cls, job_id):
+        return cls.find({
+            "job_id": job_id
+        })
 
     @classmethod
     def by_tracking_id(cls, job_id, tracking_id):

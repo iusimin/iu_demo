@@ -1,10 +1,10 @@
 <template>
-  <v-container fluid>
-    <v-layout>
-      <!-- <v-flex md12 lg12>
-          <v-btn>新建分拣任务</v-btn>
-      </v-flex> -->
-      <v-flex md12>
+  <v-container fluid grid-list-xl>
+    <v-layout wrap>
+      <v-flex md12 lg12>
+          <v-btn color="primary">新建分拣任务</v-btn>
+      </v-flex>
+      <v-flex md12 lg12>
         <v-data-table
           :headers="sort_job_info.headers"
           :items="sort_job_info.jobs"
@@ -61,7 +61,10 @@ export default {
       ],
       jobs: [],
       loading: true,
-      pagination: {},
+      pagination: {
+        sortBy: "job_finish_datetime",
+        descending: true
+      },
       total_count: 10
     }
   }),

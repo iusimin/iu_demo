@@ -39,32 +39,3 @@ class SortParcel(BaseApiResource):
         resp.media = {
             "sort_info": sort_info
         }
-
-class SortJob(BaseApiResource):
-    @falcon.before(login_required)
-    @falcon.before(JsonSchema('''
-    type: object
-    properties:
-      job_type: { type: number }
-    required: [job_type]
-    '''))
-    def on_post(self, req, resp):
-        session = req.context['session']
-        user = session.user
-        warehouse_id = user.warehouse_id
-
-        params = req.media
-        job_type = params['job_type']
-
-        job_prefix = warehouse_id + datetime.utcnow().strftime("%Y%m%d")
-        job_id = SequenceIdGenerator.get_sequence_id(job_prefix)
-
-        job = SortJobAccessor.create_if_no_running(job_id, job_type, warehouse_id)
-
-        if job:
-            resp.media = {
-                "job_id": job_id
-            }
-            CPSortJobTasks.run_job.delay(job_id)
-        else:
-            raise falcon.HTTPBadRequest(description="No job was create.")
