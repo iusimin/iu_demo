@@ -23,7 +23,7 @@ class SortJobUtil(object):
     @classmethod
     def allocate_cabinet_for_parcels(cls, job_id):
         job_accessor = SortJobAccessor(job_id)
-        job_accessor.start()
+        job_accessor.start_calculation()
         job_accessor.flush()
 
         job = job_accessor.sort_job

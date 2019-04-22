@@ -25,21 +25,21 @@ class SortJobAccessor(AccessorBase):
         return CPSortJob.create(job_id, job_type, warehouse_id)
 
     @classmethod
-    def has_running_task(cls, job_type, warehouse_id):
+    def get_active_task(cls, job_type, warehouse_id):
         return CPSortJob.find_one({
             "warehouse_id": warehouse_id,
             "job_type": job_type,
             "status": {
-                "$in": [CPSortJob.Status.Pending, CPSortJob.Status.Started]
+                "$in": CPSortJob.Status.ACTIVESTATUS
             }
         })
 
     @classmethod
     def create_if_no_running(cls, job_id, job_type, warehouse_id):
         # TODO: Not atomic, fix later.
-        has_running = cls.has_running_task(job_type, warehouse_id)
+        active_task = cls.get_active_task(job_type, warehouse_id)
         job = None
-        if not has_running:
+        if not active_task:
             job = CPSortJob.create(job_id, job_type, warehouse_id)
 
         return job
@@ -68,13 +68,13 @@ class SortJobAccessor(AccessorBase):
         return parcel_count
 
 
-    def start(self):
-        self.sort_job.status = CPSortJob.Status.Started
+    def start_calculation(self):
+        self.sort_job.status = CPSortJob.Status.CalculationStarted
         self.sort_job.timeline.job_started = datetime.utcnow()
 
     def success(self):
         utcnow = datetime.utcnow()
-        self.sort_job.status = CPSortJob.Status.Succeeded
+        self.sort_job.status = CPSortJob.Status.CalculationComplete
         self.sort_job.timeline.job_complete = utcnow
         self.sort_job.job_finish_datetime = utcnow
 
@@ -85,12 +85,20 @@ class SortJobAccessor(AccessorBase):
         self.sort_job.job_finish_datetime = utcnow
         self.sort_job.failed_reason = reason
 
+    def cancel(self, reason):
+        utcnow = datetime.utcnow()
+        self.sort_job.status = CPSortJob.Status.Cancelled
+        self.sort_job.timeline.job_complete = utcnow
+        self.sort_job.job_finish_datetime = utcnow
+        self.sort_job.cancel_reason = reason
+
     def flush(self):
         po_props = {
             "status": self.sort_job.status,
             "timeline": self.sort_job.timeline.to_mongo(),
             "job_finish_datetime": self.sort_job.job_finish_datetime,
             "failed_reason": self.sort_job.failed_reason,
+            "cancel_reason": self.sort_job.cancel_reason,
             "updated_datetime": datetime.utcnow()
         }
 

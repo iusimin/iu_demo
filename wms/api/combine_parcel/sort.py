@@ -14,10 +14,8 @@ from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
 from wms.lib.combine_parcel.utilities.sort_job_util import SortJobUtil
 from wms.lib.exception.exception import InvalidOperationException
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
-from wms.model.mongo.sequence_id_generator import SequenceIdGenerator
 from wms.model.mongo.user import User
 from wms.model.redis_keys.session import Session
-from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks
 
 
 class SortParcel(BaseApiResource):

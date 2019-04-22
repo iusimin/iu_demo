@@ -1,7 +1,19 @@
 <template>
   <div>
     <v-container fluid>
-      <v-alert :value="alert_msg != null" :type="alert_type">{{ alert_msg }}</v-alert>
+      <!-- <v-alert :value="alert_msg != null" :type="alert_type">{{ alert_msg }}</v-alert> -->
+      <v-snackbar
+        v-model="show_alert"
+        :timeout="1500"
+        :top="true"
+        :vertical="true"
+        :auto-height="true"
+        :color="alert_type == 'success' ? 'success' : 'error'"
+      >
+        <h4>{{ alert_title }}</h4>
+        <div v-if="alert_msg != null">{{ alert_msg }}</div>
+        <v-btn color="pink" flat @click="show_alert = false">Close</v-btn>
+      </v-snackbar>
       <v-tabs centered color="cyan" dark grow icons-and-text @change="tabChanged">
         <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -46,8 +58,10 @@ import Vue from "vue";
 
 export default {
   data: () => ({
+    alert_title: null,
     alert_msg: null,
     alert_type: "success",
+    show_alert: false,
     current_tab: "tab-1",
     parcel_map: {
       "tab-1": {},
@@ -82,23 +96,51 @@ export default {
       var vm = this;
       var parcel = vm.parcel_map[vm.current_tab];
       parcel.parcel_type = vm.parcel_type_map[vm.current_tab];
-      var weight = parseFloat(parcel.weight);
-      if (weight) {
-        parcel.weight = weight;
+      if (!vm.validateParcel(parcel)) {
+        return;
       }
       vm.api.inboundParcel(
         parcel,
         resp => {
           vm.tracking_id = null;
           vm.weight = null;
-          vm.alert_msg = "已成功入库！";
-          vm.alert_type = "success";
+          vm.showSnackbar("成功入库！", "成功入库！", "success");
         },
         resp => {
-          vm.alert_msg = "入库失败！";
-          vm.alert_type = "error";
+          vm.showSnackbar("入库失败！", resp.description, "error");
         }
       );
+    },
+    validateParcel: function(parcel) {
+      var vm = this;
+      var weight = parseFloat(parcel.weight);
+      if (weight) {
+        parcel.weight = weight;
+      } else {
+        vm.showSnackbar("数据错误！", "重量错误，重量应为数字!", "error");
+        return false;
+      }
+
+      if (!parcel.tracking_id) {
+        vm.showSnackbar("数据错误！", "物流单号不能为空！", "error");
+        return false;
+      }
+      return true;
+    },
+    showSnackbar: function(title, msg, type) {
+      var vm = this;
+      vm.alert_title = title;
+      vm.alert_msg = msg;
+      vm.show_alert = true;
+      vm.alert_type = type;
+    },
+    autoSubmitParcel: function() {
+      var vm = this;
+      var parcel = vm.parcel_map[vm.current_tab];
+      var weight = parseFloat(parcel.weight);
+      if (parcel.tracking_id && weight && vm.current_tab === "tab-1") {
+        vm.submitParcel();
+      }
     }
   },
   watch: {
@@ -106,12 +148,14 @@ export default {
       handler: function(newValue, oldValue) {
         var vm = this;
         Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", newValue);
+        vm.autoSubmitParcel();
       }
     },
     weight: {
       handler: function(newValue, oldValue) {
         var vm = this;
         Vue.set(vm.parcel_map[vm.current_tab], "weight", newValue);
+        vm.autoSubmitParcel();
       }
     }
   }

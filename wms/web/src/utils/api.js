@@ -124,12 +124,14 @@ export default {
             errorCallback
         );
     },
-    createSortJob: function (callback, errorCallback) {
+    createNewSortJob: function (job_type, callback, errorCallback) {
         this.call(
             "post",
             "sort-job",
             null,
-            null,
+            {
+                job_type: job_type
+            },
             callback,
             errorCallback
         );
@@ -141,6 +143,29 @@ export default {
             this.buildQueryString({
                 job_id: job_id
             }),
+            null,
+            callback,
+            errorCallback
+        );
+    },
+    cancelSortJob: function(job_id, callback, errorCallback) {
+        this.call(
+            "put",
+            "sort-job",
+            null,
+            {
+                job_id: job_id,
+                action: "Cancel"
+            },
+            callback,
+            errorCallback
+        );
+    },
+    getActiveSortJob: function(callback, errorCallback) {
+        this.call(
+            "get",
+            "active-sort-job",
+            null,
             null,
             callback,
             errorCallback

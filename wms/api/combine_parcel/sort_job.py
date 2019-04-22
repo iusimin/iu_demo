@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 
 import falcon
 from cl.backend.api import BaseApiResource
@@ -9,6 +10,8 @@ from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
     SortJobAccessor
 from wms.model.mongo.combine_parcel.combine_pool import CPSortPool
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
+from wms.model.mongo.sequence_id_generator import SequenceIdGenerator
+from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks
 
 
 class SortJob(BaseApiResource):
@@ -38,7 +41,7 @@ class SortJob(BaseApiResource):
             }
             CPSortJobTasks.run_job.delay(job_id)
         else:
-            raise falcon.HTTPBadRequest(description="No job was create.")
+            raise falcon.HTTPBadRequest(description="创建失败，有任务未结束，请先取消其他未结束的任务.")
 
     @falcon.before(login_required)
     @falcon.before(JsonSchema('''
@@ -56,6 +59,45 @@ class SortJob(BaseApiResource):
         resp.media = {
             "job_detail": job.to_dict()
         }
+
+    @falcon.before(login_required)
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      job_id: { type: string }
+      action: { type: string }
+      params: { type: object }
+    required: [job_id, action]
+    '''))
+    def on_put(self, req, resp):
+        job_id = req.media["job_id"]
+        action = req.media["action"]
+        accessor = SortJobAccessor(job_id)
+
+        if action == "Cancel":
+            accessor.cancel("")
+
+        accessor.flush()
+
+
+class ActiveSortJob(BaseApiResource):
+    @falcon.before(login_required)
+    def on_get(self, req, resp):
+        session = req.context['session']
+        user = session.user
+        warehouse_id = user.warehouse_id
+
+        job = SortJobAccessor.get_active_task(
+            job_type=CPSortJob.Type.AllocateCabinetLattice,
+            warehouse_id=warehouse_id
+        )
+
+        if job:
+            resp.media = {
+                "job": job.to_dict()
+            }
+        else:
+            raise falcon.HTTPNotFound("没有待处理任务！")
 
 
 class CPSortPoolCollectionResource(CollectionResource):

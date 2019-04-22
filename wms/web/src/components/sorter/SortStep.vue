@@ -34,7 +34,7 @@
 <script>
 import ParcelScanType from "@/mixins/ParcelScanType.vue";
 export default {
-  props: ["round_id"],
+  props: ["round_id", "job_id"],
   data: () => ({
     error_msg: null,
     sort_info: {
@@ -50,7 +50,7 @@ export default {
       var vm = this;
       vm.api.getParcelSortInfo(
         vm.parcel_scan_info.tracking_id,
-        "20190418-00001",
+        job_id,
         vm.round_id,
         resp => {
           vm.sort_info = resp.sort_info;

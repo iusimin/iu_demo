@@ -9,7 +9,8 @@ API_ROUTER = [
     ('/api/seed-pool', a.CPSeedPool),
     ('/api/sort-job', a.SortJob),
     ('/api/sort-jobs', a.CPSortJobCollectionResource),
-    ('/api/sort-pool-parcels', a.CPSortPoolCollectionResource)
+    ('/api/sort-pool-parcels', a.CPSortPoolCollectionResource),
+    ('/api/active-sort-job', a.ActiveSortJob)
 ]
 
 STATIC_ROUTE = [

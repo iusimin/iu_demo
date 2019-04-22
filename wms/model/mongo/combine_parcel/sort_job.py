@@ -25,16 +25,22 @@ class CPSortJob(Document, MongoMixin):
 
     class Status(PyEnumMixin):
         Pending = 0
-        Started = 10
+        CalculationStarted = 10
+        CalculationComplete = 11
+        Cancelled = 98
         Failed = 99
         Succeeded = 100
 
         _text_dict = {
             Pending: "待运行",
-            Started: "分拣任务正在生成",
-            Failed: "分拣任务生成失败",
-            Succeeded: "分拣任务生成完成"
+            CalculationStarted: "分拣任务正在生成",
+            CalculationComplete: "分拣任务生成完成",
+            Cancelled: "取消",
+            Failed: "分拣任务失败",
+            Succeeded: "分拣播种完成"
         }
+
+        ACTIVESTATUS = [Pending, CalculationStarted, CalculationComplete]
 
         @classmethod
         def text_dict(cls):
@@ -68,6 +74,7 @@ class CPSortJob(Document, MongoMixin):
     
     job_finish_datetime = DateTimeField()
     failed_reason = StringField()
+    cancel_reason = StringField()
 
     created_datetime = DateTimeField(required=True)
     updated_datetime = DateTimeField()

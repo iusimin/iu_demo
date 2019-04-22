@@ -1,4 +1,6 @@
+import falcon
 from cl.backend.hooks.validation import JsonSchema
+
 
 class RequireJSONMiddleware(object):
     def process_request(self, req, resp):

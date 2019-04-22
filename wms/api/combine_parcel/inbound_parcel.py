@@ -47,5 +47,7 @@ class InboundParcelResource(BaseApiResource):
                 has_sensitive=bool(sensitive_reason),
                 sensitive_reason=sensitive_reason
             )
-        except (ValueError, InvalidOperationException):
-            raise falcon.HTTPBadRequest("", "")
+        except ValueError:
+            raise falcon.HTTPNotFound(description="物流订单不存在！")
+        except InvalidOperationException:
+            raise falcon.HTTPBadRequest(description="非法操作")

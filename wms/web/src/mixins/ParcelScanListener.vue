@@ -7,10 +7,10 @@ export default {
   }),
   mounted: function() {
     var vm = this;
-    window.addEventListener("keyup", vm.keyUpHandler);
+    window.addEventListener("keyup", vm.keyPressHandler);
   },
   methods: {
-    keyUpHandler: function(e) {
+    keyPressHandler: function(e) {
       var vm = this;
       console.log(e.key);
       if (e.which != 13) {
@@ -32,7 +32,7 @@ export default {
   },
   destroyed: function() {
     var vm = this;
-    window.removeEventListener("keyup", vm.keyUpHandler);
+    window.removeEventListener("keyup", vm.keyPressHandler);
   }
 };
 </script>
