@@ -4,6 +4,8 @@ from datetime import datetime
 
 from wms.lib.combine_parcel.data_accessor.inbound_parcel_accessor import \
     CPInboundParcelAccessor
+from wms.lib.logistics_order.data_accessor.logistics_order_accessor import \
+    LogisticsOrderAccessor
 
 
 class InboundParcelUtil(object):
@@ -25,18 +27,12 @@ class InboundParcelUtil(object):
         accessor.flush()
 
     @classmethod
-    def check_parcel_ready_to_ship(cls, warehouse_id):
-        utcnow = datetime.utcnow()
-        parcels_iter = CPInboundParcelAccessor.get_parcels_tobe_combined(warehouse_id)
-        expired_parcels = []
-        eligible_parcels = []
-        combine_ids = set()
+    def get_inbound_parcel_detail(cls, tracking_id):
+        ip_accessor = CPInboundParcelAccessor(tracking_id)
+        parcel = ip_accessor.inbound_parcel
+        parcel_dict = parcel.to_dict()
+        if parcel.outbound_logistics_order_id:
+            lo_accessor = LogisticsOrderAccessor(parcel.outbound_logistics_order_id)
+            parcel_dict["outbound_logistics_order"] = lo_accessor.order.to_dict()
 
-        for parcel in parcels_iter:
-            combine_ids.add(parcel.combine_id)
-            if parcel.latest_ship_datetime <= utcnow:
-                expired_parcels.append(parcel)
-            else:
-                pass
-
-
+        return parcel_dict

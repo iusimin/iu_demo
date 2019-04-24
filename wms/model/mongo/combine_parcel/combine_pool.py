@@ -4,7 +4,6 @@ from datetime import datetime
 
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
-from iu_mongo.index import IndexDefinition
 
 from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin

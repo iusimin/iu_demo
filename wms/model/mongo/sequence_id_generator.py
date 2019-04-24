@@ -2,7 +2,6 @@
 
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
-from iu_mongo.index import IndexDefinition
 from wms.model.mongo import IU_DEMO_DB
 
 
@@ -13,7 +12,7 @@ class SequenceIdGenerator(Document):
     '''
     meta = {
         'indexes': [
-            IndexDefinition.parse_from_keys_str("prefix:1", unique=True)
+            {'keys': 'prefix:1', 'unique': True}
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,

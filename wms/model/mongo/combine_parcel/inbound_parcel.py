@@ -3,7 +3,6 @@ from datetime import datetime
 
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
-from iu_mongo.index import IndexDefinition
 
 from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
@@ -11,10 +10,13 @@ from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
-class CPInboundParcelTimeline(EmbeddedDocument):
+class CPInboundParcelTimeline(EmbeddedDocument, MongoMixin):
     created = DateTimeField()
     inbound = DateTimeField()
     seeded = DateTimeField()
+
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
 
 
 class CPInboundParcel(Document, MongoMixin):
@@ -52,7 +54,7 @@ class CPInboundParcel(Document, MongoMixin):
     status = IntField(required=True)
     parcel_type = IntField()
 
-    outbound_tracking_id = StringField()
+    outbound_logistics_order_id = StringField()
 
     ready_to_ship = BooleanField()
 

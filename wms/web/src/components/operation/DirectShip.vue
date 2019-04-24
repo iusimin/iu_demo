@@ -25,7 +25,8 @@ import Vue from "vue";
 
 export default {
   data: () => ({
-      error_msg: null
+      error_msg: null,
+      parcel_detail: null
   }),
   mixins: [ParcelScanListener],
   components: {},
@@ -34,7 +35,20 @@ export default {
   methods: {
     submitDirectParcel: function() {}
   },
-  watch: {}
+  watch: {
+    tracking_id: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        if (newValue) {
+          vm.api.getInboundParcelDetail(
+            newValue,
+            resp => {
+              vm.parcel_detail = resp.parcel_detail;
+            });
+        }
+      }
+    }
+  }
 };
 </script>
 

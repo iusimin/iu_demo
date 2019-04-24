@@ -3,12 +3,15 @@ from datetime import datetime
 
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
-from iu_mongo.index import IndexDefinition
 
 from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
+
+
+class LogisticsOrderTimeline(EmbeddedDocument, MongoMixin):
+    created = DateTimeField()
 
 
 class LogisticsOrder(Document, MongoMixin):
@@ -26,14 +29,12 @@ class LogisticsOrder(Document, MongoMixin):
 
     tracking_id = StringField(required=True)
     platform_id = StringField(required=True)
-    combine_id = StringField()
-    warehouse_id = StringField(required=True)
-    outbound_carrier = IntField()
+    carrier_id = StringField(required=True)
     status = IntField(required=True)
-    parcel_type = IntField()
 
-    timeline = EmbeddedDocumentField("CPInboundParcelTimeline")
-    operation_records = EmbeddedDocumentListField("CPOperationRecord", default=[])
+    timeline = EmbeddedDocumentField("LogisticsOrderTimeline")
+    operation_records = EmbeddedDocumentListField(
+        "CPOperationRecord", default=[])
 
     weight = FloatField()
     has_battery = BooleanField()
@@ -44,15 +45,14 @@ class LogisticsOrder(Document, MongoMixin):
     updated_datetime = DateTimeField()
 
     @classmethod
-    def create_if_not_exist(cls, tracking_id, combine_id, warehouse_id, outbound_carrier, parcel_type):
+    def create_if_not_exist(cls, tracking_id, platform_id, carrier_id):
         utcnow = datetime.utcnow()
         obj = cls(
             tracking_id=tracking_id,
-            combine_id=combine_id,
-            warehouse_id=warehouse_id,
+            platform_id=platform_id,
             status=cls.Status.Pending,
-            outbound_carrier=outbound_carrier,
-            timeline=CPOutboundParcelTimeline(
+            carrier_id=carrier_id,
+            timeline=LogisticsOrderTimeline(
                 created=utcnow
             ),
             created_datetime=utcnow

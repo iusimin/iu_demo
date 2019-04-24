@@ -51,3 +51,14 @@ class InboundParcelResource(BaseApiResource):
             raise falcon.HTTPNotFound(description="物流订单不存在！")
         except InvalidOperationException:
             raise falcon.HTTPBadRequest(description="非法操作")
+
+
+    def on_get(self, req, resp, tracking_id):
+        try:
+            detail = InboundParcelUtil.get_inbound_parcel_detail(tracking_id)
+        except ValueError:
+            raise falcon.HTTPNotFound(description="包裹不存在！")
+
+        resp.media = {
+            "parcel_detail": detail
+        }

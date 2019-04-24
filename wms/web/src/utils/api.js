@@ -86,6 +86,16 @@ export default {
             errorCallback
         );
     },
+    getInboundParcelDetail: function(tracking_id, callback, errorCallback) {
+        this.call(
+            "get",
+            "inbound-parcel/" + tracking_id,
+            null,
+            null,
+            callback,
+            errorCallback
+        );
+    },
     getParcelSortInfo: function (tracking_id, job_id, round_id, callback, errorCallback) {
         this.call(
             "get",

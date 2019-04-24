@@ -5,6 +5,7 @@ API_ROUTER = [
     ('/api/login/', a.UserLoginApi),
 
     ('/api/inbound-parcel/inbound', a.InboundParcelResource),
+    ('/api/inbound-parcel/{tracking_id}', a.InboundParcelResource),
     ('/api/sort-info', a.SortParcel),
     ('/api/seed-pool', a.CPSeedPool),
     ('/api/sort-job', a.SortJob),
