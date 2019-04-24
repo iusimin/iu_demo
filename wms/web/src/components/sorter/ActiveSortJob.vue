@@ -7,7 +7,7 @@
           color="success"
           icon="mdi-anchor"
           outline
-        ><span class="font-weight-black title">{{ active_job_id }}</span></v-alert>
+        ><span class="font-weight-black title">当前分拣任务：{{ active_job_id }}</span></v-alert>
       </v-flex>
 
       <v-flex md12 lg12 v-if="no_active_job">

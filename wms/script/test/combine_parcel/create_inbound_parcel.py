@@ -44,10 +44,7 @@ def create_inbound_parcels():
 def inbound_parcel():
     inbound_parcels = CPInboundParcel.find(
         {
-            "created_datetime": {
-                "$gte": datetime(2019, 4, 18, 0, 0, 0),
-                "$lte": datetime(2019, 4, 19, 0, 0, 0)
-            }
+            "status": CPInboundParcel.Status.Pending
         }
     )
 
@@ -58,8 +55,10 @@ def inbound_parcel():
             weight=random.uniform(0.1, 1.2),
             has_battery=False,
             has_liquid=False,
-            has_sensitive=False
+            has_sensitive=False,
+            sensitive_reason=None
         )
+        parcel.set(ready_to_ship=True)
 
 def set_ready_to_ship():
     inbound_parcels = CPInboundParcel.find(
@@ -76,6 +75,6 @@ def set_ready_to_ship():
 
 if __name__ == "__main__":
     _setup()
-    create_inbound_parcels()
-    #inbound_parcel()
+    #create_inbound_parcels()
+    inbound_parcel()
     #set_ready_to_ship()

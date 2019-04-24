@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-alert :value="error_msg != null" type="error">{{ error_msg }}</v-alert>
+    <!-- <v-alert :value="alert_msg != null" type="error">{{ alert_msg }}</v-alert> -->
     <v-form>
       <v-container>
         <v-layout row wrap>
@@ -28,6 +28,17 @@
         </v-card-text>
       </v-card>
     </div>
+    <v-snackbar
+      v-model="show_alert"
+      :timeout="1500"
+      :top="true"
+      :vertical="true"
+      :auto-height="true"
+      :color="alert_type == 'success' ? 'success' : 'error'"
+    >
+      <div v-if="alert_msg != null">{{ alert_msg }}</div>
+      <v-btn color="pink" flat @click="show_alert = false">Close</v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -36,7 +47,8 @@ import ParcelScanType from "@/mixins/ParcelScanType.vue";
 export default {
   props: ["round_id", "job_id"],
   data: () => ({
-    error_msg: null,
+    show_alert: false,
+    alert_msg: null,
     sort_info: {
       round_group_id: null,
       weight: null,
@@ -50,12 +62,18 @@ export default {
       var vm = this;
       vm.api.getParcelSortInfo(
         vm.parcel_scan_info.tracking_id,
-        job_id,
+        vm.job_id,
         vm.round_id,
         resp => {
           vm.sort_info = resp.sort_info;
         },
-        resp => {}
+        resp => {
+          vm.sort_info.round_group_id = null;
+          vm.sort_info.weight = null;
+          vm.sort_info.inbound_datetime = null;
+          vm.show_alert = true;
+          vm.alert_msg = resp.description;
+        }
       );
     }
   },

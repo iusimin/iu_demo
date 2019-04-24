@@ -107,6 +107,7 @@ import Cabinet from "@/components/outbound/Cabinet";
 import { test_parcels } from "./test_seed_parcels.js";
 
 export default {
+  props: ["job_id"],
   components: {
     Cabinet
   },
@@ -213,12 +214,16 @@ export default {
     },
     reset_cabinet: function() {
       var vm = this;
+      vm.init_cabinet();
+      vm.current_tracking_id = null;
+    },
+    init_cabinet: function() {
+      var vm = this;
       vm.target_parcels.forEach(function(lattice) {
         lattice.forEach(function(ele) {
           ele.seeded = false;
         });
       });
-      vm.current_tracking_id = null;
       vm.$refs.Cabinet.reset(vm.target_parcels);
     },
     tracking_id_updated: function() {
@@ -249,9 +254,10 @@ export default {
       if (vm.target_parcels.length == 0) {
         vm.api.getSeedCabinet(
           vm.current_tracking_id,
-          "20190418-00001",
+          vm.job_id,
           resp => {
             vm.target_parcels = resp.parcels;
+            vm.init_cabinet();
             vm.$nextTick(cb);
           },
           resp => {
