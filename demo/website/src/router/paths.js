@@ -19,7 +19,6 @@ export default [
     name: 'SignUp',
     view: 'login/SignUp'
   },
-  
   {
     path: '/user-profile',
     name: 'User Profile',
@@ -59,7 +58,8 @@ export default [
   },
   {
     path: '/notifications',
-    view: 'Notifications'
+    view: 'Notifications',
+    meta: { loginRequired: true }
   },
   {
     path: '/upgrade',

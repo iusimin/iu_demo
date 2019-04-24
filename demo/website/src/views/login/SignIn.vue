@@ -20,7 +20,6 @@
           <v-form
             ref="form"
             v-model="valid"
-            lazy-validation
           >
             <v-text-field
               v-model="username"
@@ -80,9 +79,9 @@
 
 <script>
 import axios from 'axios'
-import Login from '@/components/mixins/Login.vue'
+import Base from '@/components/mixins/Base.vue'
 export default {
-  mixins: [Login],
+  mixins: [Base],
   data () {
     return {
       // Fields
@@ -96,8 +95,7 @@ export default {
       error_msg: null,
       rules: {
         required: value => !!value || 'Required.',
-        min: v => v.length >= 8 || 'Min 8 characters',
-        emailMatch: () => ('The email and password you entered don\'t match')
+        min: v => v.length >= 8 || 'Min 8 characters'
       }
     }
   },

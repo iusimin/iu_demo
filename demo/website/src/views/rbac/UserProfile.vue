@@ -41,10 +41,10 @@
 </template>
 
 <script>
-import Login from '@/components/mixins/Login.vue'
+import Base from '@/components/mixins/Base.vue'
 import axios from 'axios'
 export default {
-  mixins: [Login],
+  mixins: [Base],
   data: () => ({
     email: null,
     phone_number: null

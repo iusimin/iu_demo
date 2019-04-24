@@ -82,10 +82,10 @@ import {
   mapMutations,
   mapState
 } from 'vuex'
-import Login from '../mixins/Login.vue'
+import Base from '../mixins/Base.vue'
 
 export default {
-  mixins: [Login],
+  mixins: [Base],
   data: () => ({
     logo: './img/vuetifylogo.png',
     links: [

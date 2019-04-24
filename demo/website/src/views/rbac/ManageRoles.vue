@@ -2,141 +2,63 @@
   <v-container
     fill-height
     fluid
-    grid-list-xl>
+    grid-list-xl
+  >
     <v-layout
       justify-center
       wrap
     >
       <v-flex
-        xs12
-        md8
+        md12
       >
         <material-card
           color="green"
-          title="Edit Profile"
-          text="Complete your profile"
+          title="Roles"
+          text="Manage roles"
         >
-          <v-form>
-            <v-container py-0>
-              <v-layout wrap>
-                <v-flex
-                  xs12
-                  md4
-                >
-                  <v-text-field
-                    label="Company (disabled)"
-                    disabled/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md4
-                >
-                  <v-text-field
-                    class="purple-input"
-                    label="User Name"
-                  />
-                </v-flex>
-                <v-flex
-                  xs12
-                  md4
-                >
-                  <v-text-field
-                    label="Email Address"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md6
-                >
-                  <v-text-field
-                    label="First Name"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md6
-                >
-                  <v-text-field
-                    label="Last Name"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md12
-                >
-                  <v-text-field
-                    label="Adress"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md4>
-                  <v-text-field
-                    label="City"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md4>
-                  <v-text-field
-                    label="Country"
-                    class="purple-input"/>
-                </v-flex>
-                <v-flex
-                  xs12
-                  md4>
-                  <v-text-field
-                    class="purple-input"
-                    label="Postal Code"
-                    type="number"/>
-                </v-flex>
-                <v-flex xs12>
-                  <v-textarea
-                    class="purple-input"
-                    label="About Me"
-                    value="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                  />
-                </v-flex>
-                <v-flex
-                  xs12
-                  text-xs-right
-                >
-                  <v-btn
-                    class="mx-0 font-weight-light"
-                    color="success"
-                  >
-                    Update Profile
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-form>
-        </material-card>
-      </v-flex>
-      <v-flex
-        xs12
-        md4
-      >
-        <material-card class="v-card-profile">
-          <v-avatar
-            slot="offset"
-            class="mx-auto d-block"
-            size="130"
+          <v-data-table
+            :headers="headers"
+            :items="items"
+            hide-actions
           >
-            <img
-              src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+            <template
+              slot="headerCell"
+              slot-scope="{ header }"
             >
-          </v-avatar>
-          <v-card-text class="text-xs-center">
-            <h6 class="category text-gray font-weight-thin mb-3">CEO / CO-FOUNDER</h6>
-            <h4 class="card-title font-weight-light">Alec Thompson</h4>
-            <p class="card-description font-weight-light">Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...</p>
-            <v-btn
-              color="success"
-              round
-              class="font-weight-light"
-            >Follow</v-btn>
-          </v-card-text>
+              <span
+                class="subheading font-weight-light text-success text--darken-3"
+                v-text="header.text"
+              />
+            </template>
+            <template
+              slot="items"
+              slot-scope="{ item }"
+            >
+              <td>{{ item.name }}</td>
+              <td>{{ item.description }}</td>
+              <td>{{ item.parents }}</td>
+              <td>
+                <span>
+                  <v-btn
+                    color="primary"
+                    flat
+                    small
+                  >
+                    Manage
+                  </v-btn>
+                </span>
+                <span>
+                  <v-btn
+                    color="error"
+                    flat
+                    small
+                  >
+                    Delete
+                  </v-btn>
+                </span>
+              </td>
+            </template>
+          </v-data-table>
         </material-card>
       </v-flex>
     </v-layout>
@@ -144,18 +66,44 @@
 </template>
 
 <script>
-import Login from '@/components/mixins/Login.vue'
 export default {
-  mixins: [Login],
   data: () => ({
-    require_login: true
-  }),
-  beforeRouteUpdate (to, from, next) {
-    if (this.require_login && !this.loginUsername) {
-      next('/login')
-    } else {
-      next()
-    }
-  }
+    headers: [
+      {
+        sortable: true,
+        text: 'Role Name',
+        value: 'name'
+      },
+      {
+        sortable: false,
+        text: 'Description',
+        value: 'description'
+      },
+      {
+        sortable: false,
+        text: 'Parents',
+        value: 'operation'
+      },
+      {
+        sortable: false,
+        text: '',
+        value: 'operation',
+        width: '200px',
+        aligh: 'right'
+      }
+    ],
+    items: [
+      {
+        name: 'Base Admin',
+        description: 'Base Admin Role',
+        parents: []
+      },
+      {
+        name: 'Super Admin',
+        description: 'Base Admin Role',
+        parents: []
+      }
+    ]
+  })
 }
 </script>

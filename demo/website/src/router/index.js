@@ -82,7 +82,7 @@ router.beforeEach((to, from, next) => {
     })
   } else {
     // Check cached result
-    if (!to.meta.loginExpired || login.hasLoggedIn()) {
+    if (!to.meta.loginRequired || login.hasLoggedIn()) {
       next()
     } else {
       next({

@@ -144,9 +144,9 @@
 </template>
 
 <script>
-import Login from '@/components/mixins/Login.vue'
+import Base from '@/components/mixins/Base.vue'
 export default {
-  mixins: [Login],
+  mixins: [Base],
   data: () => ({
     require_login: true
   }),
