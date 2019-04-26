@@ -9,3 +9,16 @@
 2.2 usermod -aG sudo iuqian
 
 2.3 su - iuqian
+
+2.4 mkdir ~/.ssh
+
+2.5 cat "your_public_ssh_key" > ~/.ssh/authorized_keys
+
+2.6 create ssh config:
+
+    Host iu_demo
+        HostName 47.103.49.204
+        User iuqian
+        IdentityFile ~/.ssh/id_rsa_iu
+        
+2.7 ssh iu_demo
