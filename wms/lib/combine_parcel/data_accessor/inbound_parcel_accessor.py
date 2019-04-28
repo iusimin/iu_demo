@@ -83,7 +83,7 @@ class CPInboundParcelAccessor(AccessorBase):
 
         if self._operations:
             update_dict["$push"] = {
-                "operation_records": {"$each": self._operations}
+                "operation_records": {"$each": [o.to_mongo() for o in self._operations]}
             }
 
         if update_dict:

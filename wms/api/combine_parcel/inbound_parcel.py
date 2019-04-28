@@ -26,7 +26,9 @@ class InboundParcelResource(BaseApiResource):
             InboundParcelResource.Action.inbound: self.inbound_parcel,
             InboundParcelResource.Action.directship: self.directship
         }
+        super(InboundParcelResource, self).__init__(*args, **kwargs)
 
+    @falcon.before(login_required)
     #@falcon.before(JsonSchema('''
     #type: object
     #properties:
@@ -42,9 +44,11 @@ class InboundParcelResource(BaseApiResource):
         if not action_func:
             raise falcon.HTTPBadRequest("非法操作！")
 
-        action_func(req, resp, tracking_id)
+        session = req.context['session']
+        user = session.user
+        action_func(req, resp, user, tracking_id)
 
-    def inbound_parcel(self, req, resp, tracking_id):
+    def inbound_parcel(self, req, resp, user, tracking_id):
         params = req.media
         parcel_type = params["parcel_type"]
         weight = params["weight"]
@@ -61,14 +65,16 @@ class InboundParcelResource(BaseApiResource):
                 has_battery=has_battery,
                 has_liquid=has_liquid,
                 has_sensitive=bool(sensitive_reason),
-                sensitive_reason=sensitive_reason
+                sensitive_reason=sensitive_reason,
+                user_id=str(user.id),
+                operator=user.username
             )
         except ValueError:
             raise falcon.HTTPNotFound(description="物流订单不存在！")
         except InvalidOperationException:
             raise falcon.HTTPBadRequest(description="非法操作!")
 
-    def directship(self, req, resp, tracking_id):
+    def directship(self, req, resp, user, tracking_id):
         params = req.media
         job_id = params["job_id"]
         weight = params["weight"]

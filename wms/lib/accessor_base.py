@@ -15,9 +15,10 @@ class AccessorBase(object):
             update_dict["$unset"] = upset_prop
         return update_dict
 
-    def add_operation(self, operator, operation, operation_description, operation_info, operation_datetime):
+    def add_operation(self, user_id, operator, operation, operation_description, operation_info, operation_datetime):
         self._operations.append(
             CPOperationRecord(
+                user_id=user_id,
                 operator=operator,
                 operation=operation,
                 operation_description=operation_description,
@@ -25,3 +26,6 @@ class AccessorBase(object):
                 operation_datetime=operation_datetime
             )
         )
+
+    def add_operation_record(self, operation_record):
+        self._operations.append(operation_record)

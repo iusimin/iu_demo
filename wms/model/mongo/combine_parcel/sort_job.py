@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from cl.utils.mongo import MongoMixin
-from cl.utils.py_enum import PyEnumMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
+from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 from wms.model.mongo.warehouse import CPCabinetSize, CPWarehouse
 
 
@@ -16,6 +18,7 @@ class CPSortJobTimeline(EmbeddedDocument, MongoMixin):
 
     def to_dict(self):
         return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+
 
 class CPSortJob(Document, MongoMixin):
     class Type(PyEnumMixin):
@@ -70,10 +73,12 @@ class CPSortJob(Document, MongoMixin):
 
     warehouse_seed_cabinet_size = EmbeddedDocumentField("CPCabinetSize")
     sort_batch_size = IntField(required=True)
-    
+
     job_finish_datetime = DateTimeField()
     failed_reason = StringField()
     cancel_reason = StringField()
+
+    operation_records = EmbeddedDocumentListField("CPOperationRecord", default=[])
 
     created_datetime = DateTimeField(required=True)
     updated_datetime = DateTimeField()

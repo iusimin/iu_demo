@@ -12,7 +12,12 @@ from wms.model.mongo import IU_DEMO_DB
 class CPOperationRecord(EmbeddedDocument, MongoMixin):
     class CPOperationType(PyEnumMixin):
         InboundScan = 0
+        Sort = 1
+        Seed = 2
+        DirectShip = 3
+        
 
+    user_id = StringField()
     operator = StringField()
     operation = IntField()
     operation_description = StringField()

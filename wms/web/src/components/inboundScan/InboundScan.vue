@@ -105,9 +105,15 @@ export default {
         resp => {
           vm.tracking_id = null;
           vm.weight = null;
+          Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
+          Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
           vm.showSnackbar("成功入库！", "成功入库！", "success");
         },
         resp => {
+          vm.tracking_id = null;
+          vm.weight = null;
+          Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
+          Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
           vm.showSnackbar("入库失败！", resp.description, "error");
         }
       );
@@ -148,6 +154,7 @@ export default {
     tracking_id: {
       handler: function(newValue, oldValue) {
         var vm = this;
+        console.log("------");
         Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", newValue);
         vm.autoSubmitParcel();
       }

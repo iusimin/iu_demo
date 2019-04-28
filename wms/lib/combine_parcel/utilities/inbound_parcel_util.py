@@ -10,6 +10,7 @@ from wms.lib.exception.exception import InvalidOperationException
 from wms.lib.logistics_order.data_accessor.logistics_order_accessor import \
     LogisticsOrderAccessor
 from wms.model.mongo.combine_parcel.combine_pool import CPSortPool
+from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
 class InboundParcelUtil(object):
@@ -25,10 +26,15 @@ class InboundParcelUtil(object):
         )
 
     @classmethod
-    def inbound_parcel(cls, tracking_id, parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason):
+    def inbound_parcel(cls, tracking_id, parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason, user_id=None, operator=None):
         accessor = CPInboundParcelAccessor(tracking_id)
         accessor.inbound(parcel_type, weight, has_battery,
                          has_liquid, has_sensitive, sensitive_reason)
+
+        if user_id and operator:
+            accessor.add_operation(
+                user_id, operator, CPOperationRecord.CPOperationType.InboundScan, None, None, datetime.utcnow())
+
         accessor.flush()
 
     @classmethod
@@ -44,8 +50,8 @@ class InboundParcelUtil(object):
         return parcel_dict
 
     @classmethod
-    def directship_parcel(cls, job_id, tracking_id, weight):
-        ip_accessor, cp_accessor, lo_accessor = cls.precheck_directship(
+    def directship_parcel(cls, job_id, tracking_id, weight, user_id=None, operator=None):
+        ip_accessor, _, lo_accessor = cls.precheck_directship(
             job_id, tracking_id)
 
         parcel = ip_accessor.inbound_parcel
@@ -57,7 +63,11 @@ class InboundParcelUtil(object):
             sensitive_reason=parcel.sensitive_reason
         )
         lo_accessor.flush()
-        
+
+        if user_id and operator:
+            ip_accessor.add_operation(
+                user_id, operator, CPOperationRecord.CPOperationType.DirectShip, None, None, datetime.utcnow())
+
         logistics_order = lo_accessor.order
         return logistics_order.label_url
 
@@ -78,3 +88,19 @@ class InboundParcelUtil(object):
             raise InvalidOperationException("非法操作：该订单非直发订单！")
 
         return ip_accessor, cp_accessor, lo_accessor
+
+    @classmethod
+    def check_parcel_ready_to_ship(cls, warehouse_id):
+        utcnow = datetime.utcnow()
+        parcels_iter = CPInboundParcelAccessor.get_parcels_tobe_combined(
+            warehouse_id)
+        expired_parcels = []
+        eligible_parcels = []
+        combine_ids = set()
+
+        for parcel in parcels_iter:
+            combine_ids.add(parcel.combine_id)
+            if parcel.latest_ship_datetime <= utcnow:
+                expired_parcels.append(parcel)
+            else:
+                pass

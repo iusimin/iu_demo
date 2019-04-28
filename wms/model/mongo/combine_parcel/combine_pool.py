@@ -8,6 +8,7 @@ from iu_mongo.fields import *
 from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
+from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
 class CPSortGroupId(EmbeddedDocument):
@@ -52,12 +53,17 @@ class CPSortPool(Document, MongoMixin):
     lattice_id = IntField(required=True)
     actual_combine_id = StringField()
 
+    operation_records = EmbeddedDocumentListField(
+        "CPOperationRecord", default=[])
+
     created_datetime = DateTimeField(required=True)
     updated_datetime = DateTimeField()
 
     SORT_GROUP_NAMES = [
-        ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"],
-        ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q"],
+        ["A", "B", "C", "D", "E", "F", "G", "H", "I",
+            "J", "K", "L", "M", "N", "O", "P", "Q"],
+        ["a", "b", "c", "d", "e", "f", "g", "h", "i",
+            "j", "k", "l", "m", "n", "o", "p", "q"],
         ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
     ]
 
@@ -121,6 +127,7 @@ class CPSortGroupIdGenerator(object):
     @property
     def current_copy(self):
         return [x for x in self.count]
+
 
 class CPSortAllocateGroupId(object):
     @staticmethod

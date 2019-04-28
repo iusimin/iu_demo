@@ -10,15 +10,16 @@ from wms.model.mongo.rbac import Role
 class User(Document):
     meta = {
         'indexes': [
+            {'keys': 'username:1', 'unique': True},
         ],
         'allow_inheritance': False,
         'db_name': IU_DEMO_DB,
         'force_insert': True,
     }
 
-    username = StringField(index=True, unique=True)
-    password = StringField()
-    email = StringField(index=True, unique=True)
+    username = StringField(required=True)
+    password = StringField(required=True)
+    email = StringField(required=True)
     phone_number = StringField()
     permissions = ListField(EmbeddedDocumentField('Permission'),  default=[])
     role_names = ListField(StringField(),  default=[])
