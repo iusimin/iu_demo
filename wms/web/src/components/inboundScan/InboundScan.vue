@@ -100,6 +100,7 @@ export default {
         return;
       }
       vm.api.inboundParcel(
+        parcel.tracking_id,
         parcel,
         resp => {
           vm.tracking_id = null;

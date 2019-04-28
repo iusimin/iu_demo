@@ -5,10 +5,10 @@
       <v-container>
         <v-layout row wrap>
           <v-flex md12>
-            <v-text-field v-model="tracking_id" label="物流单号" required></v-text-field>
+            <v-text-field class="stop-propagation" v-model="parcel_scan_info.tracking_id" label="物流单号" required></v-text-field>
           </v-flex>
           <v-flex md12>
-            <v-text-field v-model="weight" label="重量" required></v-text-field>
+            <v-text-field class="stop-propagation" v-model="parcel_scan_info.weight" label="重量" required></v-text-field>
           </v-flex>
           <v-flex offset-md10 md2>
             <v-btn color="success" type="button" @click="submitDirectParcel">打单</v-btn>
@@ -21,6 +21,7 @@
 
 <script>
 import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
+import ParcelScanType from "@/mixins/ParcelScanType.vue";
 import Vue from "vue";
 
 export default {
@@ -28,24 +29,27 @@ export default {
       error_msg: null,
       parcel_detail: null
   }),
-  mixins: [ParcelScanListener],
+  mixins: [ParcelScanListener, ParcelScanType],
   components: {},
   mounted: function() {},
   computed: {},
   methods: {
-    submitDirectParcel: function() {}
+    submitDirectParcel: function() {},
+    validateInput: function() {
+      
+    }
   },
   watch: {
     tracking_id: {
       handler: function(newValue, oldValue) {
         var vm = this;
-        if (newValue) {
-          vm.api.getInboundParcelDetail(
-            newValue,
-            resp => {
-              vm.parcel_detail = resp.parcel_detail;
-            });
-        }
+        vm.parcel_scan_info.tracking_id = newValue;
+      }
+    },
+    weight: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        vm.parcel_scan_info.weight = newValue;
       }
     }
   }

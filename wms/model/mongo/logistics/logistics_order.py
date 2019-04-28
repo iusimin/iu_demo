@@ -31,6 +31,7 @@ class LogisticsOrder(Document, MongoMixin):
     platform_id = StringField(required=True)
     carrier_id = StringField(required=True)
     status = IntField(required=True)
+    label_url = StringField()
 
     timeline = EmbeddedDocumentField("LogisticsOrderTimeline")
     operation_records = EmbeddedDocumentListField(
@@ -40,6 +41,7 @@ class LogisticsOrder(Document, MongoMixin):
     has_battery = BooleanField()
     has_liquid = BooleanField()
     has_sensitive = BooleanField()
+    sensitive_reason = StringField()
 
     created_datetime = DateTimeField(required=True)
     updated_datetime = DateTimeField()

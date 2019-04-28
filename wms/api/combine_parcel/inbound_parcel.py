@@ -6,6 +6,7 @@ import falcon
 
 from cl.backend.api import BaseApiResource
 from cl.utils import password
+from cl.utils.py_enum import PyEnumMixin
 from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
 from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
@@ -16,22 +17,37 @@ from wms.model.redis_keys.session import Session
 
 
 class InboundParcelResource(BaseApiResource):
-    @falcon.before(JsonSchema('''
-    type: object
-    properties:
-      tracking_id: { type: string }
-      parcel_type: { type: number }
-      weight: { type: number }
-      has_battery: { type: boolean }
-      has_liquid: { type: boolean }
-      has_sensitive: { type: boolean }
-    required: [tracking_id, parcel_type, weight]
-    '''))
-    def on_put(self, req, resp):
+    class Action(PyEnumMixin):
+        inbound = "inbound"
+        directship = "directship"
+
+    def __init__(self, *args, **kwargs):
+        self._action_map = {
+            InboundParcelResource.Action.inbound: self.inbound_parcel,
+            InboundParcelResource.Action.directship: self.directship
+        }
+
+    #@falcon.before(JsonSchema('''
+    #type: object
+    #properties:
+    #  parcel_type: { type: number }
+    #  weight: { type: number }
+    #  has_battery: { type: boolean }
+    #  has_liquid: { type: boolean }
+    #  has_sensitive: { type: boolean }
+    #required: [parcel_type, weight]
+    #'''))
+    def on_put(self, req, resp, tracking_id, action):
+        action_func = self._action_map.get(action)
+        if not action_func:
+            raise falcon.HTTPBadRequest("非法操作！")
+
+        action_func(req, resp, tracking_id)
+
+    def inbound_parcel(self, req, resp, tracking_id):
         params = req.media
-        tracking_id = params['tracking_id']
-        parcel_type = params['parcel_type']
-        weight = params['weight']
+        parcel_type = params["parcel_type"]
+        weight = params["weight"]
 
         has_battery = params.get("has_battery", False)
         has_liquid = params.get("has_liquid", False)
@@ -50,8 +66,13 @@ class InboundParcelResource(BaseApiResource):
         except ValueError:
             raise falcon.HTTPNotFound(description="物流订单不存在！")
         except InvalidOperationException:
-            raise falcon.HTTPBadRequest(description="非法操作")
+            raise falcon.HTTPBadRequest(description="非法操作!")
 
+    def directship(self, req, resp, tracking_id):
+        params = req.media
+        job_id = params["job_id"]
+        weight = params["weight"]
+        label_url = InboundParcelUtil.directship_parcel(job_id, tracking_id, weight)
 
     def on_get(self, req, resp, tracking_id):
         try:

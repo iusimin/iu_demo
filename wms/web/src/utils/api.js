@@ -76,10 +76,10 @@ export default {
             errorCallback
         );
     },
-    inboundParcel: function (parcel, callback, errorCallback) {
+    inboundParcel: function (tracking_id, parcel, callback, errorCallback) {
         this.call(
             "put",
-            "inbound-parcel/inbound",
+            "inbound-parcel/" + tracking_id + "/inbound",
             null,
             parcel,
             callback,
