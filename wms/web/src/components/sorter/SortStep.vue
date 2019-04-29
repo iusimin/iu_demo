@@ -60,21 +60,22 @@ export default {
   methods: {
     getSortInfo: function() {
       var vm = this;
-      vm.api.getParcelSortInfo(
-        vm.parcel_scan_info.tracking_id,
-        vm.job_id,
-        vm.round_id,
-        resp => {
+      vm.api
+        .getParcelSortInfo(
+          vm.parcel_scan_info.tracking_id,
+          vm.job_id,
+          vm.round_id
+        )
+        .then(resp => {
           vm.sort_info = resp.sort_info;
-        },
-        resp => {
+        })
+        .catch(resp => {
           vm.sort_info.round_group_id = null;
           vm.sort_info.weight = null;
           vm.sort_info.inbound_datetime = null;
           vm.show_alert = true;
           vm.alert_msg = resp.description;
-        }
-      );
+        });
     }
   },
   watch: {

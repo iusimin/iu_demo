@@ -230,8 +230,7 @@ export default {
       var vm = this;
       if (vm.target_parcels.length == 0) {
         vm.init_target_parcels(vm.seed_tracking_id);
-      }
-      else {
+      } else {
         vm.seed_tracking_id();
       }
     },
@@ -252,18 +251,16 @@ export default {
     init_target_parcels: function(cb) {
       var vm = this;
       if (vm.target_parcels.length == 0) {
-        vm.api.getSeedCabinet(
-          vm.current_tracking_id,
-          vm.job_id,
-          resp => {
+        vm.api
+          .getSeedCabinet(vm.current_tracking_id, vm.job_id)
+          .then(resp => {
             vm.target_parcels = resp.parcels;
             vm.init_cabinet();
             vm.$nextTick(cb);
-          },
-          resp => {
+          })
+          .catch(resp => {
             alert("error");
-          }
-        );
+          });
       }
     },
     adjust_table: function() {

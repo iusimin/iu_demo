@@ -23,7 +23,12 @@
             <td class="text-xs-right">{{ item.job_finish_datetime }}</td>
             <td class="text-xs-right">{{ item.parcel_count }}</td>
             <td class="text-xs-right">
-              <div v-if="isJobCancelable(item.status)" small class="mr-2" @click="confirmAndCancelSortJob(item.job_id)">取消任务</div>
+              <div
+                v-if="isJobCancelable(item.status)"
+                small
+                class="mr-2"
+                @click="confirmAndCancelSortJob(item.job_id)"
+              >取消任务</div>
             </td>
           </template>
         </v-data-table>
@@ -111,30 +116,28 @@ export default {
   methods: {
     getSortJobs: function() {
       var vm = this;
-      vm.api.getSortJobs(
-        vm.sort_job_info.pagination,
-        resp => {
+      vm.api
+        .getSortJobs(vm.sort_job_info.pagination)
+        .then(resp => {
           vm.sort_job_info.jobs = resp.data;
           vm.sort_job_info.total_count = resp.total_count;
-        },
-        resp => {
+        })
+        .catch(resp => {
           alert("0");
-        }
-      );
+        });
     },
     createNewSortJob: function() {
       var vm = this;
       vm.show_dialog = false;
-      vm.api.createNewSortJob(
-        1,
-        resp => {
+      vm.api
+        .createNewSortJob(1)
+        .then(resp => {
           vm.getSortJobs();
           alert("创建成功！");
-        },
-        resp => {
+        })
+        .catch(resp => {
           alert(resp.description);
-        }
-      );
+        });
     },
     confirmAndCancelSortJob: function(job_id) {
       var vm = this;
@@ -144,16 +147,15 @@ export default {
     cancelSortJob: function() {
       var vm = this;
       vm.show_cancel_dialog = false;
-      vm.api.cancelSortJob(
-        vm.job_to_cancel,
-        resp => {
+      vm.api
+        .cancelSortJob(vm.job_to_cancel)
+        .then(resp => {
           vm.getSortJobs();
           alert("1");
-        },
-        resp => {
+        })
+        .catch(resp => {
           alert("0");
-        }
-      );
+        });
     },
     isJobCancelable: function(status) {
       //TODO antony: Use Enum

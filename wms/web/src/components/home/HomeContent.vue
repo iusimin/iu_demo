@@ -146,16 +146,15 @@ export default {
   methods: {
     getSortJobs: function() {
       var vm = this;
-      vm.api.getSortJobs(
-        vm.sort_job_info.pagination,
-        resp => {
+      vm.api
+        .getSortJobs(vm.sort_job_info.pagination)
+        .then(resp => {
           vm.sort_job_info.jobs = resp.data;
           vm.sort_job_info.total_count = resp.total_count;
-        },
-        resp => {
+        })
+        .catch(resp => {
           alert("0");
-        }
-      );
+        });
     }
   },
   watch: {

@@ -2,12 +2,9 @@
   <v-container fluid grid-list-xl>
     <v-layout wrap>
       <v-flex md12 lg12 v-if="has_active_job">
-        <v-alert
-          v-model="has_active_job"
-          color="success"
-          icon="mdi-anchor"
-          outline
-        ><span class="font-weight-black title">当前分拣任务：{{ active_job_id }}</span></v-alert>
+        <v-alert v-model="has_active_job" color="success" icon="mdi-anchor" outline>
+          <span class="font-weight-black title">当前分拣任务：{{ active_job_id }}</span>
+        </v-alert>
       </v-flex>
 
       <v-flex md12 lg12 v-if="no_active_job">
@@ -51,14 +48,14 @@ export default {
   methods: {
     getActiveSortJob: function() {
       var vm = this;
-      vm.api.getActiveSortJob(
-        resp => {
+      vm.api
+        .getActiveSortJob()
+        .then(resp => {
           vm.active_job = resp.job;
-        },
-        resp => {
+        })
+        .catch(resp => {
           vm.no_job_message = resp.description;
-        }
-      );
+        });
     }
   },
   watch: {

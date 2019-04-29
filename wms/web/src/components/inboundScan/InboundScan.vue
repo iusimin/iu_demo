@@ -99,24 +99,22 @@ export default {
       if (!vm.validateParcel(parcel)) {
         return;
       }
-      vm.api.inboundParcel(
-        parcel.tracking_id,
-        parcel,
-        resp => {
+      vm.api
+        .inboundParcel(parcel.tracking_id, parcel)
+        .then(resp => {
           vm.tracking_id = null;
           vm.weight = null;
           Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
           Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
           vm.showSnackbar("成功入库！", "成功入库！", "success");
-        },
-        resp => {
+        })
+        .catch(resp => {
           vm.tracking_id = null;
           vm.weight = null;
           Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
           Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
           vm.showSnackbar("入库失败！", resp.description, "error");
-        }
-      );
+        });
     },
     validateParcel: function(parcel) {
       var vm = this;

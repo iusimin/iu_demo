@@ -10,11 +10,17 @@
               <!-- <v-tooltip bottom>
                 <v-icon slot="activator">mdi-account</v-icon>
                 <span>mdi-account</span>
-              </v-tooltip> -->
+              </v-tooltip>-->
             </v-toolbar>
             <v-card-text>
               <v-form>
-                <v-text-field prepend-icon="mdi-account" name="login" label="Login" type="text" v-model="username"></v-text-field>
+                <v-text-field
+                  prepend-icon="mdi-account"
+                  name="login"
+                  label="Login"
+                  type="text"
+                  v-model="username"
+                ></v-text-field>
                 <v-text-field
                   prepend-icon="mdi-lock-question"
                   name="password"
@@ -49,18 +55,15 @@ export default {
   methods: {
     login: function() {
       var vm = this;
-      vm.api.login(
-        vm.username,
-        vm.password,
-        false,
-        resp => {
-          var redirect = vm.$route.query.redirect || '/dashboard';
+      vm.api
+        .login(vm.username, vm.password, false)
+        .then(resp => {
+          var redirect = vm.$route.query.redirect || "/dashboard";
           vm.$router.push(redirect);
-        },
-        resp => {
+        })
+        .catch(resp => {
           alert("failed");
-        }
-      );
+        });
     }
   }
 };
