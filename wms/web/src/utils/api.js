@@ -36,7 +36,7 @@ export default {
             .map(k => esc(k) + '=' + esc(param_dict[k]))
             .join('&');
     },
-    call: function (method, url, query, params, callback, errorCallback, loader) {
+    call: function (method, url, query, params, loader) {
         var data = params;
         /* _.pickBy(params, e => {
                    return !_.isNil(e)
@@ -54,7 +54,7 @@ export default {
                 //'X-XSRFToken': xsrf_token
             }
         };
-        return _axios_call(config, loader).then(callback).catch(errorCallback);
+        return _axios_call(config, loader);
     },
     login: function (username, password, remember_me) {
         return this.call(

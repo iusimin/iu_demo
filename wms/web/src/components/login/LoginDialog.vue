@@ -58,7 +58,8 @@ export default {
       vm.api
         .login(vm.username, vm.password, false)
         .then(resp => {
-          var redirect = vm.$route.query.redirect || "/dashboard";
+          console.log("----------------");
+          var redirect = vm.$route.query.redirect || "/home/dashboard";
           vm.$router.push(redirect);
         })
         .catch(resp => {

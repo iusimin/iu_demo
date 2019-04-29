@@ -87,42 +87,42 @@ export default {
     logo: './img/vuetifylogo.png',
     links: [
       {
-        to: '/dashboard',
+        to: '/home/dashboard',
         icon: 'mdi-view-dashboard',
         text: '控制台'
       },
       {
-        to: '/warehouse-setting',
+        to: '/setting/warehouse-setting',
         icon: 'mdi-view-dashboard',
         text: '仓库设置'
       },
       {
-        to: '/inbound-scan',
+        to: '/operation/inbound-scan',
         icon: 'mdi-audiobook',
         text: '扫描入库'
       },
       {
-        to: '/sorter',
+        to: '/operation/sorter',
         icon: 'mdi-account-location',
         text: '分拣'
       },
       {
-        to: '/seed',
+        to: '/operation/seed',
         icon: 'mdi-adobe',
         text: '播种合并'
       },
       {
-        to: '/directship',
+        to: '/operation/directship',
         icon: 'mdi-airport',
         text: '直发打单'
       },
       {
-        to: '/outboundscan',
+        to: '/operation/outboundscan',
         icon: 'mdi-airplane-off',
         text: '出库扫描'
       },
       {
-        to: '/sort-job',
+        to: '/management/sort-job',
         icon: 'mdi-alpha',
         text: '分拣任务'
       }
