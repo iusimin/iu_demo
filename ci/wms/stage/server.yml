@@ -10,7 +10,7 @@
     guest_expire: 1d
     user_expire: 1m
   mongo:
-    - host: 10.86.19.163
+    - host: 47.103.49.204
       port: 27017
       db_names:
         - iu

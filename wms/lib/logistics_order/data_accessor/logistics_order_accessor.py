@@ -7,9 +7,10 @@ from wms.model.mongo.logistics.logistics_order import LogisticsOrder
 
 
 class LogisticsOrderAccessor(AccessorBase):
-    def __init__(self, order_id):
+    def __init__(self, order_id, *args, **kwargs):
         self._order_id = order_id
         self.order = LogisticsOrder.by_id(self._order_id)
+        super(LogisticsOrderAccessor, self).__init__(*args, **kwargs)
 
     @classmethod
     def create_order(cls, tracking_id, platform_id, carrier_id):

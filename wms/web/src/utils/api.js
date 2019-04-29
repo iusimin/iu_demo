@@ -4,28 +4,28 @@ import axios from "axios";
 var _axios_call = function (config, loader) {
     if (loader) loader.show();
     return new Promise((resolve, reject) => {
-    axios(config)
-        .then(function (resp) {
-            if (loader) loader.hide();
-            if (resolve) resolve(resp.data);
-        })
-        .catch(function (error) {
-            if (loader) loader.hide();
-            if (error.response) {
-                if (reject) {
-                    reject(error.response.data);
+        axios(config)
+            .then(function (resp) {
+                if (loader) loader.hide();
+                if (resolve) resolve(resp.data);
+            })
+            .catch(function (error) {
+                if (loader) loader.hide();
+                if (error.response) {
+                    if (reject) {
+                        reject(error.response.data);
+                    } else {
+                        new noty({
+                            text: error.response.data.msg,
+                            type: "error"
+                        }).show();
+                        //log.error(error.response.data)
+                    }
                 } else {
-                    new noty({
-                        text: error.response.data.msg,
-                        type: "error"
-                    }).show();
-                    //log.error(error.response.data)
+                    console.log(error);
+                    //log.error(error)
                 }
-            } else {
-                console.log(error);
-                //log.error(error)
-            }
-        });
+            });
     });
 };
 
@@ -82,7 +82,7 @@ export default {
             parcel
         );
     },
-    getInboundParcelDetail: function(tracking_id) {
+    getInboundParcelDetail: function (tracking_id) {
         return this.call(
             "get",
             "inbound-parcel/" + tracking_id,
@@ -142,7 +142,7 @@ export default {
             null
         );
     },
-    cancelSortJob: function(job_id) {
+    cancelSortJob: function (job_id) {
         return this.call(
             "put",
             "sort-job",
@@ -153,12 +153,15 @@ export default {
             }
         );
     },
-    getActiveSortJob: function() {
+    getActiveSortJob: function () {
+        return this.call("get", "active-sort-job", null, null);
+    },
+    submitDirectShip: function(tracking_id, parcel) {
         return this.call(
-            "get",
-            "active-sort-job",
+            "put",
+            "inbound-parcel/" + tracking_id + "/directship",
             null,
-            null
+            parcel
         );
     }
 };

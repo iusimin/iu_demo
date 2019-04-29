@@ -78,7 +78,13 @@ class InboundParcelResource(BaseApiResource):
         params = req.media
         job_id = params["job_id"]
         weight = params["weight"]
-        label_url = InboundParcelUtil.directship_parcel(job_id, tracking_id, weight)
+        try:
+            logistics_order = InboundParcelUtil.directship_parcel(job_id, tracking_id, weight)
+            resp.media = {
+                "logistics_order": logistics_order.to_dict()
+            }
+        except InvalidOperationException as ex:
+            raise falcon.HTTPBadRequest(description=str(ex))
 
     def on_get(self, req, resp, tracking_id):
         try:

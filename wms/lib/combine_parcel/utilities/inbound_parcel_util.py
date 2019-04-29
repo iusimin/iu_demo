@@ -69,7 +69,7 @@ class InboundParcelUtil(object):
                 user_id, operator, CPOperationRecord.CPOperationType.DirectShip, None, None, datetime.utcnow())
 
         logistics_order = lo_accessor.order
-        return logistics_order.label_url
+        return logistics_order
 
     @classmethod
     def precheck_directship(cls, job_id, tracking_id):

@@ -1,19 +1,7 @@
 <template>
   <div>
     <v-container fluid>
-      <!-- <v-alert :value="alert_msg != null" :type="alert_type">{{ alert_msg }}</v-alert> -->
-      <v-snackbar
-        v-model="show_alert"
-        :timeout="1500"
-        :top="true"
-        :vertical="true"
-        :auto-height="true"
-        :color="alert_type == 'success' ? 'success' : 'error'"
-      >
-        <h4>{{ alert_title }}</h4>
-        <div v-if="alert_msg != null">{{ alert_msg }}</div>
-        <v-btn color="pink" flat @click="show_alert = false">Close</v-btn>
-      </v-snackbar>
+      <snackbar ref="Snackbar"></snackbar>
       <v-tabs centered color="cyan" dark grow icons-and-text @change="tabChanged">
         <v-tabs-slider color="yellow"></v-tabs-slider>
 
@@ -54,14 +42,11 @@ import OrdinaryParcel from "./OrdinaryParcel";
 import SpecialParcel from "./SpecialParcel";
 import SensitiveParcel from "./SensitiveParcel";
 import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
+import Snackbar from "@/components/common/Snackbar.vue";
 import Vue from "vue";
 
 export default {
   data: () => ({
-    alert_title: null,
-    alert_msg: null,
-    alert_type: "success",
-    show_alert: false,
     current_tab: "tab-1",
     parcel_map: {
       "tab-1": {},
@@ -78,7 +63,8 @@ export default {
   components: {
     OrdinaryParcel,
     SpecialParcel,
-    SensitiveParcel
+    SensitiveParcel,
+    Snackbar
   },
   mounted: function() {},
   computed: {
@@ -106,14 +92,14 @@ export default {
           vm.weight = null;
           Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
           Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
-          vm.showSnackbar("成功入库！", "成功入库！", "success");
+          vm.$refs.Snackbar.showSnackbar("成功入库！", "成功入库！", "success");
         })
         .catch(resp => {
           vm.tracking_id = null;
           vm.weight = null;
           Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", null);
           Vue.set(vm.parcel_map[vm.current_tab], "weight", null);
-          vm.showSnackbar("入库失败！", resp.description, "error");
+          vm.$refs.Snackbar.showSnackbar("入库失败！", resp.description, "error");
         });
     },
     validateParcel: function(parcel) {
@@ -122,22 +108,15 @@ export default {
       if (weight) {
         parcel.weight = weight;
       } else {
-        vm.showSnackbar("数据错误！", "重量错误，重量应为数字!", "error");
+        vm.$refs.Snackbar.showSnackbar("数据错误！", "重量错误，重量应为数字!", "error");
         return false;
       }
 
       if (!parcel.tracking_id) {
-        vm.showSnackbar("数据错误！", "物流单号不能为空！", "error");
+        vm.$refs.Snackbar.showSnackbar("数据错误！", "物流单号不能为空！", "error");
         return false;
       }
       return true;
-    },
-    showSnackbar: function(title, msg, type) {
-      var vm = this;
-      vm.alert_title = title;
-      vm.alert_msg = msg;
-      vm.show_alert = true;
-      vm.alert_type = type;
     },
     autoSubmitParcel: function() {
       var vm = this;
@@ -152,7 +131,6 @@ export default {
     tracking_id: {
       handler: function(newValue, oldValue) {
         var vm = this;
-        console.log("------");
         Vue.set(vm.parcel_map[vm.current_tab], "tracking_id", newValue);
         vm.autoSubmitParcel();
       }
