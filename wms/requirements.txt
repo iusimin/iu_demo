@@ -15,3 +15,4 @@ requests==2.21.0
 redis==3.2.1
 walrus==0.7.1
 jsonschema==3.0.1
+oss2==2.6.1

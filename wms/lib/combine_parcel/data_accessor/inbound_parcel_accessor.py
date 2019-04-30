@@ -66,7 +66,7 @@ class CPInboundParcelAccessor(AccessorBase):
         self.inbound_parcel.status = CPInboundParcel.Status.Inbound
         self.inbound_parcel.timeline.inbound = datetime.utcnow()
 
-    def flush(self):
+    def flush(self, transaction_session=None):
         po_props = {
             "parcel_type": self.inbound_parcel.parcel_type,
             "status": self.inbound_parcel.status,
@@ -87,4 +87,4 @@ class CPInboundParcelAccessor(AccessorBase):
             }
 
         if update_dict:
-            self.inbound_parcel.update_one(update_dict)
+            self.inbound_parcel.update_one(update_dict, session=transaction_session)

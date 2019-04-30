@@ -92,7 +92,7 @@ class SortJobAccessor(AccessorBase):
         self.sort_job.job_finish_datetime = utcnow
         self.sort_job.cancel_reason = reason
 
-    def flush(self):
+    def flush(self, transaction_session=None):
         po_props = {
             "status": self.sort_job.status,
             "timeline": self.sort_job.timeline.to_mongo(),
@@ -104,4 +104,4 @@ class SortJobAccessor(AccessorBase):
 
         update_dict = self.split_props(po_props)
         if update_dict:
-            self.sort_job.update_one(update_dict)
+            self.sort_job.update_one(update_dict, session=transaction_session)

@@ -66,12 +66,8 @@ export default {
       vm.api
         .submitDirectShip(parcel.tracking_id, parcel)
         .then(resp => {
-          vm.$refs.Snackbar.showSnackbar("", "直发成功！", "success");
           vm.logistics_order = resp.logistics_order;
-          return 11;
-        })
-        .then(resp => {
-          vm.$refs.Snackbar.showSnackbar("直发成功！", "直发成功！", "success");
+          printPDF(vm.logistics_order.label_url);
         })
         .catch(resp => {
           vm.$refs.Snackbar.showSnackbar("错误！", resp.description, "error");

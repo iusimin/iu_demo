@@ -23,7 +23,7 @@ class LogisticsOrderAccessor(AccessorBase):
         self.order.has_sensitive = has_sensitive
         self.order.sensitive_reason = sensitive_reason
 
-    def flush(self):
+    def flush(self, transaction_session=None):
         po_props = {
             "weight": self.order.weight,
             "has_battery": self.order.has_battery,
@@ -41,4 +41,4 @@ class LogisticsOrderAccessor(AccessorBase):
             }
 
         if update_dict:
-            self.order.update_one(update_dict)
+            self.order.update_one(update_dict, session=transaction_session)
