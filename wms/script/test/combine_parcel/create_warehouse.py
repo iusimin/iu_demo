@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'
@@ -12,7 +12,7 @@ def _setup():
     application.connect()
 
 def create_warehouse():
-    CPWarehouse.create(
+    Warehouse.create(
         warehouse_id="CHINAPOST-SH001",
         warehouse_name="CHINAPOST-DONGGUAN",
         cabinet_count=8,

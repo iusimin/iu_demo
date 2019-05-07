@@ -5,7 +5,7 @@ from datetime import datetime
 from wms.lib.logistics_order.data_accessor.logistics_order_accessor import \
     LogisticsOrderAccessor
 from wms.model.mongo.logistics.logistics_order import LogisticsOrder
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'

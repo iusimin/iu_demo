@@ -19,7 +19,7 @@ from wms.model.mongo.combine_parcel.combine_pool import (CPSortAllocateGroupId,
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
 from wms.model.mongo.sequence_id_generator import SequenceIdGenerator
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'
@@ -34,7 +34,7 @@ def _setup():
 
 def create_combine_pool():
     warehouse_id = "CHINAPOST-SH001"
-    warehouse = CPWarehouse.by_warehouse_id(warehouse_id)
+    warehouse = Warehouse.by_warehouse_id(warehouse_id)
     job_prefix = datetime.utcnow().strftime("%Y%m%d")
     job_id = SequenceIdGenerator.get_sequence_id(job_prefix)
     job = SortJobAccessor.create(

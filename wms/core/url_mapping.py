@@ -3,6 +3,7 @@ from wms.api import all as a
 API_ROUTER = [
     ('/api/users/', a.UserCollectionApi),
     ('/api/login/', a.UserLoginApi),
+    ('/api/operator-warehouse', a.OperatorWarehouse),
 
     ('/api/inbound-parcel/{tracking_id}/{action}', a.InboundParcelResource),
     ('/api/inbound-parcel/{tracking_id}', a.InboundParcelResource),

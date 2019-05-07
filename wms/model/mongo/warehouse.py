@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from cl.utils.mongo import MongoMixin
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
+
+from cl.utils.mongo import MongoMixin
+from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 
 
@@ -15,7 +17,41 @@ class CPCabinetSize(EmbeddedDocument, MongoMixin):
         return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
 
 
-class CPWarehouse(Document):
+class Warehouse(Document, MongoMixin):
+    class WeightUnit(PyEnumMixin):
+        Gram = 0
+        Kilogram = 1
+
+        _text_dict = {
+            Gram: "克",
+            Kilogram: "千克"
+        }
+
+        @classmethod
+        def text_dict(cls):
+            return cls._text_dict
+
+        @classmethod
+        def get_text(cls, status):
+            return cls._text_dict[status]
+
+    class CabinetOrientation(PyEnumMixin):
+        Horizontal = 0
+        Vertical = 1
+
+        _text_dict = {
+            Horizontal: "横向",
+            Vertical: "竖向"
+        }
+
+        @classmethod
+        def text_dict(cls):
+            return cls._text_dict
+
+        @classmethod
+        def get_text(cls, status):
+            return cls._text_dict[status]
+
     meta = {
         'indexes': [
             {'keys': 'warehouse_id:1', 'unique': True}
@@ -56,3 +92,6 @@ class CPWarehouse(Document):
         return cls.find_one({
             "warehouse_id": warehouse_id
         })
+
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

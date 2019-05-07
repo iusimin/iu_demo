@@ -17,7 +17,7 @@ import i18n from '@/i18n'
 import router from '@/router'
 import store from '@/store'
 
-import api from './utils/api'
+import api from '@/utils/api'
 
 // Sync store with router
 sync(store, router)
@@ -32,7 +32,7 @@ Vue.mixin({
     };
   }
 })
-
+console.log(store);
 /* eslint-disable no-new */
 new Vue({
   i18n,

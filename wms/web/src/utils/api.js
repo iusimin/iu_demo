@@ -67,28 +67,19 @@ export default {
         );
     },
     checkLogin: function () {
-        return this.call(
-            "get",
-            "login",
-            null,
-            null
-        );
+        return this.call("get", "login", null, null);
+    },
+    getOperatorWarehouse: function() {
+        return this.call("get", "operator-warehouse", null, null);
+    },
+    updateOperatorWarehouseSetting: function(warehouse_id, setting) {
+        return this.call("put", "operator-warehouse", null, {warehouse_id: warehouse_id, ...setting});
     },
     inboundParcel: function (tracking_id, parcel) {
-        return this.call(
-            "put",
-            "inbound-parcel/" + tracking_id + "/inbound",
-            null,
-            parcel
-        );
+        return this.call("put", "inbound-parcel/" + tracking_id + "/inbound", null, parcel);
     },
     getInboundParcelDetail: function (tracking_id) {
-        return this.call(
-            "get",
-            "inbound-parcel/" + tracking_id,
-            null,
-            null
-        );
+        return this.call("get", "inbound-parcel/" + tracking_id, null, null);
     },
     getParcelSortInfo: function (tracking_id, job_id, round_id) {
         return this.call(
@@ -157,11 +148,6 @@ export default {
         return this.call("get", "active-sort-job", null, null);
     },
     submitDirectShip: function(tracking_id, parcel) {
-        return this.call(
-            "put",
-            "inbound-parcel/" + tracking_id + "/directship",
-            null,
-            parcel
-        );
+        return this.call("put", "inbound-parcel/" + tracking_id + "/directship", null, parcel);
     }
 };

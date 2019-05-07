@@ -11,7 +11,7 @@ from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
     InboundParcelUtil
 from wms.model.mongo.combine_parcel.inbound_parcel import \
     CPInboundParcel
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 from wms.server import ConfigParser, IUWMSBackendService
 
 CONFIG_FILE = '/etc/server.yml'

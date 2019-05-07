@@ -8,7 +8,7 @@ from cl.utils.mongo import MongoMixin
 from cl.utils.py_enum import PyEnumMixin
 from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
-from wms.model.mongo.warehouse import CPCabinetSize, CPWarehouse
+from wms.model.mongo.warehouse import CPCabinetSize, Warehouse
 
 
 class CPSortJobTimeline(EmbeddedDocument, MongoMixin):
@@ -85,7 +85,7 @@ class CPSortJob(Document, MongoMixin):
 
     @classmethod
     def create(cls, job_id, job_type, warehouse_id):
-        warehouse = CPWarehouse.by_warehouse_id(warehouse_id)
+        warehouse = Warehouse.by_warehouse_id(warehouse_id)
 
         if not warehouse:
             raise ValueError("No warehouse with id {0}.".format(warehouse_id))

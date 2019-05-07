@@ -2,7 +2,7 @@
 
 from wms.server import ConfigParser, IUWMSBackendService
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 
 from wms.tasks.combine_parcel.sort_job_task import CPSortJobTasks
 

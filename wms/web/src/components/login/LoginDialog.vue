@@ -43,6 +43,9 @@
 </template>
 
 <script>
+import { ActionNames } from "@/store/constants.js";
+import { mapActions } from "vuex";
+import store from "@/store";
 export default {
   data: () => ({
     username: null,
@@ -58,11 +61,14 @@ export default {
       vm.api
         .login(vm.username, vm.password, false)
         .then(resp => {
-          console.log("----------------");
+          return store.dispatch(ActionNames.GET_OPERATOR_WAREHOUSE);
+        })
+        .then(resp => {
           var redirect = vm.$route.query.redirect || "/home/dashboard";
           vm.$router.push(redirect);
         })
         .catch(resp => {
+          console.log(resp);
           alert("failed");
         });
     }

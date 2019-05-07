@@ -11,7 +11,7 @@ from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
 from wms.model.mongo.combine_parcel.combine_pool import (CPSortAllocateGroupId,
                                                          CPSortPool)
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
-from wms.model.mongo.warehouse import CPWarehouse
+from wms.model.mongo.warehouse import Warehouse
 
 
 class SortJobUtil(object):
@@ -29,7 +29,7 @@ class SortJobUtil(object):
         job = job_accessor.sort_job
 
         try:
-            warehouse = CPWarehouse.by_warehouse_id(job.warehouse_id)
+            warehouse = Warehouse.by_warehouse_id(job.warehouse_id)
             inbound_parcels = CPInboundParcel.find({
                 "warehouse_id": job.warehouse_id,
                 "status": CPInboundParcel.Status.Inbound,
