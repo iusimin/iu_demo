@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import ParcelScanType from "@/mixins/ParcelScanType.vue";
+import ParcelScanType from "@/components/mixins/ParcelScanType.vue";
 export default {
   data: () => ({
     error_msg: null

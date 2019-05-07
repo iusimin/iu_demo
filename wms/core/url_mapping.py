@@ -12,7 +12,11 @@ API_ROUTER = [
     ('/api/sort-job', a.SortJob),
     ('/api/sort-jobs', a.CPSortJobCollectionResource),
     ('/api/sort-pool-parcels', a.CPSortPoolCollectionResource),
-    ('/api/active-sort-job', a.ActiveSortJob)
+    ('/api/active-sort-job', a.ActiveSortJob),
+
+    # For demo only. Remove later.
+    ('/api/demo', a.Demo),
+    ('/api/demo/uncancelled-parcels', a.DemoUnCancelledParcels)
 ]
 
 STATIC_ROUTE = [

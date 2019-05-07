@@ -125,6 +125,11 @@ export default {
         to: '/management/sort-job',
         icon: 'mdi-alpha',
         text: '分拣任务'
+      },
+      {
+        to: '/demo/dashboard',
+        icon: 'mdi-badminton',
+        text: 'Demo控制面板'
       }
     ],
     responsive: false

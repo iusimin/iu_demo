@@ -9,7 +9,9 @@ import './components'
 import './plugins'
 
 // Sync router with store
-import { sync } from 'vuex-router-sync'
+import {
+  sync
+} from 'vuex-router-sync'
 
 // Application imports
 import App from './App'
@@ -26,13 +28,13 @@ Vue.config.productionTip = false
 Vue.config.devtools = true
 
 Vue.mixin({
-  data: function() {
+  data: function () {
     return {
       api: api
     };
   }
 })
-console.log(store);
+
 /* eslint-disable no-new */
 new Vue({
   i18n,

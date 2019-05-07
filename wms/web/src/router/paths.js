@@ -18,8 +18,9 @@ import DirectShip from "@/components/operation/DirectShip.vue";
 import OutboundScan from "@/components/operation/OutboundScan.vue";
 import SortJob from "@/components/sorter/SortJob.vue";
 
-export default [
-  {
+import DemoDashboard from "@/components/demo/DemoDashboard.vue";
+
+export default [{
     path: '/login',
     name: 'login',
     component: Empty,
@@ -36,7 +37,9 @@ export default [
       path: 'dashboard',
       component: HomeContent
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/setting',
@@ -46,7 +49,9 @@ export default [
       path: 'warehouse-setting',
       component: WarehouseSetting
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/operation',
@@ -56,7 +61,9 @@ export default [
       path: 'inbound-scan',
       component: InboundScan,
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/operation',
@@ -66,7 +73,9 @@ export default [
       path: 'sorter',
       component: Sorter
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/operation',
@@ -76,7 +85,9 @@ export default [
       path: 'seed',
       component: Outbound
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/operation',
@@ -86,7 +97,9 @@ export default [
       path: 'directship',
       component: DirectShip
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/operation',
@@ -96,9 +109,10 @@ export default [
       path: 'outboundscan',
       component: OutboundScan
     }],
-    meta: { requiresAuth: false }
-  }
-  ,
+    meta: {
+      requiresAuth: true
+    }
+  },
   {
     path: '/management',
     name: '分拣任务',
@@ -107,6 +121,20 @@ export default [
       path: 'sort-job',
       component: SortJob
     }],
-    meta: { requiresAuth: false }
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/demo',
+    name: 'Demo',
+    component: UserHome,
+    children: [{
+      path: 'dashboard',
+      component: DemoDashboard
+    }],
+    meta: {
+      requiresAuth: true
+    }
   }
 ]

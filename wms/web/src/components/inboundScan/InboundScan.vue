@@ -41,7 +41,7 @@
 import OrdinaryParcel from "./OrdinaryParcel";
 import SpecialParcel from "./SpecialParcel";
 import SensitiveParcel from "./SensitiveParcel";
-import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
+import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
 import Snackbar from "@/components/common/Snackbar.vue";
 import Vue from "vue";
 

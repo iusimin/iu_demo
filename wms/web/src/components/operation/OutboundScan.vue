@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
+import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
 import Vue from "vue";
 
 export default {

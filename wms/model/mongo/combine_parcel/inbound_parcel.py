@@ -28,6 +28,19 @@ class CPInboundParcel(Document, MongoMixin):
         Combined = 50
         Cancelled = 200
 
+        _text_dict = {
+            Pending: "待处理",
+            Inbound: "已入库",
+            Sorted: "已分拣",
+            Seeded: "已播种",
+            Combined: "已合并",
+            Cancelled: "已取消"
+        }
+
+        @classmethod
+        def get_text(cls, status):
+            return cls._text_dict[status]
+
     class ParcelType(PyEnumMixin):
         Ordinary = 0
         Special = 1

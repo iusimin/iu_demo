@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import ParcelScanType from "@/mixins/ParcelScanType.vue";
+import ParcelScanType from "@/components/mixins/ParcelScanType.vue";
 export default {
   props: ["round_id", "job_id"],
   data: () => ({

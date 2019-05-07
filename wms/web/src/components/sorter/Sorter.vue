@@ -30,7 +30,7 @@
 
 <script>
 import SortStep from "@/components/sorter/SortStep.vue";
-import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
+import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
 import ActiveSortJob from "@/components/sorter/ActiveSortJob.vue";
 import Vue from "vue";
 

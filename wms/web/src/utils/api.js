@@ -69,11 +69,14 @@ export default {
     checkLogin: function () {
         return this.call("get", "login", null, null);
     },
-    getOperatorWarehouse: function() {
+    getOperatorWarehouse: function () {
         return this.call("get", "operator-warehouse", null, null);
     },
-    updateOperatorWarehouseSetting: function(warehouse_id, setting) {
-        return this.call("put", "operator-warehouse", null, {warehouse_id: warehouse_id, ...setting});
+    updateOperatorWarehouseSetting: function (warehouse_id, setting) {
+        return this.call("put", "operator-warehouse", null, {
+            warehouse_id: warehouse_id,
+            ...setting
+        });
     },
     inboundParcel: function (tracking_id, parcel) {
         return this.call("put", "inbound-parcel/" + tracking_id + "/inbound", null, parcel);
@@ -84,8 +87,7 @@ export default {
     getParcelSortInfo: function (tracking_id, job_id, round_id) {
         return this.call(
             "get",
-            "sort-info",
-            {
+            "sort-info", {
                 tracking_id: tracking_id,
                 job_id: job_id,
                 round_id: round_id
@@ -96,8 +98,7 @@ export default {
     getSeedCabinet: function (tracking_id, job_id) {
         return this.call(
             "get",
-            "seed-pool",
-            {
+            "seed-pool", {
                 tracking_id: tracking_id,
                 job_id: job_id
             },
@@ -117,8 +118,7 @@ export default {
         return this.call(
             "post",
             "sort-job",
-            null,
-            {
+            null, {
                 job_type: job_type
             }
         );
@@ -126,8 +126,7 @@ export default {
     getSortJobDetail: function (job_id) {
         return this.call(
             "get",
-            "sort-job",
-            {
+            "sort-job", {
                 job_id: job_id
             },
             null
@@ -137,8 +136,7 @@ export default {
         return this.call(
             "put",
             "sort-job",
-            null,
-            {
+            null, {
                 job_id: job_id,
                 action: "Cancel"
             }
@@ -147,7 +145,28 @@ export default {
     getActiveSortJob: function () {
         return this.call("get", "active-sort-job", null, null);
     },
-    submitDirectShip: function(tracking_id, parcel) {
+    submitDirectShip: function (tracking_id, parcel) {
         return this.call("put", "inbound-parcel/" + tracking_id + "/directship", null, parcel);
+    },
+
+    //For demo only.
+    demoCancelAllParcels: function () {
+        return this.call("post", "demo:cancel_all_parcels", null, {});
+    },
+    demoCreateInboundParcels: function (count) {
+        return this.call("post", "demo:create_parcels", null, {
+            count: count
+        });
+    },
+    demoInboundAllParcels: function () {
+        return this.call("post", "demo:inbound_all_parcels", null, {});
+    },
+    demoSetReadyToShip: function () {
+        return this.call("post", "demo:set_ready_to_ship", null, {});
+    },
+    demoGetUncancelledParcels: function (pagination) {
+        return this.call("post", "demo/uncancelled-parcels", null, {
+            pagination: pagination
+        });
     }
 };

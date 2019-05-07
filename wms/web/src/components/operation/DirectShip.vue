@@ -37,8 +37,8 @@
 </template>
 
 <script>
-import ParcelScanListener from "@/mixins/ParcelScanListener.vue";
-import ParcelScanType from "@/mixins/ParcelScanType.vue";
+import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
+import ParcelScanType from "@/components/mixins/ParcelScanType.vue";
 import Snackbar from "@/components/common/Snackbar.vue";
 import ActiveSortJob from "@/components/sorter/ActiveSortJob.vue";
 import { printPDF } from "@/utils/print.js";

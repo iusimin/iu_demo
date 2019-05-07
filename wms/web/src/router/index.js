@@ -58,17 +58,18 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    api.checkLogin(
-      resp => {
+    api.checkLogin()
+      .then(resp => {
         next();
-      },
-      resp => {
+      })
+      .catch(resp => {
         next({
           path: '/login',
-          query: { redirect: to.fullPath }
+          query: {
+            redirect: to.fullPath
+          }
         });
-      }
-    );
+      });
   } else {
     next() // make sure to always call next()!
   }
