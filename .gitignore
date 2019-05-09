@@ -59,3 +59,8 @@ local.properties
 # For npm dist
 dist/
 node_modules/
+
+# For pipenv
+.env
+Pipfile
+Pipfile.lock
