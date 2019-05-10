@@ -50,6 +50,7 @@ class CPInboundParcel(Document, MongoMixin):
         'indexes': [
             {'keys': 'tracking_id:1', 'unique': True},
             {'keys': 'warehouse_id:1,status:1,ready_to_ship:1,combine_id:1'},
+            {'keys': 'outbound_logistics_order_id:1'},
             {'keys': 'timeline.created:1'},
             {'keys': 'timeline.inbound:1'},
             {'keys': 'created_datetime:1'}

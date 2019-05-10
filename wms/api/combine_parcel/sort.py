@@ -7,15 +7,9 @@ from cl.backend.api import BaseApiResource
 from cl.utils import password
 from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
-from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
-    SortJobAccessor
-from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
-    InboundParcelUtil
 from wms.lib.combine_parcel.utilities.sort_job_util import SortJobUtil
 from wms.lib.exception.exception import InvalidOperationException
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
-from wms.model.mongo.user import User
-from wms.model.redis_keys.session import Session
 
 
 class SortParcel(BaseApiResource):

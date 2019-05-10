@@ -55,6 +55,16 @@ class CPInboundParcelAccessor(AccessorBase):
             "ready_to_ship": False
         })
 
+    @classmethod
+    def by_tracking_ids(cls, tracking_ids):
+        return CPInboundParcel.by_tracking_ids(tracking_ids)
+
+    @classmethod
+    def by_outbound_logistics_order_id(cls, outbound_logistics_order_id):
+        return CPInboundParcel.find({
+            "outbound_logistics_order_id": outbound_logistics_order_id
+        })
+
     @StatusChecker([CPInboundParcel.Status.Pending, CPInboundParcel.Status.Inbound, CPInboundParcel.Status.Sorted, CPInboundParcel.Status.Combined])
     def inbound(self, parcel_type, weight, has_battery, has_liquid, has_sensitive, sensitive_reason):
         self.inbound_parcel.parcel_type = parcel_type

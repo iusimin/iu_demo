@@ -11,10 +11,6 @@ from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 
 
-class CPSortGroupId(EmbeddedDocument):
-    seq_id = IntField(required=True)
-
-
 class CPSortPool(Document, MongoMixin):
     class SortType(PyEnumMixin):
         Combined = 0
@@ -92,6 +88,13 @@ class CPSortPool(Document, MongoMixin):
         return cls.find_one({
             "job_id": job_id,
             "tracking_id": tracking_id
+        })
+
+    @classmethod
+    def by_tracking_ids(cls, job_id, tracking_ids):
+        return cls.find_one({
+            "job_id": job_id,
+            "tracking_id": {"$in": tracking_ids}
         })
 
     @property

@@ -2,3 +2,6 @@
 
 class InvalidOperationException(Exception):
     pass
+
+class ValidationFailedException(Exception):
+    pass

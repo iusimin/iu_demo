@@ -13,6 +13,9 @@ from wms.model.mongo.combine_parcel.operation_record import CPOperationRecord
 class LogisticsOrderTimeline(EmbeddedDocument, MongoMixin):
     created = DateTimeField()
 
+    def to_dict(self):
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+
 
 class LogisticsOrder(Document, MongoMixin):
     class Status(PyEnumMixin):

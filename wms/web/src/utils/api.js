@@ -79,7 +79,7 @@ export default {
         });
     },
     inboundParcel: function (tracking_id, parcel) {
-        return this.call("put", "inbound-parcel/" + tracking_id + "/inbound", null, parcel);
+        return this.call("put", "inbound-parcel/" + tracking_id + ":inbound", null, parcel);
     },
     getInboundParcelDetail: function (tracking_id) {
         return this.call("get", "inbound-parcel/" + tracking_id, null, null);
@@ -146,7 +146,7 @@ export default {
         return this.call("get", "active-sort-job", null, null);
     },
     submitDirectShip: function (tracking_id, parcel) {
-        return this.call("put", "inbound-parcel/" + tracking_id + "/directship", null, parcel);
+        return this.call("put", "inbound-parcel/" + tracking_id + ":directship", null, parcel);
     },
 
     //For demo only.

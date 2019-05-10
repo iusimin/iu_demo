@@ -11,51 +11,42 @@ from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
 from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
     InboundParcelUtil
-from wms.lib.exception.exception import InvalidOperationException
+from wms.lib.exception.exception import (InvalidOperationException,
+                                         ValidationFailedException)
 from wms.model.mongo.user import User
 from wms.model.redis_keys.session import Session
 
 
 class InboundParcelResource(BaseApiResource):
-    class Action(PyEnumMixin):
-        inbound = "inbound"
-        directship = "directship"
+    def on_get(self, req, resp, tracking_id):
+        try:
+            detail = InboundParcelUtil.get_inbound_parcel_detail(tracking_id)
+        except ValueError:
+            raise falcon.HTTPNotFound(description="包裹不存在！")
 
-    def __init__(self, *args, **kwargs):
-        self._action_map = {
-            InboundParcelResource.Action.inbound: self.inbound_parcel,
-            InboundParcelResource.Action.directship: self.directship
+        resp.media = {
+            "parcel_detail": detail
         }
-        super(InboundParcelResource, self).__init__(*args, **kwargs)
 
     @falcon.before(login_required)
-    #@falcon.before(JsonSchema('''
-    #type: object
-    #properties:
-    #  parcel_type: { type: number }
-    #  weight: { type: number }
-    #  has_battery: { type: boolean }
-    #  has_liquid: { type: boolean }
-    #  has_sensitive: { type: boolean }
-    #required: [parcel_type, weight]
-    #'''))
-    def on_put(self, req, resp, tracking_id, action):
-        action_func = self._action_map.get(action)
-        if not action_func:
-            raise falcon.HTTPBadRequest("非法操作！")
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      parcel_type: { type: number }
+      weight: { type: number }
+      has_battery: { type: boolean }
+      has_liquid: { type: boolean }
+    required: [parcel_type, weight]
+    '''))
+    def on_inbound(self, req, resp, tracking_id):
+        user = req.context['session'].user
 
-        session = req.context['session']
-        user = session.user
-        action_func(req, resp, user, tracking_id)
+        parcel_type = req.media["parcel_type"]
+        weight = req.media["weight"]
 
-    def inbound_parcel(self, req, resp, user, tracking_id):
-        params = req.media
-        parcel_type = params["parcel_type"]
-        weight = params["weight"]
-
-        has_battery = params.get("has_battery", False)
-        has_liquid = params.get("has_liquid", False)
-        sensitive_reason = params.get("sensitive_reason")
+        has_battery = req.media.get("has_battery", False)
+        has_liquid = req.media.get("has_liquid", False)
+        sensitive_reason = req.media.get("sensitive_reason")
 
         try:
             InboundParcelUtil.inbound_parcel(
@@ -66,32 +57,56 @@ class InboundParcelResource(BaseApiResource):
                 has_liquid=has_liquid,
                 has_sensitive=bool(sensitive_reason),
                 sensitive_reason=sensitive_reason,
-                user_id=str(user.id),
-                operator=user.username
+                user=user
             )
         except ValueError:
             raise falcon.HTTPNotFound(description="物流订单不存在！")
         except InvalidOperationException:
             raise falcon.HTTPBadRequest(description="非法操作!")
 
-    def directship(self, req, resp, user, tracking_id):
-        params = req.media
-        job_id = params["job_id"]
-        weight = params["weight"]
+    @falcon.before(login_required)
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      job_id: { type: string }
+      weight: { type: number }
+    required: [job_id, weight]
+    '''))
+    def on_directship(self, req, resp, tracking_id):
+        user = req.context['session'].user
+
+        job_id = req.media["job_id"]
+        weight = req.media["weight"]
         try:
-            logistics_order = InboundParcelUtil.directship_parcel(job_id, tracking_id, weight)
+            logistics_order = InboundParcelUtil.directship_parcel(job_id, tracking_id, weight, user)
             resp.media = {
                 "logistics_order": logistics_order.to_dict()
             }
         except InvalidOperationException as ex:
             raise falcon.HTTPBadRequest(description=str(ex))
 
-    def on_get(self, req, resp, tracking_id):
-        try:
-            detail = InboundParcelUtil.get_inbound_parcel_detail(tracking_id)
-        except ValueError:
-            raise falcon.HTTPNotFound(description="包裹不存在！")
+    @falcon.before(login_required)
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      job_id: { type: string }
+      weight: { type: number }
+      tracking_ids: { type: array }
+    required: [job_id, weight, tracking_ids]
+    '''))
+    def on_combine(self, req, resp):
+        user = req.context['session'].user
 
-        resp.media = {
-            "parcel_detail": detail
-        }
+        job_id = req.media["job_id"]
+        weight = req.media["weight"]
+        tracking_ids = req.media["tracking_ids"]
+
+        try:
+            logistics_order = InboundParcelUtil.combine_parcels(job_id, tracking_ids, weight, user)
+            resp.media = {
+                "logistics_order": logistics_order.to_dict()
+            }
+        except ValidationFailedException as ex:
+            raise falcon.HTTPBadRequest(description=str(ex))
+        except InvalidOperationException as ex:
+            raise falcon.HTTPBadRequest(description=str(ex))
