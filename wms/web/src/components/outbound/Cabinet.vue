@@ -52,6 +52,12 @@ export default {
         lattice.reset_color();
       });
       lattice.add_parcel(parcel);
+    },
+    combine_scanned_parcel: function(parcel) {
+      var vm = this;
+      var lattice_id = parcel.lattice_id;
+      var lattice = vm.$refs.Lattices[lattice_id - 1];
+      lattice.combine_scanned_parcel(parcel);
     }
   }
 };

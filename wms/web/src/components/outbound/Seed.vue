@@ -45,15 +45,6 @@
           <v-card-text>
             <v-layout>
               <v-flex md6>
-                <!-- <v-card>
-                <div>
-                  <span>未上架</span>
-                  <span>({{ pending_table.data.length }})</span>
-                  <v-chip class="text-xs-right" color="indigo" text-color="white">
-                    {{ pending_table.data.length }}
-                  </v-chip>
-                </div>
-                </v-card>-->
                 <v-data-table
                   :headers="pending_table.headers"
                   :items="pending_table.data"
@@ -67,15 +58,6 @@
                 </v-data-table>
               </v-flex>
               <v-flex md6>
-                <!-- <v-card>
-                <div>
-                  <span>已上架</span>
-                  <span>({{ seeded_table.data.length }})</span>
-                  <v-chip class="text-xs-right" color="indigo" text-color="white">
-                    {{ seeded_table.data.length }}
-                  </v-chip>
-                </div>
-                </v-card>-->
                 <v-data-table
                   :headers="seeded_table.headers"
                   :items="seeded_table.data"

@@ -19,7 +19,9 @@ export default {
     card_style: {
       "background-color": "#B39DDB"
     },
-    seeded_count: 0
+    seeded_count: 0,
+    mode: 0, //0 for seed, 1 for combine
+    combine_scanned_parcels: {}
   }),
   props: [],
   components: {},
@@ -73,6 +75,14 @@ export default {
         }
       }
       vm.seeded_count = seeded_count;
+    },
+
+    //Combine parcels
+    combine_scanned_parcel: function(parcel) {
+      var vm = this;
+      if (parcel) {
+        vm.combine_scanned_parcels[parcel.tracking_id] = parcel;
+      }
     }
   }
 };
