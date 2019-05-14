@@ -7,11 +7,7 @@ export default {
   info: '#00d3ee',
   success: '#5cb860',
   warning: '#ffa21a',
-  combine_parcel: {
-    cabinet: {
-      pending: '#B39DDB',
-      processing: '#1E88E5',
-      complete: '#2E7D32'
-    }
-  }
+  cabinetPending: '#B39DDB',
+  cabinetProcessing: '#1E88E5',
+  cabinetComplete: '#2E7D32'
 }

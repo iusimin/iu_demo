@@ -12,20 +12,21 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   data: () => ({
     lattice_info: null,
     seeded_parcels: {},
     card_style: {
-      "background-color": "#B39DDB"
+      "background-color": "primary"
     },
     seeded_count: 0,
-    mode: 0, //0 for seed, 1 for combine
     combine_scanned_parcels: {}
   }),
   props: [],
   components: {},
   computed: {
+    ...mapState(['seed_mode']),
     progress: function() {
       var vm = this;
       var res = "";
@@ -78,6 +79,9 @@ export default {
     },
 
     //Combine parcels
+    enter_combine_mode: function() {
+      var vm = this;
+    },
     combine_scanned_parcel: function(parcel) {
       var vm = this;
       if (parcel) {

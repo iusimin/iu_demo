@@ -4,6 +4,7 @@ const ActionNames = {
 }
 
 const MutationNames = {
+    SET_SEED_MODE: "setSeedMode",
     SET_OPERATOR_WAREHOUSE: "setOperatorWarehouse"
 }
 
