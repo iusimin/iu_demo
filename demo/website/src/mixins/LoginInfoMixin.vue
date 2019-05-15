@@ -35,22 +35,29 @@ export default {
   methods: {
     ...mapMutations('login', ['setUsername', 'setPermissions', 'setUserId']),
     updateLoginStatus () {
-      axios.get(
-        '/api/login',
-        {}
-      ).then(
-        response => {
-          var data = response.data
-          login.updateLoginStatus(data)
-          login.setLoginExpire()
-        }
-      ).catch(error => { // Login failed
-        if (error.response.status === 401) {
-          login.updateLoginStatus({
-            user_id: null,
-            username: null,
-            permissions: []
-          })
+      api.checkLogin().then(resp => {
+        auth.updateLoginStatus(resp)
+        if (resp.is_guest) {
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          });
+        } else {
+          if (to.matched.some(record => record.meta.requirePermission)) {
+            var has_permission = auth.hasPermission(resp, to.fullPath)
+            if (!has_permission) {
+              // TODO - error page
+              alert('403 forbiddened!')
+            } else {
+              next({
+                query: { loginData: resp }
+              });
+            }
+          } else {
+            next({
+              query: { loginData: resp }
+            });
+          }
         }
       })
     }

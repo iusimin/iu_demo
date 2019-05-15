@@ -9,13 +9,16 @@ from demo.hooks.auth import login_required, permission_required
 from cl.backend.hooks.validation import JsonSchema
 
 class UserLoginApi(BaseApiResource):
-    @falcon.before(login_required)
     def on_get(self, req, resp):
         session = req.context['session']
-        permissions = session.user.get_permissions()
+        permissions = session.permissions
+        if session.user:
+            username = session.user.username
+        else:
+            username = 'Guest'
         resp.media = {
-            'user_id': str(session.user.id),
-            'username': str(session.user.username),
+            'user_id': str(session.user_id),
+            'username': username,
             'permissions': [
                 p.to_json_dict() for p in permissions
             ],

@@ -143,6 +143,10 @@ export default {
       }
     }
   },
+  mounted() {
+    console.log(this.loginUserId)
+    console.log(this.loginIsGuest)
+  },
   methods: {
     mongoSleep () {
       if (!this.$refs.form.validate()) {

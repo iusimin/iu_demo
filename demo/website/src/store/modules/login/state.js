@@ -2,5 +2,5 @@ export default {
   user_id: null,
   username: null,
   permissions: [],
-  expire: null
+  is_guest: true
 }

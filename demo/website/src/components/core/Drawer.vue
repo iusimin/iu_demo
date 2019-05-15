@@ -43,8 +43,7 @@
           />
         </v-list-tile>
         <v-list-tile
-          v-for="(link, i) in links"
-          v-if="link.visible"
+          v-for="(link, i) in visiableLinks"
           :key="i"
           :to="link.to"
           :active-class="color"
@@ -82,7 +81,9 @@ import {
   mapMutations,
   mapState
 } from 'vuex'
-import Base from '../mixins/Base.vue'
+
+import Base from '@/mixins/Base.vue'
+import rbac from '@/utils/rbac'
 
 export default {
   mixins: [Base],
@@ -99,24 +100,19 @@ export default {
         to: '/demo',
         icon: 'mdi-view-dashboard',
         text: 'Demo',
-        login_display: true,
-        visible: false
+        visible: true
       },
       {
-        to: '/users',
+        to: '/rbac/users',
         icon: 'mdi-view-dashboard',
         text: 'Manage User',
-        login_display: true,
-        permission_display: '/api/users',
-        visible: false
+        visible: true
       },
       {
-        to: '/roles',
+        to: '/rbac/roles',
         icon: 'mdi-view-dashboard',
         text: 'Manage Role & Permission',
-        login_display: true,
-        permission_display: '/api/roles',
-        visible: false
+        visible: true
       }
     ],
     responsive: false
@@ -133,19 +129,18 @@ export default {
     },
     items () {
       return this.$t('Layout.View.items')
+    },
+    visiableLinks () {
+      return this.links.filter(l => l.visible)
     }
   },
   watch: {
-    loginPermissions: function (p) {
-      for (let i in this.links) {
-        var link = this.links[i]
-        this.links[i].visible = this.hasPermission(
-          link.login_display, link.permission_display
-        )
-      }
+    loginPermissions (p) {
+      this.renderLinks(p)
     }
   },
   mounted () {
+    this.renderLinks(this.loginPermissions)
     this.onResponsiveInverted()
     window.addEventListener('resize', this.onResponsiveInverted)
   },
@@ -161,23 +156,10 @@ export default {
         this.responsive = false
       }
     },
-    hasPermission (requireLogin, requirePermission) {
-      if (!requireLogin && !requirePermission) {
-        return true
+    renderLinks (p) {
+      for (let link of this.links) {
+        link.visible = rbac.canAccessPage(link.to, this.$router)
       }
-      if (!requirePermission && requireLogin && this.loginUserId) {
-        return true
-      }
-      if (requirePermission) {
-        for (let i in this.loginPermissions) {
-          var permission = this.loginPermissions[i]
-          var regex = new RegExp(permission.resource)
-          if (regex.test(requirePermission)) {
-            return permission.allow
-          }
-        }
-      }
-      return false
     }
   }
 }

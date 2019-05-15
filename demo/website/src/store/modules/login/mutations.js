@@ -1,8 +1,8 @@
 import {set} from '@/utils/vuex'
 
 export default {
-  setUsername: set('username'),
   setUserId: set('user_id'),
-  setPermissions: set('permissions'),
-  setExpire: set('expire')
+  setUsername: set('username'),
+  setIsGuest: set('is_guest'),
+  setPermissions: set('permissions')
 }

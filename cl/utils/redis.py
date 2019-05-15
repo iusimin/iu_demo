@@ -29,6 +29,9 @@ class BaseRedisKey(object):
         else:
             source = self.db
         return self.__container__(source, self.key)
+
+    def delete(self):
+        self.conn.delete(self.key)
     
     def ttl(self):
         if self.__container__ is None:

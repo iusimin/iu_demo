@@ -1,12 +1,6 @@
 <template>
   <v-app>
-    <core-filter />
-
-    <core-toolbar />
-
-    <core-drawer />
-
-    <core-view />
+    <router-view />
   </v-app>
 </template>
 

@@ -12,10 +12,10 @@
         md4
       >
         <material-card
-          v-if="!loginUsername"
           color="green"
           title="Sign In"
           text="Sign in your account"
+          v-if="loginIsGuest"
         >
           <v-form
             ref="form"
@@ -47,7 +47,7 @@
             >
               Sign In
             </v-btn>
-            <router-link to="/signup">
+            <router-link to="/login/signup">
               <v-btn
                 color="info"
               >
@@ -57,13 +57,12 @@
           </v-form>
         </material-card>
         <material-card
-          v-if="loginUsername"
+          v-if="!loginIsGuest"
           color="green"
           title="Change account"
           text="Change your login account"
         >
-          Hello, {{ loginUsername }}.
-          </br>
+          Hello, {{ loginUserId }}.
           <v-btn
             :disabled="signout_loading"
             color="warning"
@@ -79,7 +78,7 @@
 
 <script>
 import axios from 'axios'
-import Base from '@/components/mixins/Base.vue'
+import Base from '@/mixins/Base.vue'
 export default {
   mixins: [Base],
   data () {
@@ -99,6 +98,9 @@ export default {
       }
     }
   },
+  mounted() {
+    console.log(this.loginIsGuest)
+  },
   methods: {
     validate () {
       if (this.$refs.form.validate()) {
@@ -108,41 +110,33 @@ export default {
     signIn () {
       this.signin_loading = true
       this.error_msg = null
-      axios
-        .post(
-          '/api/login',
-          {
-            username: this.username,
-            password: this.password
-          }
-        )
-        .then(
-          response => {
-            var data = response.data
-            this.signin_loading = null
-            this.loginUserId = data.user_id
-            this.loginUsername = data.username
-            this.loginPermissions = data.permissions
-            if (this.$route.query.redirect) {
-              this.$router.push({
-                path: this.$route.query.redirect
-              })
-            } else {
-              this.$router.push({
-                path: '/'
-              })
-            }
-          }
-        )
-        .catch(error => {
-          this.signin_loading = null
-          var data = error.response.data
-          this.error_msg = data.title
-          if (data.description) {
-            this.error_msg += ' : ' + data.description
-          }
-          alert(this.error_msg)
-        })
+      axios.post(
+        '/api/login',
+        {
+          username: this.username,
+          password: this.password
+        }
+      ).then(resp => {
+        var data = resp.data
+        this.signin_loading = null
+        if (this.$route.query.redirect) {
+          this.$router.push({
+            path: this.$route.query.redirect
+          })
+        } else {
+          this.$router.push({
+            path: '/'
+          })
+        }
+      }).catch(error => {
+        this.signin_loading = null
+        var data = error.response.data
+        this.error_msg = data.title
+        if (data.description) {
+          this.error_msg += ' : ' + data.description
+        }
+        alert(this.error_msg)
+      })
     },
     signOut () {
       this.signout_loading = true

@@ -15,31 +15,36 @@ import Meta from 'vue-meta'
 // Routes
 import paths from './paths'
 
-// Stores
-import store from '@/store'
-
 import axios from 'axios'
-import login from '../utils/login'
-
-function route (path, view, name, meta) {
-  return {
-    name: name || view,
-    path,
-    component: (resovle) => import(
-      `@/views/${view}.vue`
-    ).then(resovle),
-    meta: meta
-  }
-}
+import login from '@/utils/login'
+import rbac from '@/utils/rbac'
 
 Vue.use(Router)
 
 // Create a new router
 const router = new Router({
   mode: 'history',
-  routes: paths.map(path => route(path.path, path.view, path.name, path.meta)).concat([
-    { path: '*', redirect: '/home' }
-  ]),
+  routes: paths.map(p => {
+    if (!p.children) {
+      return p
+    }
+    if (!p.children.some(p => p.path == '')) {
+      p.children = p.children.concat([{
+        path: '',
+        redirect: '/error/404'
+      }])
+    }
+    if (!p.children.some(p => p.path == '*')) {
+      p.children = p.children.concat([{
+        path: '*',
+        redirect: '/error/404'
+      }])
+    }
+    return p
+  }).concat([{
+    path: '*',
+    redirect: '/error/404'
+  }]),
   scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
@@ -53,46 +58,36 @@ const router = new Router({
 
 // Add login guard
 router.beforeEach((to, from, next) => {
-  // If login expired, check api and update
-  if (login.loginExpired()) {
-    axios.get(
-      '/api/login',
-      {}
-    ).then(
-      response => {
-        var data = response.data
-        login.updateLoginStatus(data)
-        login.setLoginExpire()
-        next()
-      }
-    ).catch(error => {
-      // Also cache logged failed status
-      login.setLoginExpire()
-      if (to.meta.loginRequired) {
-        // Redirect to sign in if require log in
-        next({
-          path: '/signin',
-          query: {
-            redirect: to.fullPath
-          }
-        })
-      } else {
-        next()
-      }
-    })
-  } else {
-    // Check cached result
-    if (!to.meta.loginRequired || login.hasLoggedIn()) {
-      next()
-    } else {
+  axios.get(
+    '/api/login',
+    {}
+  ).then(resp => {
+    var data = resp.data
+    console.log(data)
+    if (!rbac.checkPermissions(data.permissions, to.meta.permissionRequired)) {
       next({
-        path: '/signin',
+        path: '/error/401',
+        query: {
+          hint: 'You are not allowed to access this page.'
+        }
+      })
+    }
+    login.updateLoginStatus(data)
+    if (to.matched.some(record => record.meta.loginRequired) && data.is_guest) {
+      next({
+        path: '/login/signin',
         query: {
           redirect: to.fullPath
         }
       })
+    } else {
+      next()
     }
-  }
+  }).catch(error => {
+    next({
+      path: '/error/500'
+    })
+  })
 })
 
 Vue.use(Meta)

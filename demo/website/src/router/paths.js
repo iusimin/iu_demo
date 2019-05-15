@@ -3,82 +3,80 @@
  * for more information on routes, see the
  * official documentation https://router.vuejs.org/en/
  */
+
+import UserHome from '@/wrapper/UserHome.vue'
+import Empty from '@/wrapper/Empty.vue'
+
 export default [
+  {
+    path: '/',
+    redirect: '/home'
+  },
+  {
+    path: '/error/:code',
+    name: 'error',
+    component: Empty,
+    children: [{
+      path: '',
+      component: () => import('@/components/common/ErrorPage.vue')
+    }]
+  },
   {
     path: '/home',
     name: 'Home',
-    view: 'Home'
+    component: UserHome,
+    children: [{
+      path: '',
+      component: () => import('@/components/common/WelcomePage.vue')
+    }]
   },
   {
-    path: '/signin',
-    name: 'SignIn',
-    view: 'login/SignIn'
-  },
-  {
-    path: '/signup',
-    name: 'SignUp',
-    view: 'login/SignUp'
-  },
-  {
-    path: '/user-profile',
-    name: 'User Profile',
-    view: 'rbac/UserProfile',
-    meta: { loginRequired: true }
+    path: '/login',
+    name: 'Login',
+    component: Empty,
+    children: [{
+      path: 'signin',
+      component: () => import('@/components/login/SignIn.vue')
+    }, {
+      path: 'signup',
+        component: () => import('@/components/login/SignUp.vue')
+    }]
   },
   {
     path: '/demo',
     name: 'Demo',
-    view: 'demo/Demo',
-    meta: { loginRequired: true }
+    component: UserHome,
+    children: [{
+      path: '',
+      component: () => import('@/components/demo/Demo.vue'),
+      meta: {
+        loginRequired: true
+      }
+    }]
   },
   {
-    path: '/users',
-    name: 'Manage Users',
-    view: 'rbac/ManageUsers',
-    meta: { loginRequired: true }
-  },
-  {
-    path: '/roles',
-    name: 'Manage Roles',
-    view: 'rbac/ManageRoles',
-    meta: { loginRequired: true }
-  },
-  // Origin examples
-  {
-    path: '/typography',
-    view: 'Typography'
-  },
-  {
-    path: '/icons',
-    view: 'Icons'
-  },
-  {
-    path: '/maps',
-    view: 'Maps'
-  },
-  {
-    path: '/notifications',
-    view: 'Notifications',
-    meta: { loginRequired: true }
-  },
-  {
-    path: '/upgrade',
-    name: 'Upgrade to PRO',
-    view: 'Upgrade'
-  },
-  {
-    path: '/inbound-scan',
-    name: '扫描入库',
-    view: 'InboundScan/InboundScan'
-  },
-  {
-    path: '/sorter',
-    name: '分拣',
-    view: 'Sorter/Sorter'
-  },
-  {
-    path: '/outbound',
-    name: '播种合并',
-    view: 'Outbound/Outbound'
+    path: '/rbac',
+    name: 'RBAC',
+    component: UserHome,
+    children: [{
+      path: 'roles',
+      component: () => import('@/components/rbac/ManageRoles.vue'),
+      meta: {
+        loginRequired: true,
+        permissionRequired: [
+          {
+            'resource': '/api/roles/',
+            'actions': ['GET', 'POST', 'PUT', 'DELETE']
+          },
+          {
+            'resource': '/api/role/',
+            'actions': ['GET', 'POST', 'PUT', 'DELETE']
+          }
+        ]
+      }
+    }, {
+      path: 'users',
+        component: () => import('@/components/rbac/ManageUsers.vue'),
+    }]
   }
 ]

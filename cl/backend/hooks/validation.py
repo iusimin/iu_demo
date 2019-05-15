@@ -19,7 +19,7 @@ class JsonSchema(object):
                 'Invalid schema target'
             )
         self.target = target
-        self.title=title
+        self.title = title
     
     def __call__(self, req, resp, resource, params):
         if self.target == 'params':
@@ -51,3 +51,118 @@ class UrlParamsSchema(JsonSchema):
             target='params',
             title='URL param failed validation'
         )
+
+class QuerySchema(JsonSchema):
+    ALL_OPS = [ '$lt', '$gt', '$ne', '$lte', '$gte', '$exists']
+    ALL_COMBINES = [ '$and', '$or' ]
+    DEFAULT_MAX_LIMIT = 100
+    
+    def __init__(self, schema=None, allowed_ops=ALL_OPS,
+            allowed_combines=ALL_COMBINES, max_limit=DEFAULT_MAX_LIMIT,
+            target='content', title='Request data failed validation'):
+        schema = yaml.safe_load(schema)
+        tdef_dict = {}
+        try:
+            assert schema.get('type') == 'object'
+            assert isinstance(schema.get('properties'), dict)
+            # query_ops + query_items
+            item_props = {}
+            for fname, fdef in schema.get('properties').items():
+                assert len(fdef) == 1 and 'type' in fdef
+                ftype = fdef['type']
+                tdef_key = 'query_ops_%s' % ftype
+                item_props.update({
+                    fname: {
+                        'oneOf': [
+                            {'type': ftype},
+                            {'$ref': '#/definitions/%s' % tdef_key},
+                        ]
+                    }
+                })
+                op_props = {}
+                for op in allowed_ops:
+                    if op == '$exists':
+                        op_props.update({
+                            op: {
+                                'type': 'boolean'
+                            }
+                        })
+                    else:
+                        op_props.update({
+                            op: {
+                                'type': ftype
+                            }
+                        })
+                
+                tdef_dict.update({
+                    tdef_key: {
+                        'type': 'object',
+                        'properties': op_props,
+                        'additionalProperties': False,
+                    }
+                })
+            tdef_dict.update({
+                'query_items': {
+                    'type': 'object',
+                    'properties': item_props,
+                    'additionalProperties': False,
+                }
+            })
+            # query_combines
+            cb_props = {}
+            for cb in allowed_combines:
+                cb_props.update({
+                    cb: {
+                        'type': 'array',
+                        'items': {
+                            'oneOf': [
+                                {'$ref': "#/definitions/query_items"},
+                                {'$ref': "#/definitions/query_combines"},
+                            ]
+                        }
+                    }
+                })
+            tdef_dict.update({
+                'query_combines': {
+                    'type': 'object',
+                    'properties': cb_props,
+                    'additionalProperties': False,
+                }
+            })
+            # body
+            converted_schema = {}
+            body_properties = {
+                'query': {
+                    'oneOf': [
+                        {'$ref': '#/definitions/query_items'},
+                        {'$ref': '#/definitions/query_combines'},
+                    ]
+                },
+                'limit': {
+                    'type': 'integer',
+                    'minimum': 1,
+                    'maximum': max_limit,
+                },
+                'offset': {
+                    'type': 'integer',
+                    'minimum': 0,
+                },
+                'fields': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                }
+            }
+            converted_schema.update({
+                'definitions': tdef_dict,
+                'type': 'object',
+                'properties': body_properties,
+                'required': ['query'],
+                'additionalProperties': False,
+            })
+        except AssertionError:
+            raise falcon.HTTPInternalServerError(
+                'Bad JSON schema'
+            )
+        self.schema = converted_schema
+        self.target = target
+        self.title=title

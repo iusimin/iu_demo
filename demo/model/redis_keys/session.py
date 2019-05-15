@@ -1,18 +1,16 @@
-from demo.model.mongo.user import User
-import uuid
-import walrus as w
-from datetime import timedelta, datetime
-from cl.utils.cache import instance_cache
-from demo.model.mongo.user import User
-from cl.utils.redis import BaseRedisKey, redis_pipeline
 import pickle
-from bson import ObjectId
+import uuid
+from datetime import datetime, timedelta
+import walrus as w
+
+from cl.utils.redis import BaseRedisKey, redis_pipeline
+from demo.lib.cache import instance_cache
+from demo.model.mongo.user import User
 
 GUEST_PREFIX = 'G_'
 
 class Session(BaseRedisKey):
     __container__ = w.Hash
-    user = None
 
     @classmethod
     def options(cls):
@@ -37,15 +35,27 @@ class Session(BaseRedisKey):
         return self.container()
     
     @property
+    def user_id(self):
+        session_content = self.snapshot
+        if self.is_guest():
+            return session_content.get('user_id').decode('utf-8')
+        return str(self.user.id) if self.user else None
+
+    @property
+    def permissions(self):
+        session_content = self.snapshot
+        return self.user.get_permissions() if self.user else []
+
+    @property
     def user(self):
         session_content = self.snapshot
+        if self.is_guest():
+            return None
         if 'user_cache' not in session_content or \
                 int(session_content['user_expire']) < int(datetime.utcnow().strftime('%s')):
             user_expire = datetime.utcnow() + timedelta(seconds=self.options()['user_expire'])
             user_expire = user_expire.strftime('%s')
-            user = User.find_one({
-                'id': ObjectId(session_content['user_id'].decode('utf-8'))
-            })
+            user = User.by_id(session_content['user_id'].decode('utf-8'))
             self.container().update(
                 user_cache=pickle.dumps(user),
                 user_expire=user_expire,
@@ -54,15 +64,6 @@ class Session(BaseRedisKey):
             return user
         else:
             return pickle.loads(session_content['user_cache'])
-    
-    @property
-    def permissions(self):
-        session_content = self.snapshot
-        if 'user_permissions' not in session_content or \
-                int(session_content['user_expire']) < int(datetime.utcnow().strftime('%s')):
-            return self.user.get_permissions()
-        else:
-            return pickle.loads(session_content['user_permissions'])
 
     def expire_user(self):
         self.container().update(
@@ -87,5 +88,4 @@ class Session(BaseRedisKey):
             session_hash.expire(ttl)
 
     def logout(self):
-        session_hash = self.container()
-        del session_hash
+        self.delete()
