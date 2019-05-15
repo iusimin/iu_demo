@@ -9,6 +9,8 @@
 </template>
 
 <script>
+//TODO antony: refactor later.
+import { mapState } from "vuex";
 import Lattice from "./Lattice";
 export default {
   data: () => ({
@@ -18,7 +20,9 @@ export default {
   components: {
     Lattice
   },
-  computed: {},
+  computed: {
+    ...mapState(["seed_mode"])
+  },
   methods: {
     reset: function(parcels_by_combine_id) {
       var vm = this;
@@ -46,18 +50,38 @@ export default {
     },
     seed_parcel: function(parcel) {
       var vm = this;
-      var lattice_id = parcel.lattice_id;
-      var lattice = vm.$refs.Lattices[lattice_id - 1];
       vm.$refs.Lattices.forEach(function(lattice) {
         lattice.reset_color();
       });
-      lattice.add_parcel(parcel);
-    },
-    combine_scanned_parcel: function(parcel) {
-      var vm = this;
       var lattice_id = parcel.lattice_id;
       var lattice = vm.$refs.Lattices[lattice_id - 1];
-      lattice.combine_scanned_parcel(parcel);
+      lattice.add_parcel(parcel);
+    },
+    combineScannedParcel: function(parcel) {
+      var vm = this;
+      vm.$refs.Lattices.forEach(function(lattice) {
+        lattice.resetCombineColor();
+      });
+      var lattice_id = parcel.lattice_id;
+      var lattice = vm.$refs.Lattices[lattice_id - 1];
+      lattice.combineScannedParcel(parcel);
+    }
+  },
+  watch: {
+    seed_mode: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        if (oldValue == 0 && newValue == 1) {
+          vm.$refs.Lattices.forEach(function(lattice) {
+            lattice.enterCombineMode();
+          });
+        }
+        if (oldValue == 1 && newValue == 0) {
+          vm.$refs.Lattices.forEach(function(lattice) {
+            lattice.enterSeedMode();
+          });
+        }
+      }
     }
   }
 };

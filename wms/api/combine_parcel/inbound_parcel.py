@@ -85,6 +85,8 @@ class InboundParcelResource(BaseApiResource):
         except InvalidOperationException as ex:
             raise falcon.HTTPBadRequest(description=str(ex))
 
+
+class InboundParcelCombineResource(BaseApiResource):
     @falcon.before(login_required)
     @falcon.before(JsonSchema('''
     type: object
@@ -103,6 +105,9 @@ class InboundParcelResource(BaseApiResource):
 
         try:
             logistics_order = InboundParcelUtil.combine_parcels(job_id, tracking_ids, weight, user)
+            # Fake, For testing
+            from wms.model.mongo.logistics.logistics_order import LogisticsOrder
+            logistics_order = LogisticsOrder.by_id("5cc08900e48ab70040272e98")
             resp.media = {
                 "logistics_order": logistics_order.to_dict()
             }

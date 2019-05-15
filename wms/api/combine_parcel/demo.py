@@ -14,6 +14,7 @@ from wms.hooks.auth import login_required, permission_required
 from wms.hooks.validation import JsonSchema
 from wms.lib.combine_parcel.utilities.inbound_parcel_util import \
     InboundParcelUtil
+from wms.lib.combine_parcel.utilities.sort_job_util import SortJobUtil
 from wms.lib.exception.exception import InvalidOperationException
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
 
@@ -37,11 +38,26 @@ class Demo(BaseApiResource):
 
     @falcon.before(login_required)
     def on_inbound_all_parcels(self, req, resp):
-        DemoUtility.inbound_all_parcels()
+        user = req.context['session'].user
+        DemoUtility.inbound_all_parcels(user)
 
     @falcon.before(login_required)
     def on_set_ready_to_ship(self, req, resp):
         DemoUtility.set_ready_to_ship()
+
+    @falcon.before(login_required)
+    @falcon.before(JsonSchema('''
+    type: object
+    properties:
+      job_id: { type: string }
+    required: [job_id]
+    '''))
+    def on_run_sort_job(self, req, resp):
+        job_id = req.media["job_id"]
+        try:
+            DemoUtility.run_sort_job(job_id)
+        except InvalidOperationException as ex:
+            raise falcon.HTTPBadRequest(description=str(ex))
 
 
 class DemoUnCancelledParcels(CollectionResource):
@@ -93,7 +109,7 @@ class DemoUtility(object):
             )
 
     @classmethod
-    def inbound_all_parcels(cls):
+    def inbound_all_parcels(cls, user):
         inbound_parcels = CPInboundParcel.find(
             {
                 "status": CPInboundParcel.Status.Pending
@@ -108,7 +124,8 @@ class DemoUtility(object):
                 has_battery=False,
                 has_liquid=False,
                 has_sensitive=False,
-                sensitive_reason=None
+                sensitive_reason=None,
+                user=user
             )
 
     @classmethod
@@ -122,3 +139,7 @@ class DemoUtility(object):
                 "updated_datetime": datetime.utcnow()
             }
         })
+
+    @classmethod
+    def run_sort_job(cls, job_id):
+        SortJobUtil.allocate_cabinet_for_parcels(job_id)

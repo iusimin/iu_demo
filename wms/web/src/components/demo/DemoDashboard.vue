@@ -1,5 +1,6 @@
 <template>
   <div>
+    <active-sort-job v-model="active_job_id"></active-sort-job>
     <v-container fluid grid-list-md>
       <snackbar ref="Snackbar"></snackbar>
       <v-layout row wrap>
@@ -24,6 +25,9 @@
         </v-flex>
         <v-flex md2>
           <v-btn color="warning" @click="getActiveParcels">刷新包裹列表</v-btn>
+        </v-flex>
+        <v-flex md2>
+          <v-btn color="accent" @click="runSortJob">跑分拣任务</v-btn>
         </v-flex>
         <v-flex md12>
           <v-data-table
@@ -54,8 +58,10 @@
 
 <script>
 import Snackbar from "@/components/common/Snackbar.vue";
+import ActiveSortJob from "@/components/sorter/ActiveSortJob.vue";
 export default {
   data: () => ({
+    active_job_id: null,
     parcel_count: 20,
     active_parcels: {
       headers: [
@@ -75,7 +81,8 @@ export default {
     }
   }),
   components: {
-    Snackbar
+    Snackbar,
+    ActiveSortJob
   },
   mounted: function() {
     var vm = this;
@@ -141,6 +148,17 @@ export default {
         })
         .catch(resp => {
           alert("0");
+        });
+    },
+    runSortJob: function() {
+      var vm = this;
+      vm.api
+        .demoRunSortJob(vm.active_job_id)
+        .then(resp => {
+          alert("Success");
+        })
+        .catch(resp => {
+          alert(resp.description);
         });
     }
   }

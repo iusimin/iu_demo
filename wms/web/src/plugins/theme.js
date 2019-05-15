@@ -9,5 +9,8 @@ export default {
   warning: '#ffa21a',
   cabinetPending: '#B39DDB',
   cabinetProcessing: '#1E88E5',
-  cabinetComplete: '#2E7D32'
+  cabinetSeedComplete: '#43A047',
+  cabinetHightlight: '#F50057',
+  cabinetCombineStart: '#7CB342',
+  cabinetCombineComplete: '#2E7D32',
 }

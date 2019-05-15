@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from wms.lib.accessor_base import AccessorBase
+from wms.lib.exception.exception import InvalidOperationException
 from wms.model.mongo.combine_parcel.combine_pool import CPSortPool
 from wms.model.mongo.combine_parcel.sort_job import CPSortJob
 
@@ -67,8 +68,13 @@ class SortJobAccessor(AccessorBase):
 
         return parcel_count
 
+    def check_eligible_to_run(self):
+        return self.sort_job.status < CPSortJob.Status.CalculationStarted
 
     def start_calculation(self):
+        if not self.check_eligible_to_run():
+            raise InvalidOperationException("该任务已运行！")
+
         self.sort_job.status = CPSortJob.Status.CalculationStarted
         self.sort_job.timeline.job_started = datetime.utcnow()
 

@@ -1,10 +1,12 @@
 <template>
   <v-container fluid>
+    <snackbar ref="Snackbar"></snackbar>
     <v-layout>
       <v-flex md3>
         <div>
           <a style="text-decoration: underline;color:#757575;" @click="toggle_manual">手动输入物流单号</a>
           <v-text-field
+            class="stop-propagation"
             v-if="manual_input"
             v-model="manual_tracking_id"
             @keyup.enter="manual_complete"
@@ -81,18 +83,46 @@
     <v-layout>
       <v-btn color="tertiary" @click="reset_cabinet">清空任务</v-btn>
     </v-layout>
+    <v-layout row justify-center>
+      <v-dialog v-model="show_weight_dialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">合并包裹重量</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field label="合并包裹重量" v-model="combined_weight" required></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click="submitCombinedWeight">提交</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
   </v-container>
 </template>
 
 <script>
+//TODO antony: refactor later.
+import { mapState } from "vuex";
 import Cabinet from "@/components/outbound/Cabinet";
 import { test_parcels } from "./test_seed_parcels.js";
+import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
+import Snackbar from "@/components/common/Snackbar.vue";
 
 export default {
   props: ["job_id"],
   components: {
-    Cabinet
+    Cabinet,
+    Snackbar
   },
+  mixins: [ParcelScanListener],
   data: () => ({
     pending_table: {
       headers: [
@@ -121,13 +151,20 @@ export default {
     manual_input: false,
     manual_tracking_id: null,
     cabinet_size: [8, 6],
-    target_parcels: []
+    target_parcels: [],
+    show_weight_dialog: false,
+    combined_weight: null
   }),
   mounted: function() {
     var vm = this;
     vm.reset_cabinet();
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].addEventListener("keyup", vm.stopInputPropagation);
+    }
   },
   computed: {
+    ...mapState(["seed_mode"]),
     all_parcels: function() {
       var vm = this;
       var res = [];
@@ -184,10 +221,19 @@ export default {
     }
   },
   methods: {
+    stopInputPropagation: function(e) {
+      e.stopPropagation();
+    },
     toggle_manual: function() {
       var vm = this;
       vm.manual_input = !vm.manual_input;
       vm.manual_tracking_id = null;
+      vm.$nextTick(function() {
+        var eles = document.getElementsByClassName("stop-propagation");
+        for (let i = 0; i < eles.length; i++) {
+          eles[i].addEventListener("keyup", vm.stopInputPropagation);
+        }
+      });
     },
     manual_complete: function() {
       var vm = this;
@@ -204,16 +250,21 @@ export default {
       vm.target_parcels.forEach(function(lattice) {
         lattice.forEach(function(ele) {
           ele.seeded = false;
+          ele.combine_scanned = false;
         });
       });
       vm.$refs.Cabinet.reset(vm.target_parcels);
     },
     tracking_id_updated: function() {
       var vm = this;
-      if (vm.target_parcels.length == 0) {
-        vm.init_target_parcels(vm.seed_tracking_id);
-      } else {
-        vm.seed_tracking_id();
+      if (vm.seed_mode == 0) {
+        if (vm.target_parcels.length == 0) {
+          vm.init_target_parcels(vm.seed_tracking_id);
+        } else {
+          vm.seed_tracking_id();
+        }
+      } else if (vm.seed_mode == 1) {
+        vm.combineScanParcel();
       }
     },
     seed_tracking_id: function() {
@@ -251,11 +302,60 @@ export default {
       vm.seeded_table.data = [];
       if (vm.current_lattice) {
         vm.pending_table.data = vm.current_lattice.filter(function(ele) {
-          return !ele.seeded;
+          return vm.seed_mode == 0 ? !ele.seeded : !ele.combine_scanned;
         });
         vm.seeded_table.data = vm.current_lattice.filter(function(ele) {
-          return ele.seeded;
+          return vm.seed_mode == 0 ? ele.seeded : ele.combine_scanned;
         });
+      }
+    },
+    combineScanParcel: function() {
+      var vm = this;
+      var current_parcel = vm.parcels_by_tracking_id[vm.current_tracking_id];
+      if (current_parcel) {
+        vm.$refs.Cabinet.combineScannedParcel(current_parcel);
+        current_parcel.combine_scanned = true;
+        vm.adjust_table();
+        vm.checkLatticeScanComplete(current_parcel);
+      }
+    },
+    checkLatticeScanComplete: function(parcel) {
+      var vm = this;
+      if (vm.current_lattice) {
+        var combine_scanned = vm.current_lattice.filter(function(ele) {
+          return ele.combine_scanned;
+        });
+        console.log(combine_scanned.length);
+        console.log(vm.current_lattice.length);
+        if (combine_scanned.length == vm.current_lattice.length) {
+          vm.combined_weight = null;
+          vm.show_weight_dialog = true;
+        }
+      }
+    },
+    submitCombinedWeight: function() {
+      var vm = this;
+      vm.show_weight_dialog = false;
+      if (vm.current_lattice) {
+        var combine_scanned_tracking_ids = vm.current_lattice
+          .filter(function(ele) {
+            return ele.combine_scanned;
+          })
+          .map(function(ele) {
+            return ele.tracking_id;
+          });
+        vm.api
+          .getCombinedLogisticsOrder(
+            vm.job_id,
+            parseFloat(vm.combined_weight),
+            combine_scanned_tracking_ids
+          )
+          .then(resp => {
+            alert("1");
+          })
+          .catch(resp => {
+            vm.$refs.Snackbar.showSnackbar("错误", resp.description, "error");
+          });
       }
     }
   },
@@ -266,6 +366,32 @@ export default {
         vm.tracking_id_updated();
       },
       deep: true
+    },
+    seed_mode: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        vm.current_tracking_id = null;
+      }
+    },
+    tracking_id: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        vm.current_tracking_id = newValue;
+      }
+    },
+    weight: {
+      handler: function(newValue, oldValue) {
+        var vm = this;
+        vm.combined_weight = newValue;
+        vm.submitCombinedWeight();
+      }
+    }
+  },
+  destroyed: function() {
+    var vm = this;
+    var eles = document.getElementsByClassName("stop-propagation");
+    for (let i = 0; i < eles.length; i++) {
+      eles[i].removeEventListener("keyup", vm.stopInputPropagation);
     }
   }
 };

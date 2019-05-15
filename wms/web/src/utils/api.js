@@ -148,6 +148,13 @@ export default {
     submitDirectShip: function (tracking_id, parcel) {
         return this.call("put", "inbound-parcel/" + tracking_id + ":directship", null, parcel);
     },
+    getCombinedLogisticsOrder: function(job_id, weight, tracking_ids) {
+        return this.call("post", "inbound-parcels:combine", null, {
+            job_id: job_id,
+            weight: weight,
+            tracking_ids: tracking_ids
+        });
+    },
 
     //For demo only.
     demoCancelAllParcels: function () {
@@ -167,6 +174,11 @@ export default {
     demoGetUncancelledParcels: function (pagination) {
         return this.call("post", "demo/uncancelled-parcels", null, {
             pagination: pagination
+        });
+    },
+    demoRunSortJob: function(job_id) {
+        return this.call("post", "demo:run_sort_job", null, {
+            job_id: job_id
         });
     }
 };

@@ -13,20 +13,41 @@
 
 <script>
 import { mapState } from 'vuex';
+import Vue from "vue";
+
 export default {
   data: () => ({
     lattice_info: null,
     seeded_parcels: {},
+    combine_scanned_parcels: {},
     card_style: {
       "background-color": "primary"
-    },
-    seeded_count: 0,
-    combine_scanned_parcels: {}
+    }
   }),
   props: [],
   components: {},
   computed: {
     ...mapState(['seed_mode']),
+    seeded_count: function() {
+      var vm = this;
+      var seeded_count = 0;
+      for (let k in vm.seeded_parcels) {
+        if (vm.seeded_parcels.hasOwnProperty(k)) {
+          seeded_count += 1;
+        }
+      }
+      return seeded_count;
+    },
+    combine_scanned_count: function() {
+      var vm = this;
+      var count = 0;
+      for (let k in vm.combine_scanned_parcels) {
+        if (vm.combine_scanned_parcels.hasOwnProperty(k)) {
+          count += 1;
+        }
+      }
+      return count;
+    },
     progress: function() {
       var vm = this;
       var res = "";
@@ -44,8 +65,7 @@ export default {
     add_parcel: function(parcel) {
       var vm = this;
       if (parcel) {
-        vm.seeded_parcels[parcel.tracking_id] = parcel;
-        vm.calculate_seeded_count();
+        Vue.set(vm.seeded_parcels, parcel.tracking_id, parcel);
       }
       vm.hightlight();
     },
@@ -53,12 +73,12 @@ export default {
       var vm = this;
       vm.lattice_info = lattice_info;
       vm.seeded_parcels = {};
-      vm.calculate_seeded_count();
+      //vm.calculate_seeded_count();
       vm.reset_color();
     },
     reset_color: function() {
       var vm = this;
-      vm.card_style["background-color"] = "#B39DDB"; // TODO: use color from theme
+      vm.card_style["background-color"] = "#B39DDB";
       if (vm.lattice_info && vm.seeded_count == vm.lattice_info.total_count) {
         vm.card_style["background-color"] = "#43A047";
       }
@@ -67,25 +87,38 @@ export default {
       var vm = this;
       vm.card_style["background-color"] = "#F50057";
     },
-    calculate_seeded_count: function() {
+
+    enterSeedMode: function() {
       var vm = this;
-      var seeded_count = 0;
-      for (let k in vm.seeded_parcels) {
-        if (vm.seeded_parcels.hasOwnProperty(k)) {
-          seeded_count += 1;
-        }
+      vm.seeded_parcels = {};
+      vm.combine_scanned_parcels = {};
+      vm.reset_color();
+    },
+    checkMode: function(expected_mode) {
+      var vm = this;
+      if (vm.seed_mode != expected_mode) {
+        return false;
       }
-      vm.seeded_count = seeded_count;
+      return true;
     },
 
     //Combine parcels
-    enter_combine_mode: function() {
+    enterCombineMode: function() {
       var vm = this;
+      vm.card_style["background-color"] = "#7CB342";
     },
-    combine_scanned_parcel: function(parcel) {
+    combineScannedParcel: function(parcel) {
       var vm = this;
       if (parcel) {
-        vm.combine_scanned_parcels[parcel.tracking_id] = parcel;
+        Vue.set(vm.combine_scanned_parcels, parcel.tracking_id, parcel);
+        vm.hightlight();
+      }
+    },
+    resetCombineColor: function() {
+      var vm = this;
+      vm.card_style["background-color"] = "#7CB342";
+      if (vm.lattice_info && vm.combine_scanned_count == vm.lattice_info.total_count) {
+        vm.card_style["background-color"] = "#2E7D32";
       }
     }
   }
