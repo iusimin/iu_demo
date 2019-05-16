@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import falcon
 from bson import ObjectId
 
+#import xhtml2pdf.pisa as pisa
 from cl.backend.api import BaseApiResource
 from cl.utils import password
 from cl.utils.py_enum import PyEnumMixin
@@ -143,3 +144,35 @@ class DemoUtility(object):
     @classmethod
     def run_sort_job(cls, job_id):
         SortJobUtil.allocate_cabinet_for_parcels(job_id)
+
+    #@classmethod
+    #def generate_tracking_label(cls, tracking_ids, output_file_name):
+    #    html_file = '''<!DOCTYPE html>
+    #        <html xmlns="http://www.w3.org/1999/xhtml">
+    #        <head>
+    #            <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    #            <meta charset="utf-8">
+    #            <style type="text/css">
+    #            @page {{ size: 10cm 6cm; }}
+    #            @font-face {{
+    #                font-family: 'wqynotothai';
+    #                src: url(/fonts/wqy_hacked.ttf);
+    #            }}
+    #            p {{
+    #                font-family: 'wqynotothai';
+    #            }}
+    #            </style>
+    #        </head>
+    #        <body>
+    #            {0}
+    #        </body>
+    #        </html>'''.format(
+    #            "<br />".join(['''<div style="width:100%;text-align:center;padding-top:10px;">
+    #                <pdf:barcode value="{0}" type="code128" align="middle"
+    #                    barwidth="0.85" barheight="40"/>
+    #                <p style="width:100%;text-align:center;font-size:20px;">{0}</p>
+    #            </div>''' for tracking_id in tracking_ids])
+    #        )
+
+    #    result_file = open(output_file_name, "w+b")
+    #    pisa.CreatePDF(html_file, dest=result_file)

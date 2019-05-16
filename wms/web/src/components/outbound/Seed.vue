@@ -77,7 +77,12 @@
         </v-card>
       </v-flex>
       <v-flex md9>
-        <cabinet ref="Cabinet" :parcels="null" :size_x="10" :size_y="5"></cabinet>
+        <cabinet
+          ref="Cabinet"
+          :parcels="null"
+          :size_x="cabinet_size.width"
+          :size_y="cabinet_size.height"
+        ></cabinet>
       </v-flex>
     </v-layout>
     <v-layout>
@@ -115,6 +120,7 @@ import Cabinet from "@/components/outbound/Cabinet";
 import { test_parcels } from "./test_seed_parcels.js";
 import ParcelScanListener from "@/components/mixins/ParcelScanListener.vue";
 import Snackbar from "@/components/common/Snackbar.vue";
+import { printPDF } from "@/utils/print.js";
 
 export default {
   props: ["job_id"],
@@ -150,18 +156,19 @@ export default {
     tracking_id_valid: true,
     manual_input: false,
     manual_tracking_id: null,
-    cabinet_size: [8, 6],
+    cabinet_size: {
+      // TODO antony: Initialized from warehouse setting
+      width: 0,
+      height: 0
+    },
     target_parcels: [],
     show_weight_dialog: false,
-    combined_weight: null
+    combined_weight: null,
+    logistics_order: null
   }),
   mounted: function() {
     var vm = this;
-    vm.reset_cabinet();
-    var eles = document.getElementsByClassName("stop-propagation");
-    for (let i = 0; i < eles.length; i++) {
-      eles[i].addEventListener("keyup", vm.stopInputPropagation);
-    }
+    vm.initWarehouseCabinetSize();
   },
   computed: {
     ...mapState(["seed_mode"]),
@@ -223,6 +230,15 @@ export default {
   methods: {
     stopInputPropagation: function(e) {
       e.stopPropagation();
+    },
+    initWarehouseCabinetSize: function() {
+      var vm = this;
+      vm.api.getOperatorWarehouse().then(resp => {
+        vm.cabinet_size = resp.warehouse.cabinet_size;
+        vm.$nextTick(function() {
+          vm.reset_cabinet();
+        });
+      });
     },
     toggle_manual: function() {
       var vm = this;
@@ -287,9 +303,12 @@ export default {
         vm.api
           .getSeedCabinet(vm.current_tracking_id, vm.job_id)
           .then(resp => {
+            vm.cabinet_size = resp.job.warehouse_seed_cabinet_size;
             vm.target_parcels = resp.parcels;
-            vm.init_cabinet();
-            vm.$nextTick(cb);
+            vm.$nextTick(function() {
+              vm.init_cabinet();
+              vm.$nextTick(cb);
+            });
           })
           .catch(resp => {
             alert("error");
@@ -325,8 +344,6 @@ export default {
         var combine_scanned = vm.current_lattice.filter(function(ele) {
           return ele.combine_scanned;
         });
-        console.log(combine_scanned.length);
-        console.log(vm.current_lattice.length);
         if (combine_scanned.length == vm.current_lattice.length) {
           vm.combined_weight = null;
           vm.show_weight_dialog = true;
@@ -351,7 +368,8 @@ export default {
             combine_scanned_tracking_ids
           )
           .then(resp => {
-            alert("1");
+            vm.logistics_order = resp.logistics_order;
+            printPDF(vm.logistics_order.label_url);
           })
           .catch(resp => {
             vm.$refs.Snackbar.showSnackbar("错误", resp.description, "error");

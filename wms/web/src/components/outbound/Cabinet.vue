@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-layout v-for="i in size_y" :key="i">
       <v-flex v-for="j in size_x" :key="j">
-        <lattice ref="Lattices" :lattice_info="get_cabinet_info((i - 1) * size_y + j)"></lattice>
+        <lattice ref="Lattices" :lattice_info="get_cabinet_info((i - 1) * size_x + j)"></lattice>
       </v-flex>
     </v-layout>
   </v-container>

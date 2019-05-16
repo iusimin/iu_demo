@@ -92,7 +92,7 @@ class CPSortPool(Document, MongoMixin):
 
     @classmethod
     def by_tracking_ids(cls, job_id, tracking_ids):
-        return cls.find_one({
+        return cls.find({
             "job_id": job_id,
             "tracking_id": {"$in": tracking_ids}
         })

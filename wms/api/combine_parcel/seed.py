@@ -16,8 +16,9 @@ class CPSeedPool(BaseApiResource):
         tracking_id = req.get_param("tracking_id", required=True)
         job_id = req.get_param("job_id", required=True)
 
-        parcels = SortJobUtil.get_combine_cabinet_from_first_tracking_id(job_id, tracking_id)
+        job, parcels = SortJobUtil.get_combine_cabinet_from_first_tracking_id(job_id, tracking_id)
 
         resp.media = {
+            "job": job.to_dict(),
             "parcels": parcels
         }

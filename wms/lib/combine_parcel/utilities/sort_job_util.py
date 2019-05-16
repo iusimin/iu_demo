@@ -89,7 +89,7 @@ class SortJobUtil(object):
 
     @classmethod
     def get_combine_cabinet_from_first_tracking_id(cls, job_id, tracking_id):
-        #job_accessor = SortJobAccessor(job_id)
+        job_accessor = SortJobAccessor(job_id)
         parcel = CPSortPool.by_tracking_id(job_id, tracking_id)
 
         if not parcel:
@@ -125,4 +125,4 @@ class SortJobUtil(object):
 
             res.append(parcels_in_lattice)
 
-        return res
+        return job_accessor.sort_job, res
