@@ -15,6 +15,7 @@ export default [
   {
     path: '/error/:code',
     name: 'error',
+    meta: { staticPage: true },
     component: Empty,
     children: [{
       path: '',

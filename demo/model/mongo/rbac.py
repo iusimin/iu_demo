@@ -67,11 +67,12 @@ class Role(Document, MongoMixin):
                     plist.append(p)
         return plist
     
-    def to_json_dict(self, fields=None):
+    def to_json_dict(self):
         ret = {
             'name': self.name,
             'description': self.description,
             'parents': [str(p) for p in self.parents],
+            'created_ts': self.id.generation_time.strftime('%Y-%m-%d %H:%M:%S'),
             'permissions': [
                 p.to_json_dict() for p in self.permissions
             ],
@@ -79,6 +80,4 @@ class Role(Document, MongoMixin):
                 p.to_json_dict() for p in self.get_permissions()
             ]
         }
-        if fields is not None:
-            ret = {k:v for k, v in ret.items() if k in fields}
         return ret

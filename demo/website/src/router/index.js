@@ -58,6 +58,10 @@ const router = new Router({
 
 // Add login guard
 router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.staticPage)) {
+    console.log('static page')
+    next()
+  }
   axios.get(
     '/api/login',
     {}
@@ -80,9 +84,8 @@ router.beforeEach((to, from, next) => {
           redirect: to.fullPath
         }
       })
-    } else {
-      next()
     }
+    next()
   }).catch(error => {
     next({
       path: '/error/500'

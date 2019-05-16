@@ -4,7 +4,7 @@ import yaml
 import json
 
 class JsonSchema(object):
-    def __init__(self, schema=None, target='content',
+    def __init__(self, schema, target='content',
             title='Request data failed validation'):
         if isinstance(schema, str):
             self.schema = yaml.safe_load(schema)
@@ -53,13 +53,22 @@ class UrlParamsSchema(JsonSchema):
         )
 
 class QuerySchema(JsonSchema):
+    '''
+    '''
     ALL_OPS = [ '$lt', '$gt', '$ne', '$lte', '$gte', '$exists']
     ALL_COMBINES = [ '$and', '$or' ]
     DEFAULT_MAX_LIMIT = 100
     
-    def __init__(self, schema=None, allowed_ops=ALL_OPS,
-            allowed_combines=ALL_COMBINES, max_limit=DEFAULT_MAX_LIMIT,
-            target='content', title='Request data failed validation'):
+    def __list_to_pattern(self, l):
+        if not l:
+            return '.*'
+        res = '|'.join(l)
+        return '(%s)' % res
+
+    def __init__(self, schema, fields=[],
+            allowed_ops=ALL_OPS, allowed_combines=ALL_COMBINES,
+            max_limit=DEFAULT_MAX_LIMIT, target='content',
+            title='Request data failed validation'):
         schema = yaml.safe_load(schema)
         tdef_dict = {}
         try:
@@ -106,6 +115,7 @@ class QuerySchema(JsonSchema):
                     'type': 'object',
                     'properties': item_props,
                     'additionalProperties': False,
+                    'required': schema.get('required', [])
                 }
             })
             # query_combines
@@ -130,10 +140,13 @@ class QuerySchema(JsonSchema):
                 }
             })
             # body
+            # Checking and applying fields
+            allowed_fields = [f['name'] for f in fields]
+            allowed_sort = [f['name'] for f in fields if f.get('sortable')]
             converted_schema = {}
             body_properties = {
                 'query': {
-                    'oneOf': [
+                    'anyOf': [
                         {'$ref': '#/definitions/query_items'},
                         {'$ref': '#/definitions/query_combines'},
                     ]
@@ -143,13 +156,33 @@ class QuerySchema(JsonSchema):
                     'minimum': 1,
                     'maximum': max_limit,
                 },
-                'offset': {
+                'skip': {
                     'type': 'integer',
                     'minimum': 0,
                 },
+                'sort': { # [(field, order)]
+                    'type': 'array',
+                    'items': {
+                        'type': 'array',
+                        'items': [
+                            {
+                                'type': 'string',
+                                'pattern': self.__list_to_pattern(allowed_sort)
+                            },
+                            {
+                                'type': 'integer',
+                                'minimum': -1,
+                                'maximum': 1,
+                            }
+                        ]
+                    }
+                },
                 'fields': {
                     'type': 'array',
-                    'items': {'type': 'string'},
+                    'items': {
+                        'type': 'string',
+                        'pattern': self.__list_to_pattern(allowed_fields)
+                    },
                 }
             }
             converted_schema.update({
@@ -165,4 +198,8 @@ class QuerySchema(JsonSchema):
             )
         self.schema = converted_schema
         self.target = target
-        self.title=title
+        self.title = title
+
+    def __call__(self, req, resp, resource, params):
+        req.context['q'] = req.media
+        super(QuerySchema, self).__call__(req, resp, resource, params)

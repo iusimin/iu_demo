@@ -1,8 +1,9 @@
 from demo.model.mongo.rbac import Role, Permission
 from cl.backend.api import BaseApiResource
-from cl.backend.hooks.validation import JsonSchema
+from cl.backend.hooks.validation import JsonSchema, QuerySchema
 from demo.hooks.auth import permission_required
-from cl.backend.hooks.transform import add_list_index
+from cl.backend.hooks.transform import add_list_index, created_ts_to_id, \
+    filter_fields
 from iu_mongo import errors as dberr
 import falcon
 import json
@@ -34,6 +35,25 @@ def extract_params_object(req, resp, resource, params):
     req.context['role'] = role
 
 class RoleCollectionApi(BaseApiResource):
+    @falcon.before(QuerySchema('''
+    type: object
+    properties: { }
+    ''', fields=[
+        {'name': 'name', 'sortable': True},
+        {'name': 'description', 'sortable': False},
+        {'name': 'parents', 'sortable': True},
+        {'name': 'created_ts', 'sortable': True},
+    ], allowed_ops=[], allowed_combines=[]))
+    @falcon.before(created_ts_to_id)
+    @falcon.before(permission_required)
+    @falcon.after(filter_fields)
+    def on_list(self, req, resp):
+        data = req.context['q']
+        fields = data.pop('fields', None) # TODO - fields not support now
+        query = data.pop('query')
+        roles = Role.find(query, **data)
+        resp.media = [r.to_json_dict() for r in roles]
+
     @falcon.before(permission_required)
     def on_get(self, req, resp):
         roles = Role.find({})
