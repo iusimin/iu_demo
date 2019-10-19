@@ -48,6 +48,7 @@ class Permission(EmbeddedDocument, MongoMixin):
 class Role(Document, MongoMixin):
     meta = {
         'indexes': [
+            {'keys': 'name:1', 'unique': True},
         ],
         'db_name': IU_DEMO_DB,
     }

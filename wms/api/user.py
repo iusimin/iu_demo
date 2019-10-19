@@ -27,7 +27,7 @@ class UserCollectionApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp):
         all_users = User.find({})
-        resp.media = [u.to_json_dict() for u in all_users]
+        resp.media = [u.to_dict() for u in all_users]
 
     @falcon.before(JsonSchema('''
     type: object
@@ -83,9 +83,9 @@ class UserApi(BaseApiResource):
     @falcon.before(permission_required)
     def on_get(self, req, resp, user_id):
         u = req.context['api_user']
-        ret = u.to_json_dict()
+        ret = u.to_dict()
         roles = u.get_roles()
-        ret['roles'] = [r.to_json_dict() for r in roles]
+        ret['roles'] = [r.to_dict() for r in roles]
         for r in ret['roles']:
             r.pop('permissions_all')
         resp.media = ret
@@ -115,7 +115,7 @@ class UserRoleCollectionApi(BaseApiResource):
     def on_get(self, req, resp, user_id):
         u = req.context['api_user']
         roles = u.get_roles()
-        ret = [r.to_json_dict() for r in roles]
+        ret = [r.to_dict() for r in roles]
         for r in ret:
             r.pop('permissions_all')
         resp.media = ret
@@ -196,7 +196,7 @@ class UserPermissionCollectionApi(BaseApiResource):
     def on_get(self, req, resp, user_id):
         user = req.context['api_user']
         resp.media = [
-            p.to_json_dict() for p in user.permissions
+            p.to_dict() for p in user.permissions
         ]
     
     @falcon.after(add_list_index)
@@ -237,7 +237,7 @@ class UserPermissionCollectionApi(BaseApiResource):
                 user.permissions.append(permission)
         user.save()
         resp.media = [
-            p.to_json_dict() for p in user.permissions
+            p.to_dict() for p in user.permissions
         ]
 
 class UserPermissionApi(BaseApiResource):
@@ -247,7 +247,7 @@ class UserPermissionApi(BaseApiResource):
     def on_get(self, req, resp, user_id, permission_id):
         user = req.context['api_user']
         resp.media = [
-            p.to_json_dict() for p in user.permissions
+            p.to_dict() for p in user.permissions
         ]
     
     @falcon.before(extract_params_object)

@@ -6,11 +6,12 @@ from datetime import datetime
 from iu_mongo.document import Document, EmbeddedDocument
 from iu_mongo.fields import *
 
+from cl.utils.mongo import MongoMixin
 from wms.model.mongo import IU_DEMO_DB
 from wms.model.mongo.rbac import Role
 
 
-class User(Document):
+class User(Document, MongoMixin):
     meta = {
         'indexes': [
             {'keys': 'username:1', 'unique': True},
@@ -24,8 +25,8 @@ class User(Document):
     password = StringField(required=True)
     email = StringField(required=True)
     phone_number = StringField()
+    role_ids = ListField(StringField(), default=[])
     permissions = ListField(EmbeddedDocumentField('Permission'),  default=[])
-    role_names = ListField(StringField(),  default=[])
 
     warehouse_id = StringField(required=True)
 
@@ -46,6 +47,12 @@ class User(Document):
         user.save()
         return user
 
+    @classmethod
+    def by_username(cls, username):
+        return User.find_one({
+            "username": username
+        })
+
     def get_permissions(self):
         plist = list(self.permissions)
         roles = self.get_roles()
@@ -57,22 +64,7 @@ class User(Document):
         return plist
     
     def get_roles(self):
-        roles_dict = {
-            r.name: r for r in Role.find({
-                'name': {'$in': self.role_names}
-            })
-        }
-        return [roles_dict[rn] for rn in self.role_names]
+        return Role.by_ids(self.role_ids)
 
     def to_dict(self):
-        return {
-            'id': str(self.id),
-            'username': str(self.username),
-            'email': str(self.email),
-            'phone_number': str(self.phone_number),
-            'role_names': [str(r) for r in self.role_names],
-            'permissions_all': [
-                p.to_dict() for p in self.get_permissions()
-            ],
-            'warehouse_id': self.warehouse_id
-        }
+        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')

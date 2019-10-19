@@ -7,15 +7,13 @@ from iu_mongo import errors as dberr
 from cl.backend.api import BaseApiResource
 from cl.backend.hooks.transform import add_list_index
 from cl.backend.hooks.validation import JsonSchema
-from demo.hooks.auth import permission_required
-from demo.model.mongo.rbac import Permission, Role
+from wms.hooks.auth import permission_required
+from wms.model.mongo.rbac import Permission, Role
 
 
 def extract_params_object(req, resp, resource, params):
-    if 'role_name' in params:
-        role = Role.find_one({
-            'name': params['role_name']
-        })
+    if 'role_id' in params:
+        role = Role.by_id(params['role_name'])
     else:
         return
     if 'permission_id' in params:
@@ -112,7 +110,7 @@ class RoleCollectionApi(BaseApiResource):
             raise falcon.HTTPBadRequest(
                 'Role name already exists.'
             )
-        ret_value = [r.to_json_dict() for r in roles]
+        ret_value = [r.to_dict() for r in roles]
         if len(ret_value) == 0:
             resp.media = ret_value[0]
         else:
@@ -122,9 +120,13 @@ class RoleCollectionApi(BaseApiResource):
 class RoleApi(BaseApiResource):
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_get(self, req, resp, role_name):
-        role = req.context['role']
-        resp.media = role.to_json_dict()
+    def on_get(self, req, resp, role_id):
+        print("----------------")
+        role = Role.by_id(role_id)
+        if role:
+            resp.media = role.to_dict()
+        else:
+            raise falcon.HTTPNotFound(description="Role不存在！")
 
     @falcon.before(extract_params_object)
     @falcon.before(JsonSchema('''
@@ -134,31 +136,31 @@ class RoleApi(BaseApiResource):
       description: { type: string }
     '''))
     @falcon.before(permission_required)
-    def on_patch(self, req, resp, role_name):
+    def on_patch(self, req, resp, role_id):
         params = req.media
         role = req.context['role']
         for k, v in params.items():
             setattr(role, k, v)
         role.save()
-        resp.media = role.to_json_dict()
+        resp.media = role.to_dict()
 
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_delete(self, req, resp, role_name):
+    def on_delete(self, req, resp, role_id):
         role = req.context['role']
         role.delete()
         resp.media = {
             'title': 'Success',
-            'id': role_name,
+            'id': role_id,
         }
 
 class RolePermissionCollectionApi(BaseApiResource):
     @falcon.after(add_list_index)
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_get(self, req, resp, role_name):
+    def on_get(self, req, resp, role_id):
         role = req.context['role']
-        resp.media = [p.to_json_dict() for p in role.permissions]
+        resp.media = [p.to_dict() for p in role.permissions]
 
     @falcon.after(add_list_index)
     @falcon.before(extract_params_object)
@@ -182,7 +184,7 @@ class RolePermissionCollectionApi(BaseApiResource):
       - $ref: "#/definitions/permission"
     '''))
     @falcon.before(permission_required)
-    def on_post(self, req, resp, role_name):
+    def on_post(self, req, resp, role_id):
         role = req.context['role']
         params = req.media
         if isinstance(params, dict):
@@ -202,7 +204,7 @@ class RolePermissionCollectionApi(BaseApiResource):
                 role.permissions.append(permission)
                 permission_resources.append(p)
         role.save()
-        resp.media = [p.to_json_dict() for p in role.permissions]
+        resp.media = [p.to_dict() for p in role.permissions]
         resp.status = falcon.HTTP_201
 
     @falcon.before(extract_params_object)
@@ -224,7 +226,7 @@ class RolePermissionCollectionApi(BaseApiResource):
       $ref: "#/definitions/permission"
     '''))
     @falcon.before(permission_required)
-    def on_put(self, req, resp, role_name):
+    def on_put(self, req, resp, role_id):
         role = req.context['role']
         params = req.media
         resp.media = []
@@ -245,15 +247,15 @@ class RolePermissionCollectionApi(BaseApiResource):
             permissions.append(permission)
         role.permissions = permissions
         role.save()
-        resp.media = [ p.to_json_dict() for p in role.permissions ]
+        resp.media = [ p.to_dict() for p in role.permissions ]
 
 class RolePermissionApi(BaseApiResource):
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_get(self, req, resp, role_name, permission_id):
+    def on_get(self, req, resp, role_id, permission_id):
         role = req.context['role']
         permission = req.context['permission']
-        resp.media = permission.to_json_dict()
+        resp.media = permission.to_dict()
     
     @falcon.before(extract_params_object)
     @falcon.before(JsonSchema('''
@@ -268,7 +270,7 @@ class RolePermissionApi(BaseApiResource):
     required: [allow, resource, actions]
     '''))
     @falcon.before(permission_required)
-    def on_put(self, req, resp, role_name, permission_id):
+    def on_put(self, req, resp, role_id, permission_id):
         role = req.context['role']
         params = req.media
         role.permissions[permission_id] = Permission(
@@ -280,31 +282,31 @@ class RolePermissionApi(BaseApiResource):
         )
         role.save()
         permission = role.permissions[permission_id]
-        resp.media = permission.to_json_dict()
+        resp.media = permission.to_dict()
 
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_delete(self, req, resp, role_name, permission_id):
+    def on_delete(self, req, resp, role_id, permission_id):
         role = req.context['role']
         role.permissions.pop(permission_id)
         role.save()
         resp.media = {
             'title': 'Success',
-            'role_name': role_name,
+            'role_name': role.name,
             'permission_id': permission_id,
         }
 
 class RoleParentCollectionApi(BaseApiResource):
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_get(self, req, resp, role_name):
+    def on_get(self, req, resp, role_id):
         role = req.context['role']
         parents = Role.find({
             'name': {
                 '$in': role.parents,
             }
         })
-        resp.media = [ p.to_json_dict() for p in parents ]
+        resp.media = [ p.to_dict() for p in parents ]
 
     @falcon.before(extract_params_object)
     @falcon.before(JsonSchema('''
@@ -321,7 +323,7 @@ class RoleParentCollectionApi(BaseApiResource):
       - $ref: "#/definitions/parent"
     '''))
     @falcon.before(permission_required)
-    def on_post(self, req, resp, role_name):
+    def on_post(self, req, resp, role_id):
         role = req.context['role']
         params = req.media
         if isinstance(params, str):
@@ -348,7 +350,7 @@ class RoleParentCollectionApi(BaseApiResource):
       $ref: "#/definitions/parent"
     '''))
     @falcon.before(permission_required)
-    def on_put(self, req, resp, role_name):
+    def on_put(self, req, resp, role_id):
         role = req.context['role']
         params = req.media
         role.parents = params
@@ -358,21 +360,21 @@ class RoleParentCollectionApi(BaseApiResource):
 class RoleParentApi(BaseApiResource):
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_get(self, req, resp, role_name, parent_name):
+    def on_get(self, req, resp, role_id, parent_name):
         role = req.context['role']
         parent = Role.find_one({
             'name': parent_name
         })
-        resp.media = parent.to_json_dict()
+        resp.media = parent.to_dict()
 
     @falcon.before(extract_params_object)
     @falcon.before(permission_required)
-    def on_delete(self, req, resp, role_name, parent_name):
+    def on_delete(self, req, resp, role_id, parent_name):
         role = req.context['role']
         role.parents.remove(parent_name)
         role.save()
         resp.media = {
             'title': 'Success',
-            'role_name': role_name,
+            'role_name': role.name,
             'parent_name': parent_name,
         }

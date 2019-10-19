@@ -1,6 +1,13 @@
 from wms.api import all as a
 
 API_ROUTER = [
+    ('/api/roles/', a.RoleCollectionApi),
+    ('/api/role/{role_id}/', a.RoleApi),
+    ('/api/role/{role_id}/permissions/', a.RolePermissionCollectionApi),
+    ('/api/role/{role_id}/permission/{permission_id:int}/', a.RolePermissionApi),
+    ('/api/role/{role_id}/parents/', a.RoleParentCollectionApi),
+    ('/api/role/{role_id}/parent/{parent_name}/', a.RoleParentApi),
+
     ('/api/users/', a.UserCollectionApi),
     ('/api/login/', a.UserLoginApi),
     ('/api/operator-warehouse', a.OperatorWarehouse),
