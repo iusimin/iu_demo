@@ -1,6 +1,6 @@
 <template>
   <div>
-    <core-filter />
+    
 
     <core-toolbar />
 

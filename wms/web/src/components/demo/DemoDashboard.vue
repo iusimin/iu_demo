@@ -105,7 +105,7 @@ export default {
     createParcels: function() {
       var vm = this;
       vm.api
-        .demoCreateInboundParcels(vm.parcel_count)
+        .demoCreateInboundParcels(parseFloat(vm.parcel_count))
         .then(resp => {
           vm.getActiveParcels();
           alert("Success");

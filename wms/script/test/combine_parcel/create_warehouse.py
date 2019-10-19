@@ -13,8 +13,8 @@ def _setup():
 
 def create_warehouse():
     Warehouse.create(
-        warehouse_id="CHINAPOST-SH001",
-        warehouse_name="CHINAPOST-DONGGUAN",
+        warehouse_id="SHYW",
+        warehouse_name="SHANGHAI-YANWEN01",
         cabinet_count=8,
         cabinet_width=8,
         cabinet_height=5,

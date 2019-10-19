@@ -1,39 +1,39 @@
 <template>
-  <v-container fluid grid-list-xl>
-    <v-layout wrap>
-      <snackbar ref="Snackbar"></snackbar>
-      <v-flex md12 lg12>
-        <active-sort-job v-model="active_job_id"></active-sort-job>
-      </v-flex>
-      <v-flex md12 lg12>
-        <v-form>
-          <v-container>
-            <v-layout row wrap>
-              <v-flex md12>
-                <v-text-field
-                  class="stop-propagation"
-                  v-model="parcel_scan_info.tracking_id"
-                  label="物流单号"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex md12>
-                <v-text-field
-                  class="stop-propagation"
-                  v-model="parcel_scan_info.weight"
-                  label="重量"
-                  required
-                ></v-text-field>
-              </v-flex>
-              <v-flex offset-md10 md2>
-                <v-btn color="success" type="button" @click="submitDirectParcel">打单</v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <div>
+    <active-sort-job v-model="active_job_id"></active-sort-job>
+    <v-container fluid grid-list-xl>
+      <v-layout wrap>
+        <snackbar ref="Snackbar"></snackbar>
+        <v-flex md12 lg12>
+          <v-form>
+            <v-container>
+              <v-layout row wrap>
+                <v-flex md12>
+                  <v-text-field
+                    class="stop-propagation"
+                    v-model="parcel_scan_info.tracking_id"
+                    label="物流单号"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <v-flex md12>
+                  <v-text-field
+                    class="stop-propagation"
+                    v-model="parcel_scan_info.weight"
+                    label="重量"
+                    required
+                  ></v-text-field>
+                </v-flex>
+                <v-flex offset-md10 md2>
+                  <v-btn color="success" type="button" @click="submitDirectParcel">打单</v-btn>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-form>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </div>
 </template>
 
 <script>

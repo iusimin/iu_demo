@@ -140,7 +140,7 @@ class CPSortAllocateGroupId(object):
         if number <= 0:
             raise ValueError("number")
 
-        digits = math.ceil(math.log(number, scale))
+        digits = math.ceil(math.log(number, scale)) or 1
         id_generator = CPSortGroupIdGenerator(scale, digits)
 
         seq_ids = []

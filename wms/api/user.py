@@ -54,14 +54,13 @@ class UserCollectionApi(BaseApiResource):
 
         e_password = password.encrypt_password(pwd)
         try:
-            u = User(
+            u = User.create_user(
                 username=username,
-                password=e_password,
+                password_hashed=e_password,
                 email=email,
                 phone_number=phone,
                 warehouse_id=warehouse_id
             )
-            u.save()
             resp.status = falcon.HTTP_201
             resp.media = {
                 'id': str(u.id),

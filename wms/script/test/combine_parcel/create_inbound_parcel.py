@@ -36,7 +36,7 @@ def create_inbound_parcels():
         InboundParcelUtil.create_parcel(
             tracking_id=tracking_id,
             combine_id=combine_id,
-            warehouse_id="CHINAPOST-SH001",
+            warehouse_id="SHYW",
             inbound_carrier=0,
             latest_ship_datetime=datetime.now() + timedelta(days=random.randint(3,5))
         )

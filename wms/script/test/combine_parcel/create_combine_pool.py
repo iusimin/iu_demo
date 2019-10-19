@@ -33,12 +33,12 @@ def _setup():
 
 
 def create_combine_pool():
-    warehouse_id = "CHINAPOST-SH001"
+    warehouse_id = "SHYW"
     warehouse = Warehouse.by_warehouse_id(warehouse_id)
     job_prefix = datetime.utcnow().strftime("%Y%m%d")
     job_id = SequenceIdGenerator.get_sequence_id(job_prefix)
     job = SortJobAccessor.create(
-        job_id, CPSortJob.Type.AllocateCabinetLattice, "CHINAPOST-SH001")
+        job_id, CPSortJob.Type.AllocateCabinetLattice, "SHYW")
 
     inbound_parcels = CPInboundParcel.find({
         "created_datetime": {

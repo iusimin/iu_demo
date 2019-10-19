@@ -258,6 +258,7 @@ export default {
     },
     reset_cabinet: function() {
       var vm = this;
+      vm.target_parcels = [];
       vm.init_cabinet();
       vm.current_tracking_id = null;
     },

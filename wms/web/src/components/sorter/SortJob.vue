@@ -151,10 +151,10 @@ export default {
         .cancelSortJob(vm.job_to_cancel)
         .then(resp => {
           vm.getSortJobs();
-          alert("1");
+          alert("取消成功");
         })
         .catch(resp => {
-          alert("0");
+          alert("取消失败"+resp.description);
         });
     },
     isJobCancelable: function(status) {

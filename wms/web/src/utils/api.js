@@ -79,7 +79,7 @@ export default {
         });
     },
     inboundParcel: function (tracking_id, parcel) {
-        return this.call("put", "inbound-parcel/" + tracking_id + ":inbound", null, parcel);
+        return this.call("post", "inbound-parcel/" + tracking_id + ":inbound", null, parcel);
     },
     getInboundParcelDetail: function (tracking_id) {
         return this.call("get", "inbound-parcel/" + tracking_id, null, null);

@@ -1,31 +1,31 @@
 <template>
-  <v-container fluid grid-list-xl>
-    <v-layout wrap>
-      <v-flex md12 lg12>
-        <active-sort-job v-model="active_job_id"></active-sort-job>
-      </v-flex>
-      <v-flex md12 lg12>
-        <v-stepper v-model="round_id" vertical>
-          <v-stepper-step :complete="round_id > 1" step="1">第一次分拣</v-stepper-step>
-          <v-stepper-content step="1">
-            <sort-step v-model="parcel_infos[1]" :round_id="1" :job_id="active_job_id"></sort-step>
-            <v-btn color="primary" @click="round_id = 2">继续下一轮分拣</v-btn>
-          </v-stepper-content>
+  <div>
+    <active-sort-job v-model="active_job_id"></active-sort-job>
+    <v-container fluid grid-list-xl>
+      <v-layout wrap>
+        <v-flex md12 lg12>
+          <v-stepper v-model="round_id" vertical>
+            <v-stepper-step :complete="round_id > 1" step="1">第一次分拣</v-stepper-step>
+            <v-stepper-content step="1">
+              <sort-step v-model="parcel_infos[1]" :round_id="1" :job_id="active_job_id"></sort-step>
+              <v-btn color="primary" @click="round_id = 2">继续下一轮分拣</v-btn>
+            </v-stepper-content>
 
-          <v-stepper-step :complete="round_id > 2" step="2">第二次分拣</v-stepper-step>
-          <v-stepper-content step="2">
-            <sort-step v-model="parcel_infos[2]" :round_id="2" :job_id="active_job_id"></sort-step>
-            <v-btn color="primary" @click="round_id = 3">继续下一轮分拣</v-btn>
-          </v-stepper-content>
+            <v-stepper-step :complete="round_id > 2" step="2">第二次分拣</v-stepper-step>
+            <v-stepper-content step="2">
+              <sort-step v-model="parcel_infos[2]" :round_id="2" :job_id="active_job_id"></sort-step>
+              <v-btn color="primary" @click="round_id = 3">继续下一轮分拣</v-btn>
+            </v-stepper-content>
 
-          <v-stepper-step :complete="round_id > 3" step="3">第三次分拣</v-stepper-step>
-          <v-stepper-content step="3">
-            <sort-step v-model="parcel_infos[3]" :round_id="3" :job_id="active_job_id"></sort-step>
-          </v-stepper-content>
-        </v-stepper>
-      </v-flex>
-    </v-layout>
-  </v-container>
+            <v-stepper-step :complete="round_id > 3" step="3">第三次分拣</v-stepper-step>
+            <v-stepper-content step="3">
+              <sort-step v-model="parcel_infos[3]" :round_id="3" :job_id="active_job_id"></sort-step>
+            </v-stepper-content>
+          </v-stepper>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </div>
 </template>
 
 <script>

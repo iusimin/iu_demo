@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 2px;">
+  <div>
     <v-card ref="LatticeCard" v-bind:style="card_style">
       <v-card-text>
         <v-layout align-center justify-center column>
@@ -79,7 +79,10 @@ export default {
     reset_color: function() {
       var vm = this;
       vm.card_style["background-color"] = "#B39DDB";
-      if (vm.lattice_info && vm.seeded_count == vm.lattice_info.total_count) {
+      if (!vm.lattice_info || vm.lattice_info.total_count == 0) {
+        vm.card_style["background-color"] = "#546E7A";
+      }
+      else if (vm.lattice_info && vm.seeded_count == vm.lattice_info.total_count) {
         vm.card_style["background-color"] = "#43A047";
       }
     },

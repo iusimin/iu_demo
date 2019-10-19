@@ -1,21 +1,30 @@
 <template>
   <v-container fluid grid-list-xl>
-    <v-layout wrap>
-      <v-flex md12 lg12 v-if="has_active_job">
-        <v-alert v-model="has_active_job" color="success" icon="mdi-anchor" outline>
-          <span class="font-weight-black title">当前分拣任务：{{ active_job_id }}</span>
-        </v-alert>
-      </v-flex>
+    <div style="margin: -40px 0px;">
+      <v-layout wrap>
+        <v-flex md12 lg12 v-if="has_active_job">
+          <v-alert
+            type="success"
+            v-model="has_active_job"
+            color="success"
+            icon="mdi-anchor"
+          >
+            <span class="font-weight-black title">当前分拣任务：{{ active_job_id }}</span>
+          </v-alert>
+        </v-flex>
 
-      <v-flex md12 lg12 v-if="no_active_job">
-        <v-alert
-          v-model="no_active_job"
-          color="warning"
-          icon="priority_high"
-          outline
-        >{{ no_job_message }}</v-alert>
-      </v-flex>
-    </v-layout>
+        <v-flex md12 lg12 v-if="no_active_job">
+          <v-alert
+            type="warning"
+            v-model="no_active_job"
+            color="warning"
+            icon="mdi-anchor"
+          >
+            <span class="font-weight-black title">{{ no_job_message }}</span>
+          </v-alert>
+        </v-flex>
+      </v-layout>
+    </div>
   </v-container>
 </template>
 

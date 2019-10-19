@@ -97,7 +97,7 @@ class ActiveSortJob(BaseApiResource):
                 "job": job.to_dict()
             }
         else:
-            raise falcon.HTTPNotFound("没有待处理任务！")
+            raise falcon.HTTPNotFound(description="没有待处理的分拣任务！")
 
 
 class CPSortPoolCollectionResource(CollectionResource):
