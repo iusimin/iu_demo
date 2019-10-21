@@ -36,14 +36,12 @@ class Permission(EmbeddedDocument, MongoMixin):
             return default_allow
     
     def to_dict(self):
-        return {
-            'allow': self.allow,
-            'resource': self.resource,
-            'actions': [
+        obj = self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+        obj["actions"] = [
                 Permission.Action.num_to_name()[a]
                     for a in self.actions
             ]
-        }
+        return obj
 
 class Role(Document, MongoMixin):
     meta = {

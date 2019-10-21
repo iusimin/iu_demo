@@ -15,10 +15,12 @@ class UserLoginApi(BaseApiResource):
     @falcon.before(login_required)
     def on_get(self, req, resp):
         session = req.context['session']
+        user = session.user
         session_dict = session.snapshot
         resp.media = {
             'user_id': session_dict.get('user_id').decode('utf-8'),
             'is_guest': session.is_guest(),
+            'user': user.to_dict(["username", "phone_number", "warehouse_id", "permissions"])
         }
 
     def on_post(self, req, resp):

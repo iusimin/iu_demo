@@ -13,7 +13,7 @@ from wms.model.mongo.rbac import Permission, Role
 
 def extract_params_object(req, resp, resource, params):
     if 'role_id' in params:
-        role = Role.by_id(params['role_name'])
+        role = Role.by_id(params['role_id'])
     else:
         return
     if 'permission_id' in params:
@@ -31,7 +31,7 @@ def extract_params_object(req, resp, resource, params):
     if not role:
         raise falcon.HTTPNotFound(
                 title='Role not found',
-                description='role_name=%s' % params['role_name'])
+                description='role_id=%s' % params['role_id'])
     req.context['role'] = role
 
 class RoleCollectionApi(BaseApiResource):
@@ -203,7 +203,7 @@ class RolePermissionCollectionApi(BaseApiResource):
                 )
                 role.permissions.append(permission)
                 permission_resources.append(p)
-        role.save()
+        role.set(permissions=role.permissions)
         resp.media = [p.to_dict() for p in role.permissions]
         resp.status = falcon.HTTP_201
 

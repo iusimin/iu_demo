@@ -66,5 +66,10 @@ class User(Document, MongoMixin):
     def get_roles(self):
         return Role.by_ids(self.role_ids)
 
-    def to_dict(self):
-        return self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+    def to_dict(self, keys=None):
+        obj = self.to_dict_by_keys(keys)
+        obj["permissions"] = [permission.to_dict() for permission in self.get_permissions()]
+        if keys is not None:
+            keys = set(keys)
+            obj = {k: v for k, v in obj.items() if k in keys}
+        return obj

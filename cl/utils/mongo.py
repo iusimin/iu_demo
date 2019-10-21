@@ -40,3 +40,10 @@ class MongoMixin(object):
                 value = getattr(self, fname)
                 _dict[fname] = transform_field(value)
         return _dict
+
+    def to_dict_by_keys(self, keys=None):
+        obj = self.to_dict_default(date_format='%Y-%m-%d %H:%M:%S')
+        if keys is not None:
+            keys = set(keys)
+            obj = {k: v for k, v in obj.items() if k in keys}
+        return obj

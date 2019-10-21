@@ -1,7 +1,7 @@
 # 1. ssh ecs instance
 1.1 chmod 400 iu_key.pem
 
-1.2 ssh -i iu_key.pem root@13.88.10.127
+1.2 ssh -i iu_key.pem root@168.62.6.74
 
 # 2. create your own user
 2.1 adduser iuqian
@@ -17,7 +17,7 @@
 2.6 create ssh config:
 
     Host iu_demo
-        HostName 13.88.10.127
+        HostName 168.62.6.74
         User iuqian
         IdentityFile ~/.ssh/id_rsa_iu
         
