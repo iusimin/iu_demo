@@ -17,6 +17,7 @@ import WarehouseSetting from "@/components/admin/WarehouseSetting.vue";
 import DirectShip from "@/components/operation/DirectShip.vue";
 import OutboundScan from "@/components/operation/OutboundScan.vue";
 import SortJob from "@/components/sorter/SortJob.vue";
+import CheckReadyJob from "@/components/sorter/CheckReadyJob.vue";
 
 import DemoDashboard from "@/components/demo/DemoDashboard.vue";
 
@@ -108,6 +109,18 @@ export default [{
     children: [{
       path: 'outboundscan',
       component: OutboundScan
+    }],
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/management',
+    name: '出库判定任务',
+    component: UserHome,
+    children: [{
+      path: 'check-job',
+      component: CheckReadyJob
     }],
     meta: {
       requiresAuth: true

@@ -20,8 +20,15 @@ const CabinetOrientation = [{
 
 const CabinetSize = [3,4,5,6,7,8,9,10,11,12]
 
+const SortJobType = {
+    CheckInboundParcelReadyToShip: 0,
+    AllocateCabinetLattice: 1,
+    CheckInboundParcelReadyToShipAndAllocateCabinetLattice: 2
+}
+
 export {
     WarehouseWeightUnits,
     CabinetOrientation,
-    CabinetSize
+    CabinetSize,
+    SortJobType
 }

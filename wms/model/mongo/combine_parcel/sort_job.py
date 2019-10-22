@@ -24,6 +24,7 @@ class CPSortJob(Document, MongoMixin):
     class Type(PyEnumMixin):
         CheckInboundParcelReadyToShip = 0
         AllocateCabinetLattice = 1
+        CheckInboundParcelReadyToShipAndAllocateCabinetLattice = 2
 
     class Status(PyEnumMixin):
         Pending = 0

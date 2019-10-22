@@ -51,6 +51,7 @@ class CPInboundParcel(Document, MongoMixin):
             {'keys': 'tracking_id:1', 'unique': True},
             {'keys': 'warehouse_id:1,status:1,ready_to_ship:1,combine_id:1'},
             {'keys': 'outbound_logistics_order_id:1'},
+            {'keys': 'combine_id:1'},
             {'keys': 'timeline.created:1'},
             {'keys': 'timeline.inbound:1'},
             {'keys': 'created_datetime:1'}
@@ -64,7 +65,7 @@ class CPInboundParcel(Document, MongoMixin):
     combine_id = StringField()
     warehouse_id = StringField(required=True)
     inbound_carrier = IntField()
-    latest_ship_datetime = DateTimeField(required=True)
+    latest_ship_datetime = DateTimeField(required=True) # UTC
     status = IntField(required=True)
     parcel_type = IntField()
 

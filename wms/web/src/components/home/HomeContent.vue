@@ -69,6 +69,28 @@
           />
         </v-flex>
         <v-flex md12 lg6>
+          <material-card color="green" title="出库判定任务" text="判断包裹是否可以出库">
+            <v-data-table
+              :headers="check_sort_job_info.headers"
+              :items="check_sort_job_info.jobs"
+              :loading="check_sort_job_info.loading"
+              hide-actions
+              :pagination.sync="check_sort_job_info.pagination"
+              :total-items="check_sort_job_info.total_count"
+            >
+              <template slot="headerCell" slot-scope="{ header }">
+                <span class="font-weight-light text-warning text--darken-3" v-text="header.text"/>
+              </template>
+              <template slot="items" slot-scope="{ index, item }">
+                <td>{{ index + 1 }}</td>
+                <td>{{ item.job_id }}</td>
+                <td class="text-xs-right">{{ item.status_text }}</td>
+                <td class="text-xs-right">{{ item.created_datetime }}</td>
+              </template>
+            </v-data-table>
+          </material-card>
+        </v-flex>
+        <v-flex md12 lg6>
           <material-card color="orange" title="分拣任务" text="分拣任务列表">
             <v-data-table
               :headers="sort_job_info.headers"
@@ -85,7 +107,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ item.job_id }}</td>
                 <td class="text-xs-right">{{ item.status_text }}</td>
-                <td class="text-xs-right">{{ item.job_finish_datetime }}</td>
+                <td class="text-xs-right">{{ item.created_datetime }}</td>
                 <td class="text-xs-right">{{ item.parcel_count }}</td>
               </template>
             </v-data-table>
@@ -97,6 +119,9 @@
 </template>
 
 <script>
+import {
+  SortJobType
+} from "@/constants/constants.js";
 export default {
   name: "HomeContent",
   data: () => ({
@@ -115,10 +140,10 @@ export default {
         },
         { text: "状态", align: "right", sortable: false, value: "status_text" },
         {
-          text: "时间",
+          text: "创建时间",
           align: "right",
           sortable: true,
-          value: "job_finish_datetime"
+          value: "created_datetime"
         },
         {
           text: "包裹数量",
@@ -130,10 +155,39 @@ export default {
       jobs: [],
       loading: true,
       pagination: {
-        sortBy: "job_finish_datetime",
+        sortBy: "created_datetime",
         descending: true
       },
-      total_count: 10
+      total_count: 5
+    },
+    check_sort_job_info: {
+      headers: [
+        {
+          text: "序号",
+          align: "left",
+          sortable: false
+        },
+        {
+          text: "任务ID",
+          align: "left",
+          sortable: false,
+          value: "job_id"
+        },
+        { text: "状态", align: "right", sortable: false, value: "status_text" },
+        {
+          text: "创建时间",
+          align: "right",
+          sortable: true,
+          value: "created_datetime"
+        }
+      ],
+      jobs: [],
+      loading: true,
+      pagination: {
+        sortBy: "created_datetime",
+        descending: true
+      },
+      total_count: 5
     }
   }),
   props: [],
@@ -141,19 +195,31 @@ export default {
   computed: {},
   mounted: function() {
     var vm = this;
-    vm.getSortJobs();
+    //vm.getSortJobs();
   },
   methods: {
     getSortJobs: function() {
       var vm = this;
       vm.api
-        .getSortJobs(vm.sort_job_info.pagination)
+        .getSortJobs(SortJobType.AllocateCabinetLattice, vm.sort_job_info.pagination)
         .then(resp => {
           vm.sort_job_info.jobs = resp.data;
           vm.sort_job_info.total_count = resp.total_count;
         })
         .catch(resp => {
-          alert("0");
+          alert("错误");
+        });
+    },
+    getCheckJobs: function() {
+      var vm = this;
+      vm.api
+        .getSortJobs(SortJobType.CheckInboundParcelReadyToShip, vm.sort_job_info.pagination)
+        .then(resp => {
+          vm.check_sort_job_info.jobs = resp.data;
+          vm.check_sort_job_info.total_count = resp.total_count;
+        })
+        .catch(resp => {
+          alert("错误");
         });
     }
   },
@@ -162,6 +228,13 @@ export default {
       handler: function(newVal, oldVal) {
         var vm = this;
         vm.getSortJobs();
+      },
+      deep: true
+    },
+    "check_sort_job_info.pagination": {
+      handler: function(newVal, oldVal) {
+        var vm = this;
+        vm.getCheckJobs();
       },
       deep: true
     }

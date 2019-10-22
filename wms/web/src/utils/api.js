@@ -105,11 +105,14 @@ export default {
             null
         );
     },
-    getSortJobs: function (pagination) {
+    getSortJobs: function (job_type, pagination) {
         return this.call(
             "post", // post as get
-            "sort-jobs",
+            "sort-jobs", 
             null, {
+                "query": {
+                    "job_type": job_type
+                },
                 pagination: pagination
             }
         );
@@ -148,7 +151,7 @@ export default {
     submitDirectShip: function (tracking_id, parcel) {
         return this.call("put", "inbound-parcel/" + tracking_id + ":directship", null, parcel);
     },
-    getCombinedLogisticsOrder: function(job_id, weight, tracking_ids) {
+    getCombinedLogisticsOrder: function (job_id, weight, tracking_ids) {
         return this.call("post", "inbound-parcels:combine", null, {
             job_id: job_id,
             weight: weight,
@@ -176,7 +179,7 @@ export default {
             pagination: pagination
         });
     },
-    demoRunSortJob: function(job_id) {
+    demoRunSortJob: function (job_id) {
         return this.call("post", "demo:run_sort_job", null, {
             job_id: job_id
         });

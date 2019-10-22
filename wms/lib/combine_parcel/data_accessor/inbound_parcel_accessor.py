@@ -46,14 +46,33 @@ class CPInboundParcelAccessor(AccessorBase):
         )
 
     @classmethod
-    def get_parcels_tobe_combined(cls, warehouse_id):
+    def get_inbound_parcels(cls, warehouse_id):
         return CPInboundParcel.find_iter({
             "warehouse_id": warehouse_id,
             "status": {
-                "$in": [CPInboundParcel.Status.Pending, CPInboundParcel.Status.Inbound]
+                "$in": [CPInboundParcel.Status.Inbound]
             },
             "ready_to_ship": False
         })
+
+    @classmethod
+    def bulk_set_ready_to_ship(cls, tracking_ids):
+        with CPInboundParcel.bulk() as bulk_context:
+            utc_now = datetime.utcnow()
+            for tracking_id in tracking_ids:
+                CPInboundParcel.bulk_update(
+                    bulk_context,
+                    {
+                        "tracking_id": tracking_id
+                    },
+                    {
+                        "$set": {
+                            "ready_to_ship": True,
+                            "updated_datetime": utc_now
+                        }
+                    },
+                    multi=False
+                )
 
     @classmethod
     def by_tracking_ids(cls, tracking_ids):

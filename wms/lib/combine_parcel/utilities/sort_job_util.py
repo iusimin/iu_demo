@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+from datetime import datetime
 from itertools import groupby
 
 from bson import ObjectId
@@ -11,6 +12,7 @@ from wms.lib.combine_parcel.data_accessor.sort_job_accessor import \
 from wms.model.mongo.combine_parcel.combine_pool import (CPSortAllocateGroupId,
                                                          CPSortPool)
 from wms.model.mongo.combine_parcel.inbound_parcel import CPInboundParcel
+from wms.model.mongo.combine_parcel.sort_job import CPSortJob
 from wms.model.mongo.warehouse import Warehouse
 
 
@@ -19,10 +21,61 @@ class SortJobUtil(object):
     @classmethod
     def check_inbound_parcel_ready_to_ship(cls, job_id):
         job_accessor = SortJobAccessor(job_id)
+        job_accessor.check_job_type(CPSortJob.Type.CheckInboundParcelReadyToShip)
+        job_accessor.start_calculation()
+        job_accessor.flush()
+
+        job = job_accessor.sort_job
+
+        try:
+            inbound_parcels = CPInboundParcel.find_iter({
+                "warehouse_id": job.warehouse_id,
+                "status": CPInboundParcel.Status.Inbound,
+                "ready_to_ship": False
+            })
+
+            parcel_groups = defaultdict(list)
+            for parcel in inbound_parcels:
+                parcel_groups[parcel.combine_id].append(parcel)
+
+            combine_ids = parcel_groups.keys()
+            if combine_ids:
+                utc_now = datetime.utcnow()
+                all_parcels = CPInboundParcel.find_iter({
+                    "combine_id": {
+                        "$in": combine_ids
+                    }
+                })
+                all_parcel_groups = defaultdict(list)
+                for parcel in all_parcels:
+                    all_parcel_groups[parcel.combine_id].append(parcel)
+
+                ready_to_ship_parcels = defaultdict(list)
+                for combine_id, parcels in parcel_groups.items():
+                    all_combine_id_parcels = all_parcel_groups[combine_id]
+                    if len([parcel for parcel in all_combine_id_parcels if not parcel.ready_to_ship]) == len(parcels):
+                        ready_to_ship_parcels[combine_id] = parcels
+                    else:
+                        for parcel in parcels:
+                            if parcel.latest_ship_datetime < utc_now:
+                                ready_to_ship_parcels[combine_id].append(parcel)
+
+                if ready_to_ship_parcels:
+                    ready_to_ship_tracking_ids = []
+                    for parcels in ready_to_ship_parcels.values():
+                        for parcel in parcels:
+                            ready_to_ship_tracking_ids.append(parcel.tracking_id)
+                    if ready_to_ship_tracking_ids:
+                        CPInboundParcelAccessor.bulk_set_ready_to_ship(ready_to_ship_tracking_ids)
+        except Exception as ex:
+            job_accessor.fail(str(ex))
+        finally:
+            job_accessor.flush()
 
     @classmethod
     def allocate_cabinet_for_parcels(cls, job_id):
         job_accessor = SortJobAccessor(job_id)
+        job_accessor.check_job_type(CPSortJob.Type.AllocateCabinetLattice)
         job_accessor.start_calculation()
         job_accessor.flush()
 
@@ -30,18 +83,17 @@ class SortJobUtil(object):
 
         try:
             warehouse = Warehouse.by_warehouse_id(job.warehouse_id)
-            inbound_parcels = CPInboundParcel.find({
+            inbound_parcels = CPInboundParcel.find_iter({
                 "warehouse_id": job.warehouse_id,
                 "status": CPInboundParcel.Status.Inbound,
                 "ready_to_ship": True
             })
 
-            combine_ids = list(
-                set(parcel.combine_id for parcel in inbound_parcels))
             parcel_groups = defaultdict(list)
             for parcel in inbound_parcels:
                 parcel_groups[parcel.combine_id].append(parcel)
 
+            combine_ids = parcel_groups.keys()
             if combine_ids:
                 group_ids = CPSortAllocateGroupId.allocate(
                     len(combine_ids), warehouse.sort_batch_size)
@@ -69,10 +121,6 @@ class SortJobUtil(object):
             job_accessor.fail(str(ex))
         finally:
             job_accessor.flush()
-
-    @classmethod
-    def get_latest_complete_job_id(cls):
-        return SortJobAccessor.get_latest_complete_job_id()
 
     @classmethod
     def get_parcel_sort_info(cls, job_id, tracking_id, round_id):

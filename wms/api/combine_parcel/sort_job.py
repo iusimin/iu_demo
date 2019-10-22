@@ -39,7 +39,10 @@ class SortJob(BaseApiResource):
             resp.media = {
                 "job_id": job_id
             }
-            CPSortJobTasks.run_job.delay(job_id)
+            if job_type == CPSortJob.Type.AllocateCabinetLattice:
+                CPSortJobTasks.run_allocate_cabinet_job.delay(job_id)
+            elif job_type == CPSortJob.Type.CheckInboundParcelReadyToShip:
+                CPSortJobTasks.run_check_ready_to_ship_job.delay(job_id)
         else:
             raise falcon.HTTPBadRequest(description="创建失败，有任务未结束，请先取消其他未结束的任务.")
 
@@ -133,15 +136,18 @@ class CPSortJobCollectionResource(CollectionResource):
 
     def get_field_mapping(self):
         return {
-            "job_finish_datetime": "job_finish_datetime"
+            "created_datetime": "created_datetime"
         }
 
     def get_query(self):
-        return {}
+        job_type = self.query_dict.get("job_type")
+        return {
+            "job_type": job_type
+        }
     
     def transform_date(self, data):
-        job_ids = [item.job_id for item in data]
-        parcel_count = SortJobAccessor.get_job_parcel_count(job_ids)
+        job_ids = [item.job_id for item in data if item.job_type == CPSortJob.Type.AllocateCabinetLattice]
+        parcel_count = SortJobAccessor.get_allocation_job_parcel_count(job_ids)
         return [self._build_item(item, parcel_count) for item in data]
 
     def _build_item(self, item, parcel_count):

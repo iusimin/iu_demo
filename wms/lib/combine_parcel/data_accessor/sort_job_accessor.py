@@ -46,14 +46,7 @@ class SortJobAccessor(AccessorBase):
         return job
 
     @classmethod
-    def get_latest_complete_job_id(cls):
-        return CPSortJob.find_one(
-            {},
-            sort=[("job_finish_datetime", -1), ("_id", -1)]
-        )
-
-    @classmethod
-    def get_job_parcel_count(cls, job_ids):
+    def get_allocation_job_parcel_count(cls, job_ids):
         #TODO antony: use aggregation
         parcel_count = defaultdict(int)
         for parcel in CPSortPool.find_iter({
@@ -67,6 +60,10 @@ class SortJobAccessor(AccessorBase):
             parcel_count[parcel.job_id] += 1
 
         return parcel_count
+
+    def check_job_type(self, job_type):
+        if self.sort_job.job_type != job_type:
+            raise Exception("Invalid job type.")
 
     def check_eligible_to_run(self):
         return self.sort_job.status < CPSortJob.Status.CalculationStarted

@@ -19,7 +19,7 @@ def run():
         "status": CPSortJob.Status.Pending
     })
     for job in jobs:
-        CPSortJobTasks.run_job(job.job_id)
+        CPSortJobTasks.run_allocate_cabinet_job(job.job_id)
 
 
 if __name__ == "__main__":

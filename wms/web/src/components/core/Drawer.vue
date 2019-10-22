@@ -122,6 +122,11 @@ export default {
         text: '出库扫描'
       },
       {
+        to: '/management/check-job',
+        icon: 'mdi-eye',
+        text: '出库判定任务'
+      },
+      {
         to: '/management/sort-job',
         icon: 'mdi-alpha',
         text: '分拣任务'
