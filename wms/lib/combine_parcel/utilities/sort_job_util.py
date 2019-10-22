@@ -38,7 +38,7 @@ class SortJobUtil(object):
             for parcel in inbound_parcels:
                 parcel_groups[parcel.combine_id].append(parcel)
 
-            combine_ids = parcel_groups.keys()
+            combine_ids = list(parcel_groups.keys())
             if combine_ids:
                 utc_now = datetime.utcnow()
                 all_parcels = CPInboundParcel.find_iter({
@@ -67,6 +67,8 @@ class SortJobUtil(object):
                             ready_to_ship_tracking_ids.append(parcel.tracking_id)
                     if ready_to_ship_tracking_ids:
                         CPInboundParcelAccessor.bulk_set_ready_to_ship(ready_to_ship_tracking_ids)
+
+            job_accessor.success()
         except Exception as ex:
             job_accessor.fail(str(ex))
         finally:

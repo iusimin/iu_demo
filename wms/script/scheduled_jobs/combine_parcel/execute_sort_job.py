@@ -19,7 +19,10 @@ def run():
         "status": CPSortJob.Status.Pending
     })
     for job in jobs:
-        CPSortJobTasks.run_allocate_cabinet_job(job.job_id)
+        if job.job_type == CPSortJob.Type.AllocateCabinetLattice:
+            CPSortJobTasks.run_allocate_cabinet_job(job.job_id)
+        elif job.job_type == CPSortJob.Type.CheckInboundParcelReadyToShip:
+            CPSortJobTasks.run_check_ready_to_ship_job(job.job_id)
 
 
 if __name__ == "__main__":
